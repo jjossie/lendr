@@ -1,21 +1,24 @@
-import {StatusBar} from 'expo-status-bar';
-import {Button, ScrollView, StyleSheet, Text, View} from 'react-native';
-import {useState} from "react";
-import Product from "./src/components/Product";
 import {NavigationContainer} from "@react-navigation/native";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import Demo from "./src/components/screens/Demo";
 import Details from "./src/components/screens/Details";
+import ToolDetail from "./src/components/screens/ToolDetail";
+import {CustomNativeBaseProvider} from "./src/components/CustomNativeBaseProvider";
+
 
 const Stack = createNativeStackNavigator();
 
+
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Detail">
-        <Stack.Screen name="Detail" component={Details}/>
-        <Stack.Screen name="Home" component={Demo}/>
-      </Stack.Navigator>
-    </NavigationContainer>
+    <CustomNativeBaseProvider>
+      <NavigationContainer onLayout>
+        <Stack.Navigator initialRouteName="ToolDetail">
+          <Stack.Screen name="Detail" component={Details}/>
+          <Stack.Screen name="Home" component={Demo}/>
+          <Stack.Screen name="ToolDetail" component={ToolDetail}/>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </CustomNativeBaseProvider>
   );
 }
