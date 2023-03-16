@@ -9,7 +9,7 @@ export interface ITool {
   },
   rate: {
     price: number;
-    timeUnit: "hour" | "day" | "week";
+    timeUnit: TimeUnit
   },
   preferences: {
     delivery: boolean;
@@ -17,3 +17,5 @@ export interface ITool {
     useOnSite: boolean;
   }
 }
+
+export type TimeUnit = "hour" | "day" | "week";

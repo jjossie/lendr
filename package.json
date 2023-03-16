@@ -15,7 +15,7 @@
     "@react-navigation/native-stack": "^6.9.12",
     "@types/react-native": "^0.70.11",
     "expo": "~47.0.12",
-    "expo-splash-screen": "^0.18.1",
+    "expo-splash-screen": "~0.17.5",
     "expo-status-bar": "~1.4.2",
     "firebase": "^9.17.2",
     "native-base": "^3.4.28",
