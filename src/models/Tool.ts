@@ -17,6 +17,7 @@ export interface ITool {
     localPickup: boolean;
     useOnSite: boolean;
   }
+  holder: string
 }
 
 export interface IToolForm {

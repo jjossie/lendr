@@ -6,6 +6,7 @@ import ToolDetail from "./src/components/screens/ToolDetail";
 import {CustomNativeBaseProvider} from "./src/components/CustomNativeBaseProvider";
 import EditTool from "./src/components/screens/EditTool";
 import {LogBox} from "react-native";
+import LenderInventory from "./src/components/screens/LenderInventory";
 
 
 const Stack = createNativeStackNavigator();
@@ -20,9 +21,10 @@ export default function App() {
   return (
     <CustomNativeBaseProvider>
       <NavigationContainer onLayout>
-        <Stack.Navigator initialRouteName="EditTool">
+        <Stack.Navigator initialRouteName="LenderInventory">
           <Stack.Screen name="Detail"  component={Details}/>
           <Stack.Screen name="Home" component={Demo}/>
+          <Stack.Screen name="LenderInventory" component={LenderInventory}/>
           <Stack.Screen name="ToolDetail" component={ToolDetail}/>
           <Stack.Screen name="EditTool" component={EditTool}/>
         </Stack.Navigator>

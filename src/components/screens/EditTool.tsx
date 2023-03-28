@@ -14,22 +14,19 @@ import {
   TextArea,
   theme,
 } from "native-base";
-import {ExchangePreferences, IToolForm, TimeUnit} from "../../models/Tool";
+import {ExchangePreferences, ITool, IToolForm, TimeUnit} from "../../models/Tool";
 import {createTool} from "../../controllers/Tool";
 
 export interface EditToolProps {
   toolId: string;
   navigation: any;
+  route: any;
 }
 
 
 const EditTool = (props: EditToolProps) => {
-  useEffect(() => {
-    // Get data for this tool if editing one, or leave blank if not editing a tool
-  });
 
-
-  // Component state
+  // Component UI state
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
@@ -44,12 +41,23 @@ const EditTool = (props: EditToolProps) => {
     useOnSite: false,
   });
 
+  // Side Effects
+  useEffect(() => {
+    // Get data for this tool if editing one, or leave blank if not editing a tool
+    if (props.route.params?.tool) {
+      const tool: ITool = props.route.params.tool;
+      setName(tool.name);
+      setDescription(tool.description);
+      setPrice(tool.rate.price);
+      setTimeUnit(tool.rate.timeUnit);
+    }
+  }, []);
 
   // Callbacks
-
   const handleCreateTool = useCallback(() => {
     console.log("HandleCreateTool called");
     setIsLoading(true);
+    console.log(`Setting isLoading to true`);
     setIsError(false);
 
     const newTool: IToolForm = {
@@ -61,27 +69,28 @@ const EditTool = (props: EditToolProps) => {
       },
       preferences,
     };
-    // TODO validate that newTool has no null values
     createTool(newTool).then(() => {
       console.log("Tool Created!");
       setIsLoading(false);
-      props.navigation.navigate('Home')
+      props.navigation.goBack();
     }).catch((e) => {
       console.log("Failed to create tool");
       setIsError(true);
+      setIsLoading(false);
       console.log(e);
     });
   }, [name, description, price, timeUnit, preferences]);
 
   return (
       <ScrollView bg={theme.colors.white}>
-        {isError && <Alert w="100%" status="error">Failed to create tool. 👹</Alert> }
         <Column alignItems="center" space={4} mx={3} my={4} py={12}>
           {/* Basic Text Input */}
           <FormControl isRequired>
             <FormControl.Label>Tool Name</FormControl.Label>
             <Input
-                onChangeText={value => {setName(value);}}
+                onChangeText={value => {
+                  setName(value);
+                }}
                 size="lg"
                 variant="filled"
                 placeholder="Hammer"/>
@@ -89,7 +98,9 @@ const EditTool = (props: EditToolProps) => {
           <FormControl isRequired>
             <FormControl.Label>Description</FormControl.Label>
             <TextArea
-                onChangeText={value => {setDescription(value);}}
+                onChangeText={value => {
+                  setDescription(value);
+                }}
                 autoCompleteType={undefined}
                 h={20}
                 placeholder={`Tell us about the ${name}`}
@@ -146,23 +157,33 @@ const EditTool = (props: EditToolProps) => {
           {/* Borrowing Preference Switches*/}
           <Column space={6} w="100%" px={4}>
             <Row space={4} alignItems="center">
-              <Switch onValueChange={set => {setPreferences({...preferences, delivery: set})}} size="md"/>
+              <Switch onValueChange={set => {
+                setPreferences({...preferences, delivery: set});
+              }} size="md"/>
               <Text fontSize="md">Willing to deliver to borrower</Text>
             </Row>
             <Row space={4} alignItems="center">
-              <Switch onValueChange={set => {setPreferences({...preferences, localPickup: set})}} size="md"/>
+              <Switch onValueChange={set => {
+                setPreferences({...preferences, localPickup: set});
+              }} size="md"/>
               <Text fontSize="md">Borrower can come pick up</Text>
             </Row>
             <Row space={4} alignItems="center">
-              <Switch onValueChange={set => {setPreferences({...preferences, useOnSite: set})}} size="md"/>
+              <Switch onValueChange={set => {
+                setPreferences({...preferences, useOnSite: set});
+              }} size="md"/>
               <Text fontSize="md">Borrower can use it here</Text>
             </Row>
           </Column>
 
+          {isError && <Alert w="100%" status="error">Failed to create tool. 👹</Alert>}
+
           <Button w="50%"
                   variant="solid"
                   size="lg"
-                  disabled={isLoading}
+                  isLoading={isLoading}
+                  isLoadingText=""
+                  spinnerPlacement="start"
                   onPress={handleCreateTool}>Create Stuff</Button>
 
         </Column>
