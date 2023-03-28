@@ -1,8 +1,9 @@
 export interface ITool {
   name: string;
-  brand: string;
+  brand?: string;
   description: string;
   lender: {
+    lenderId?: string;
     name: string;
     profileImgPath: string;
     rating: number;
@@ -16,6 +17,29 @@ export interface ITool {
     localPickup: boolean;
     useOnSite: boolean;
   }
+}
+
+export interface IToolForm {
+  name?: string;
+  brand?: string;
+  description?: string;
+  lender?: {
+    lenderId?: string;
+    name?: string;
+    profileImgPath?: string;
+    rating?: number;
+  },
+  rate: {
+    price: number;
+    timeUnit: TimeUnit
+  },
+  preferences?: ExchangePreferences
+}
+
+export interface ExchangePreferences {
+  delivery?: boolean;
+  localPickup?: boolean;
+  useOnSite?: boolean;
 }
 
 export type TimeUnit = "hour" | "day" | "week";

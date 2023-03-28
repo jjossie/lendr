@@ -5,17 +5,23 @@ import Details from "./src/components/screens/Details";
 import ToolDetail from "./src/components/screens/ToolDetail";
 import {CustomNativeBaseProvider} from "./src/components/CustomNativeBaseProvider";
 import EditTool from "./src/components/screens/EditTool";
+import {LogBox} from "react-native";
 
 
 const Stack = createNativeStackNavigator();
 
+
+// For now will disable on-screen warning with:
+LogBox.ignoreLogs([
+  "We can not support a function callback. See Github Issues for details https://github.com/adobe/react-spectrum/issues/2320",
+]);
 
 export default function App() {
   return (
     <CustomNativeBaseProvider>
       <NavigationContainer onLayout>
         <Stack.Navigator initialRouteName="EditTool">
-          <Stack.Screen name="Detail" component={Details}/>
+          <Stack.Screen name="Detail"  component={Details}/>
           <Stack.Screen name="Home" component={Demo}/>
           <Stack.Screen name="ToolDetail" component={ToolDetail}/>
           <Stack.Screen name="EditTool" component={EditTool}/>
