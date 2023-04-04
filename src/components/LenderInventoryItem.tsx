@@ -17,7 +17,7 @@ const LenderInventoryItem: React.FC<Props> = (props: Props) => {
         <Card onPress={() => {
           props.navigation.navigate("EditTool", {
             toolId: "f",
-            tool: props.tool
+            tool: props.tool,
           });
         }}>
           <Row w="100%" h={32}>
@@ -28,7 +28,7 @@ const LenderInventoryItem: React.FC<Props> = (props: Props) => {
                   fontSize="md">/{props.tool.rate.timeUnit}</Text>
               </Row>
             </Column>
-            <Image source={{uri: "https://source.unsplash.com/random"}} style={style.image}/>
+            <Image source={{uri: "https://source.unsplash.com/random/640×480/?hammer,saw,woodworking,"}} style={style.image}/>
           </Row>
         </Card>
   );

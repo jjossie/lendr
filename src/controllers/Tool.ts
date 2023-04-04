@@ -20,6 +20,24 @@ export async function createTool(newTool: IToolForm) {
   });
 }
 
+export async function editTool(toolId: string, newTool: IToolForm) {
+
+  if (!(
+      newTool.description &&
+      newTool.name &&
+      newTool.rate.price &&
+      newTool.rate.timeUnit &&
+      newTool.preferences
+  ))
+    throw new Error("Missing properties on newTool");
+
+  // TODO add logged-in user as the lender and holder
+  // TODO make this an update
+  return addDoc(collection(db, "tools"), {
+    ...newTool
+  });
+}
+
 export async function getAllTools(): Promise<ITool[]> {
   const querySnapshot = await getDocs(collection(db, "tools"))
   let tools: ITool[] = [];

@@ -15,7 +15,7 @@ import {
   theme,
 } from "native-base";
 import {ExchangePreferences, ITool, IToolForm, TimeUnit} from "../../models/Tool";
-import {createTool} from "../../controllers/Tool";
+import {createTool, editTool} from "../../controllers/Tool";
 
 export interface EditToolProps {
   toolId: string;
@@ -29,6 +29,7 @@ const EditTool = (props: EditToolProps) => {
   // Component UI state
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   // Form state
   const [name, setName] = useState("Hammer");
@@ -45,19 +46,21 @@ const EditTool = (props: EditToolProps) => {
   useEffect(() => {
     // Get data for this tool if editing one, or leave blank if not editing a tool
     if (props.route.params?.tool) {
+      setIsEditing(true);
       const tool: ITool = props.route.params.tool;
       setName(tool.name);
       setDescription(tool.description);
       setPrice(tool.rate.price);
       setTimeUnit(tool.rate.timeUnit);
+      setPreferences(tool.preferences);
+    } else {
+      setIsEditing(false);
     }
   }, []);
 
   // Callbacks
-  const handleCreateTool = useCallback(() => {
-    console.log("HandleCreateTool called");
+  const handleSaveTool = useCallback(() => {
     setIsLoading(true);
-    console.log(`Setting isLoading to true`);
     setIsError(false);
 
     const newTool: IToolForm = {
@@ -69,16 +72,31 @@ const EditTool = (props: EditToolProps) => {
       },
       preferences,
     };
-    createTool(newTool).then(() => {
-      console.log("Tool Created!");
-      setIsLoading(false);
-      props.navigation.goBack();
-    }).catch((e) => {
-      console.log("Failed to create tool");
-      setIsError(true);
-      setIsLoading(false);
-      console.log(e);
-    });
+    if (!isEditing) {
+      // Create new tool
+      createTool(newTool).then(() => {
+        console.log("Tool Created!");
+        setIsLoading(false);
+        props.navigation.goBack();
+      }).catch((e) => {
+        console.log("Failed to create tool");
+        setIsError(true);
+        setIsLoading(false);
+        console.log(e);
+      });
+    } else {
+      // Save existing tool
+      editTool("someId", newTool).then(() => {
+        console.log("Tool Saved!");
+        setIsLoading(false);
+        props.navigation.goBack();
+      }).catch((e) => {
+        console.log("Failed to edit tool");
+        setIsError(true);
+        setIsLoading(false);
+        console.log(e);
+      });
+    }
   }, [name, description, price, timeUnit, preferences]);
 
   return (
@@ -93,6 +111,7 @@ const EditTool = (props: EditToolProps) => {
                 }}
                 size="lg"
                 variant="filled"
+                value={name}
                 placeholder="Hammer"/>
           </FormControl>
           <FormControl isRequired>
@@ -105,6 +124,7 @@ const EditTool = (props: EditToolProps) => {
                 h={20}
                 placeholder={`Tell us about the ${name}`}
                 size="lg"
+                value={description}
                 variant="filled"/>
           </FormControl>
 
@@ -157,21 +177,30 @@ const EditTool = (props: EditToolProps) => {
           {/* Borrowing Preference Switches*/}
           <Column space={6} w="100%" px={4}>
             <Row space={4} alignItems="center">
-              <Switch onValueChange={set => {
-                setPreferences({...preferences, delivery: set});
-              }} size="md"/>
+              <Switch
+                  onValueChange={set => {
+                    setPreferences({...preferences, delivery: set});
+                  }}
+                  value={preferences.delivery}
+                  size="md"/>
               <Text fontSize="md">Willing to deliver to borrower</Text>
             </Row>
             <Row space={4} alignItems="center">
-              <Switch onValueChange={set => {
-                setPreferences({...preferences, localPickup: set});
-              }} size="md"/>
+              <Switch
+                  onValueChange={set => {
+                    setPreferences({...preferences, localPickup: set});
+                  }}
+                  value={preferences.localPickup}
+                  size="md"/>
               <Text fontSize="md">Borrower can come pick up</Text>
             </Row>
             <Row space={4} alignItems="center">
-              <Switch onValueChange={set => {
-                setPreferences({...preferences, useOnSite: set});
-              }} size="md"/>
+              <Switch
+                  onValueChange={set => {
+                    setPreferences({...preferences, useOnSite: set});
+                  }}
+                  value={preferences.useOnSite}
+                  size="md"/>
               <Text fontSize="md">Borrower can use it here</Text>
             </Row>
           </Column>
@@ -184,7 +213,7 @@ const EditTool = (props: EditToolProps) => {
                   isLoading={isLoading}
                   isLoadingText=""
                   spinnerPlacement="start"
-                  onPress={handleCreateTool}>Create Stuff</Button>
+                  onPress={handleSaveTool}>{isEditing ? "Save Edits" : "Publish Tool"}</Button>
 
         </Column>
       </ScrollView>
