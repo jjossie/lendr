@@ -7,7 +7,11 @@ import {CustomNativeBaseProvider} from "./src/components/CustomNativeBaseProvide
 import EditTool from "./src/components/screens/EditTool";
 import {LogBox} from "react-native";
 import LenderInventory from "./src/components/screens/LenderInventory";
+import Login from "./src/components/screens/Login";
 
+
+// import {auth} from "./src/models/firebase"
+import {useEffect, useState} from "react";
 
 const Stack = createNativeStackNavigator();
 
@@ -18,17 +22,38 @@ LogBox.ignoreLogs([
 ]);
 
 export default function App() {
+
+  // const [user] = useAuthState(auth);
+
+  const [initializing, setInitializing] = useState(false);
+  const [user, setUser] = useState(null);
+
+  // const handleAuthStateChange = (user) => {
+  //   setUser(user);
+  //   setInitializing(false);
+  // }
+
+  useEffect(() => {
+
+  }, [])
+
+  if (initializing) return null;
+  if (user) console.log(user.email);
+
   return (
     <CustomNativeBaseProvider>
-      <NavigationContainer onLayout>
-        <Stack.Navigator initialRouteName="LenderInventory">
-          <Stack.Screen name="Detail"  component={Details}/>
-          <Stack.Screen name="Home" component={Demo}/>
-          <Stack.Screen name="LenderInventory" component={LenderInventory}/>
-          <Stack.Screen name="ToolDetail" component={ToolDetail}/>
-          <Stack.Screen name="EditTool" component={EditTool}/>
-        </Stack.Navigator>
-      </NavigationContainer>
+      {user
+        ? <NavigationContainer onLayout>
+          <Stack.Navigator initialRouteName="LenderInventory">
+            <Stack.Screen name="Detail" component={Details}/>
+            <Stack.Screen name="Home" component={Demo}/>
+            <Stack.Screen name="LenderInventory" component={LenderInventory}/>
+            <Stack.Screen name="ToolDetail" component={ToolDetail}/>
+            <Stack.Screen name="EditTool" component={EditTool}/>
+          </Stack.Navigator>
+        </NavigationContainer>
+        : <Login/>
+      }
     </CustomNativeBaseProvider>
   );
 }
