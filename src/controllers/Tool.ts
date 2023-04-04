@@ -1,4 +1,4 @@
-import {addDoc, collection, getDocs} from "firebase/firestore/lite";
+import {addDoc, collection, getDocs} from "firebase/firestore";
 import {db} from "../models/firebase";
 import {ITool, IToolForm} from "../models/Tool";
 

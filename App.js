@@ -10,7 +10,6 @@ import LenderInventory from "./src/components/screens/LenderInventory";
 import Login from "./src/components/screens/Login";
 
 
-// import {auth} from "./src/models/firebase"
 import {useEffect, useState} from "react";
 
 const Stack = createNativeStackNavigator();
@@ -26,7 +25,7 @@ export default function App() {
   // const [user] = useAuthState(auth);
 
   const [initializing, setInitializing] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({});
 
   // const handleAuthStateChange = (user) => {
   //   setUser(user);
