@@ -7,7 +7,7 @@ import {CustomNativeBaseProvider} from "./src/components/CustomNativeBaseProvide
 import EditTool from "./src/components/screens/EditTool";
 import {LogBox} from "react-native";
 import LenderInventory from "./src/components/screens/LenderInventory";
-import Login from "./src/components/screens/Login";
+import Register from "./src/components/screens/Register";
 
 
 import {useEffect, useState} from "react";
@@ -63,7 +63,7 @@ export default function App() {
             <Stack.Screen name="EditTool" component={EditTool}/>
           </Stack.Navigator>
         </NavigationContainer>
-        : <Login/>
+        : <Register/>
       }
     </CustomNativeBaseProvider>
   );

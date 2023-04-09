@@ -1,24 +1,26 @@
 import React, {useState} from 'react';
 import {Button, Center, Column, FormControl, Input} from 'native-base';
-import {signInUser} from "../../controllers/auth";
+import {createUser} from "../../controllers/auth";
 
-export interface LoginProps {
+
+export interface RegisterProps {
 
 }
 
-const Login: React.FC<LoginProps> = (props: LoginProps) => {
+const Register: React.FC<RegisterProps> = (props: RegisterProps) => {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
-  const signIn = async () => {
-    console.log("Trying to sign in");
-    signInUser(email, password);
+  const handleRegister = async () => {
+    console.log("Trying to register new user");
+    createUser(email, password);
   };
 
   return (
       <Center h="100%" w="100%">
         <Column w={80} space={4}>
+          {/* Basic Text Input */}
           <FormControl isRequired>
             <FormControl.Label>Email</FormControl.Label>
             <Input
@@ -40,13 +42,13 @@ const Login: React.FC<LoginProps> = (props: LoginProps) => {
                 variant="filled"
                 type="password"
                 value={password}
-            />
+                />
           </FormControl>
 
-          <Button onPress={signIn}>Sign In</Button>
+          <Button onPress={handleRegister}>Create User</Button>
         </Column>
       </Center>
   );
 };
 
-export default Login;
+export default Register;

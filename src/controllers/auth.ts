@@ -1,4 +1,4 @@
-import {createUserWithEmailAndPassword, getAuth} from "firebase/auth";
+import {createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword} from "firebase/auth";
 
 
 export function createUser(email: string, password: string) {
@@ -20,3 +20,20 @@ export function createUser(email: string, password: string) {
       });
 }
 
+
+export function signInUser(email: string, password: string){
+  const auth = getAuth();
+  signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        console.log('User signed in!');
+        // ...
+      })
+      .catch((error) => {
+        console.log('User sign-in failed!');
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error(error);
+      });
+}
