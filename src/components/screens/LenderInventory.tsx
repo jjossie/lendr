@@ -4,6 +4,8 @@ import {getAllTools} from "../../controllers/Tool";
 import {ITool} from "../../models/Tool";
 import LenderInventoryItem from "../LenderInventoryItem";
 import Spacer from "../utilities/Spacer";
+import {useAuthentication} from "../../utils/hooks/useAuthentication";
+import {signOutUser} from "../../controllers/auth";
 
 export interface LenderInventoryProps {
   navigation: any
@@ -12,6 +14,8 @@ export interface LenderInventoryProps {
 const LenderInventory: React.FC<LenderInventoryProps> = (props: LenderInventoryProps) => {
 
   const [toolsList, setToolsList]: [ITool[], any] = useState([]);
+
+  const {user} = useAuthentication();
 
   // Side Effects
   useEffect(() => {
@@ -27,6 +31,7 @@ const LenderInventory: React.FC<LenderInventoryProps> = (props: LenderInventoryP
 
   return (
       <ScrollView>
+        <Button onPress={() => {signOutUser()}}>Sign Out</Button>
         <Column>
           <Text p={4} bold fontSize="4xl">My Tools</Text>
           {toolsList.map(tool => { // Key should be different probably
