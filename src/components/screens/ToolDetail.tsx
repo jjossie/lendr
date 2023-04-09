@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {ScrollView} from 'react-native';
-import {doc, DocumentData, Firestore, getDoc} from 'firebase/firestore';
-import {db} from '../../models/firebase';
+import {doc, DocumentData, getDoc} from 'firebase/firestore';
+import {db} from '../../config/firebase';
 import {Column, Heading, Text} from "native-base";
 
 export interface Props {
-  db: Firestore
 }
 
 const getToolData = async (): Promise<DocumentData | undefined> => {

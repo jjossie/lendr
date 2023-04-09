@@ -18,7 +18,6 @@ import {ExchangePreferences, ITool, IToolForm, TimeUnit} from "../../models/Tool
 import {createTool, editTool} from "../../controllers/Tool";
 
 export interface EditToolProps {
-  toolId: string;
   navigation: any;
   route: any;
 }

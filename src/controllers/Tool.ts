@@ -1,5 +1,5 @@
 import {addDoc, collection, doc, getDocs, setDoc} from "firebase/firestore";
-import {db} from "../models/firebase";
+import {db} from "../config/firebase";
 import {ITool, IToolForm} from "../models/Tool";
 
 
