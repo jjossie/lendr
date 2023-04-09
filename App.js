@@ -11,6 +11,7 @@ import Login from "./src/components/screens/Login";
 
 
 import {useEffect, useState} from "react";
+import {getAuth, onAuthStateChanged} from "firebase/auth";
 
 const Stack = createNativeStackNavigator();
 
@@ -21,16 +22,27 @@ LogBox.ignoreLogs([
 ]);
 
 export default function App() {
-
-  // const [user] = useAuthState(auth);
-
+  // "Initializing" state var might be necessary later, but doesn't seem essential rn
   const [initializing, setInitializing] = useState(false);
   const [user, setUser] = useState({});
 
-  // const handleAuthStateChange = (user) => {
-  //   setUser(user);
-  //   setInitializing(false);
-  // }
+  const auth = getAuth();
+  onAuthStateChanged(auth, (user) => {
+    console.log("AuthState changed");
+    if (user) {
+      // User is signed in, see docs for a list of available properties
+      // https://firebase.google.com/docs/reference/js/firebase.User
+      console.log("User signed in")
+      const uid = user.uid;
+      setUser(user);
+      // ...
+    } else {
+      // User is signed out
+      // ...
+      console.log("User signed out")
+      setUser(null);
+    }
+  });
 
   useEffect(() => {
 

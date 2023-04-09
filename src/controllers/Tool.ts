@@ -1,4 +1,4 @@
-import {addDoc, collection, getDocs} from "firebase/firestore";
+import {addDoc, collection, doc, getDocs, setDoc} from "firebase/firestore";
 import {db} from "../models/firebase";
 import {ITool, IToolForm} from "../models/Tool";
 
@@ -33,9 +33,13 @@ export async function editTool(toolId: string, newTool: IToolForm) {
 
   // TODO add logged-in user as the lender and holder
   // TODO make this an update
-  return addDoc(collection(db, "tools"), {
-    ...newTool
-  });
+  // return addDoc(collection(db, "tools"), {
+  //   ...newTool
+  // });
+
+    return setDoc(doc(db, "tools", toolId), {
+      ...newTool
+    })
 }
 
 export async function getAllTools(): Promise<ITool[]> {

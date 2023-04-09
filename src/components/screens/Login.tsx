@@ -1,27 +1,7 @@
 import React, {useState} from 'react';
 import {Button, Center, Column, FormControl, Input} from 'native-base';
+import {createUser} from "../../controllers/auth";
 
-
-// import auth from '@react-native-firebase/auth';
-
-// function createUser(email: string, password: string) {
-//   auth()
-//       .createUserWithEmailAndPassword(email, password)
-//       .then(() => {
-//         console.log('User account created & signed in!');
-//       })
-//       .catch(error => {
-//         if (error.code === 'auth/email-already-in-use') {
-//           console.log('That email address is already in use!');
-//         }
-//
-//         if (error.code === 'auth/invalid-email') {
-//           console.log('That email address is invalid!');
-//         }
-//         console.error(error);
-//       });
-// }
-//
 
 export interface LoginProps {
 
@@ -32,8 +12,9 @@ const Login: React.FC<LoginProps> = (props: LoginProps) => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
-  const signIn = () => {
+  const signIn = async () => {
     console.log("Trying to sign in");
+    createUser(email, password);
   };
 
   return (
@@ -61,7 +42,7 @@ const Login: React.FC<LoginProps> = (props: LoginProps) => {
                 variant="filled"
                 type="password"
                 value={password}
-                placeholder="SuperSecretPassword!"/>
+                />
           </FormControl>
 
           <Button onPress={signIn}>Create User</Button>
