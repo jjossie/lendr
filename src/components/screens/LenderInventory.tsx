@@ -6,12 +6,13 @@ import LenderInventoryItem from "../LenderInventoryItem";
 import Spacer from "../utilities/Spacer";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
 import {signOutUser} from "../../controllers/auth";
+import {NativeStackScreenProps} from "@react-navigation/native-stack";
 
 export interface LenderInventoryProps {
   navigation: any
 }
 
-const LenderInventory: React.FC<LenderInventoryProps> = (props: LenderInventoryProps) => {
+const LenderInventory: React.FC<NativeStackScreenProps<any>> = ({navigation}) => {
 
   const [toolsList, setToolsList]: [ITool[], any] = useState([]);
 
@@ -35,7 +36,7 @@ const LenderInventory: React.FC<LenderInventoryProps> = (props: LenderInventoryP
         <Column>
           <Text p={4} bold fontSize="4xl">My Tools</Text>
           {toolsList.map(tool => { // Key should be different probably
-            return <LenderInventoryItem navigation={props.navigation}
+            return <LenderInventoryItem navigation={navigation}
                                         key={tool.name}
                                         tool={tool}/>;
           })}
@@ -45,7 +46,7 @@ const LenderInventory: React.FC<LenderInventoryProps> = (props: LenderInventoryP
                   variant="solid"
                   size="lg"
                   onPress={() => {
-                    props.navigation.navigate("EditTool");
+                    navigation.navigate("EditTool");
                   }}>Add New Tool</Button>
         </Column>
         <Spacer/>

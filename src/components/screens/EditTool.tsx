@@ -16,14 +16,10 @@ import {
 } from "native-base";
 import {ExchangePreferences, ITool, IToolForm, TimeUnit} from "../../models/Tool";
 import {createTool, editTool} from "../../controllers/Tool";
-
-export interface EditToolProps {
-  navigation: any;
-  route: any;
-}
+import {NativeStackScreenProps} from "@react-navigation/native-stack";
 
 
-const EditTool = (props: EditToolProps) => {
+const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
 
   // Component UI state
   const [isLoading, setIsLoading] = useState(false);
@@ -44,9 +40,9 @@ const EditTool = (props: EditToolProps) => {
   // Side Effects
   useEffect(() => {
     // Get data for this tool if editing one, or leave blank if not editing a tool
-    if (props.route.params?.tool) {
+    if (route.params?.tool) {
       setIsEditing(true);
-      const tool: ITool = props.route.params.tool;
+      const tool: ITool = route.params.tool;
       setName(tool.name);
       setDescription(tool.description);
       setPrice(tool.rate.price);
@@ -76,7 +72,7 @@ const EditTool = (props: EditToolProps) => {
       createTool(newTool).then(() => {
         console.log("Tool Created!");
         setIsLoading(false);
-        props.navigation.goBack();
+        navigation.goBack();
       }).catch((e) => {
         console.log("Failed to create tool");
         setIsError(true);
@@ -88,7 +84,7 @@ const EditTool = (props: EditToolProps) => {
       editTool("someId", newTool).then(() => {
         console.log("Tool Saved!");
         setIsLoading(false);
-        props.navigation.goBack();
+        navigation.goBack();
       }).catch((e) => {
         console.log("Failed to edit tool");
         setIsError(true);

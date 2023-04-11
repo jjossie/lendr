@@ -3,9 +3,8 @@ import {ScrollView} from 'react-native';
 import {doc, DocumentData, getDoc} from 'firebase/firestore';
 import {db} from '../../config/firebase';
 import {Column, Heading, Text} from "native-base";
+import {NativeStackScreenProps} from "@react-navigation/native-stack";
 
-export interface Props {
-}
 
 const getToolData = async (): Promise<DocumentData | undefined> => {
   const toolDocRef = doc(db, "tools", "T2FSjG3CFvmnxylUtDdu");
@@ -19,7 +18,7 @@ const getToolData = async (): Promise<DocumentData | undefined> => {
 };
 
 
-const ToolDetail: React.FC<Props> = (props: Props) => {
+const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation}) => {
 
   const [toolData, setToolData] = useState<DocumentData>({});
   useEffect(() => {

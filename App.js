@@ -3,9 +3,10 @@ import {LogBox} from "react-native";
 
 
 import {useEffect, useState} from "react";
-import MainStack from "./src/components/navigation/MainStack";
 import AuthStack from "./src/components/navigation/AuthStack";
 import {useAuthentication} from "./src/utils/hooks/useAuthentication";
+import {NavigationContainer} from "@react-navigation/native";
+import MainTabNavigator from "./src/components/navigation/MainTabNavigator";
 
 
 // For now will disable on-screen warning with:
@@ -28,10 +29,12 @@ export default function App() {
 
   return (
     <CustomNativeBaseProvider>
-      {user
-        ? <MainStack/>
-        : <AuthStack/>
-      }
+      <NavigationContainer>
+        {user
+          ? <MainTabNavigator/>
+          : <AuthStack/>
+        }
+      </NavigationContainer>
     </CustomNativeBaseProvider>
   );
 }
