@@ -12,7 +12,7 @@ const Stack = createNativeStackNavigator();
 const LendStack: React.FC<BottomTabScreenProps<any>> = () => {
   return (
         <Stack.Navigator initialRouteName="LenderInventory">
-          <Stack.Screen name="LenderInventory" component={LenderInventory}/>
+          <Stack.Screen name="LenderInventory" component={LenderInventory} options={{title: "Inventory"}}/>
           <Stack.Screen name="ToolDetail" component={ToolDetail}/>
           <Stack.Screen name="EditTool" component={EditTool}/>
         </Stack.Navigator>

@@ -5,7 +5,6 @@ import {ITool} from "../../models/Tool";
 import LenderInventoryItem from "../LenderInventoryItem";
 import Spacer from "../utilities/Spacer";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
-import {signOutUser} from "../../controllers/auth";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 
 export interface LenderInventoryProps {
@@ -32,7 +31,6 @@ const LenderInventory: React.FC<NativeStackScreenProps<any>> = ({navigation}) =>
 
   return (
       <ScrollView>
-        <Button onPress={() => {signOutUser()}}>Sign Out</Button>
         <Column>
           <Text p={4} bold fontSize="4xl">My Tools</Text>
           {toolsList.map(tool => { // Key should be different probably
