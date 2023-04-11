@@ -1,25 +1,27 @@
 import React, {useState} from 'react';
-import {Button, Center, Column, FormControl, Input, ScrollView, Text} from 'native-base';
-import {signInUser} from "../../controllers/auth";
+import {Button, Center, Column, FormControl, Input, ScrollView} from 'native-base';
+import {logInUser, registerUser} from "../../controllers/auth";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 
-export interface LoginProps {
-
-}
-
-const Login: React.FC<NativeStackScreenProps<any>> = ({navigation}) => {
+const Login: React.FC<NativeStackScreenProps<any>> = () => {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
-  const signIn = async () => {
+  const handleLogIn = async () => {
     console.log("Trying to sign in");
-    signInUser(email, password);
+    logInUser(email, password);
   };
+
+  const handleRegister = async () => {
+    console.log("Trying to register new user");
+    registerUser(email, password);
+  };
+
 
   return (
       <ScrollView>
-        <Center h="100%" w="100%">
+        <Center h="100%" w="100%" py={12}>
           <Column w={80} space={4}>
             <FormControl isRequired>
               <FormControl.Label>Email</FormControl.Label>
@@ -45,13 +47,8 @@ const Login: React.FC<NativeStackScreenProps<any>> = ({navigation}) => {
               />
             </FormControl>
 
-            <Button onPress={signIn}>Sign In</Button>
-            <Text>No account?</Text>
-            <Button
-                onPress={() => {
-                  navigation.navigate("Register");
-                }}
-                variant="outline">Register</Button>
+            <Button size="lg" onPress={handleLogIn}    variant="solid"  >Sign In</Button>
+            <Button size="lg" onPress={handleRegister} variant="outline">Register</Button>
           </Column>
         </Center>
       </ScrollView>

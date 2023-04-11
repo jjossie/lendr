@@ -1,7 +1,7 @@
 import {createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut} from "firebase/auth";
 
 
-export function createUser(email: string, password: string) {
+export function registerUser(email: string, password: string) {
   const auth = getAuth();
   createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
@@ -10,18 +10,23 @@ export function createUser(email: string, password: string) {
         const user = userCredential.user;
       })
       .catch(error => {
-        if (error.code === 'auth/email-already-in-use') {
-          console.log('That email address is already in use 🗿');
-        }
-        if (error.code === 'auth/invalid-email') {
-          console.log('That email address is invalid 💀');
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            console.log('That email address is already in use 🗿');
+            break;
+          case 'auth/invalid-email':
+            console.log('That email address is invalid 💀');
+            break;
+          case 'auth/weak-password':
+            console.log('Password too weak bruh 😱');
+            break;
         }
         console.error(error);
       });
 }
 
 
-export function signInUser(email: string, password: string) {
+export function logInUser(email: string, password: string) {
   const auth = getAuth();
   signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {

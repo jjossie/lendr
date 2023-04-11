@@ -6,8 +6,6 @@ import Constants from "expo-constants";
 // import {getAuth, signInWithPopup, GoogleAuthProvider} from 'firebase/auth';
 
 
-console.log("hello");
-console.log(`bruh ${Constants.manifest?.extra?.firebaseApiKey}`);
 const firebaseConfig = {
   apiKey: Constants.manifest?.extra?.firebaseApiKey,
   authDomain: Constants.manifest?.extra?.firebaseAuthDomain,
