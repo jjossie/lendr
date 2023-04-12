@@ -1,4 +1,4 @@
-import {addDoc, collection, doc, getDocs, setDoc} from "firebase/firestore";
+import {addDoc, collection, doc, getDoc, getDocs, setDoc} from "firebase/firestore";
 import {db} from "../config/firebase";
 import {ITool, IToolForm} from "../models/Tool";
 
@@ -52,3 +52,15 @@ export async function getAllTools(): Promise<ITool[]> {
 // export async function getToolById(toolId: string): Promise<ITool> {
 //   const querySnapshot = await getDoc<ITool>()
 // }
+
+
+export async function getToolById(toolId: string = "T2FSjG3CFvmnxylUtDdu"): Promise<ITool | undefined> {
+  const toolDocRef = doc(db, "tools", toolId);
+  const toolDoc = await getDoc(toolDocRef);
+
+  if (toolDoc.exists())
+    console.log(toolDoc.data());
+  else
+    console.log("Couldn't find tool data");
+  return toolDoc.data() as ITool;
+}

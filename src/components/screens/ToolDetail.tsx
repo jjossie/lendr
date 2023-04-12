@@ -1,30 +1,22 @@
 import React, {useEffect, useState} from 'react';
 import {ScrollView} from 'react-native';
-import {doc, DocumentData, getDoc} from 'firebase/firestore';
-import {db} from '../../config/firebase';
 import {Column, Heading, Text} from "native-base";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
-
-
-const getToolData = async (): Promise<DocumentData | undefined> => {
-  const toolDocRef = doc(db, "tools", "T2FSjG3CFvmnxylUtDdu");
-  const toolDoc = await getDoc(toolDocRef);
-
-  if (toolDoc.exists())
-    console.log(toolDoc.data());
-  else
-    console.log("Couldn't find tool data");
-  return toolDoc.data();
-};
+import {getToolById} from "../../controllers/Tool";
+import {ITool} from "../../models/Tool";
 
 
 const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation}) => {
 
-  const [toolData, setToolData] = useState<DocumentData>({});
+  const [toolData, setToolData] = useState<ITool | undefined>(undefined);
   useEffect(() => {
-    getToolData()
+    getToolById()
         .then(data => {
           setToolData(data!);
+        })
+        .catch(() => {
+          console.log("Error in retrieving ToolData 👹");
+          navigation.goBack();
         });
   }, []);
 
@@ -32,7 +24,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation}) => {
       <ScrollView>
         {toolData ? <Column bg="#FFF" p={5} space={3}>
           <Heading>{toolData.brand} {toolData.name}</Heading>
-          <Text fontWeight={500} fontSize={"lg"}>${toolData.rate?.price}/{toolData.rate?.time}</Text>
+          <Text fontWeight={500} fontSize={"lg"}>${toolData.rate?.price}/{toolData.rate?.timeUnit}</Text>
           <Text fontSize="md">{toolData.description}</Text>
           <Text>{toolData.lender?.name} - {toolData.lender?.rating}/5 stars</Text>
           {/*<Text>{JSON.stringify(toolData)}</Text>*/}
