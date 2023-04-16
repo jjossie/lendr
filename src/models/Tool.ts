@@ -1,3 +1,5 @@
+import {Location} from "./Location";
+
 export interface ITool {
   id?: string;
   name: string;
@@ -18,7 +20,9 @@ export interface ITool {
     localPickup: boolean;
     useOnSite: boolean;
   }
-  holder: string
+  ownerUid: string;
+  currentHolderUid: string;
+  location?: Location;
 }
 
 export interface IToolForm {
@@ -36,7 +40,10 @@ export interface IToolForm {
     timeUnit: TimeUnit
   },
   preferences?: ExchangePreferences
+  location?: Location
 }
+
+
 
 export interface ExchangePreferences {
   delivery?: boolean;
