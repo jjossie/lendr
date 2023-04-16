@@ -3,13 +3,13 @@ import {doc, getDoc, setDoc, Timestamp} from "firebase/firestore";
 import {db} from "../config/firebase";
 
 
-export function registerUser(email: string, password: string) {
+export function registerUser(firstName: string, lastName: string, email: string, password: string,) {
   const auth = getAuth();
   createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
         console.log('User account created & signed in 💯');
         console.log(userCredential);
-        await createUserInDB(userCredential.user, "Joe", "Momma");
+        await createUserInDB(userCredential.user, firstName, lastName);
       })
       .catch(error => {
         switch (error.code) {
@@ -34,7 +34,7 @@ export function logInUser(email: string, password: string) {
       .then(async (userCredential) => {
         // Signed in
         console.log('User signed in ✅');
-        await createUserInDB(userCredential.user, "Joe", "Momma");
+        await createUserInDB(userCredential.user);
       })
       .catch((error) => {
         console.log('User sign-in failed 🅱️');
@@ -49,22 +49,24 @@ export function signOutUser() {
   });
 }
 
-async function createUserInDB(authUserObj: User,  firstName: string, lastName: string) {
+async function createUserInDB(authUser: User, firstName: string = "Joe", lastName: string = "Momma") {
 
   // Use the Firebase Auth UID as the document ID in Firestore
-  const userDocRef = doc(db, "users", authUserObj.uid);
+  const userDocRef = doc(db, "users", authUser.uid);
   const userDocSnap = await getDoc(userDocRef);
 
-  if (!userDocSnap.exists()){
-    console.log(`Creating user ${authUserObj.uid} in firestore`);
+  if (!userDocSnap.exists()) {
+    console.log(`Creating user ${authUser.uid} in firestore`);
     return setDoc(userDocRef, {
+      providerData: {
+        ...authUser.providerData[0]
+      },
       firstName,
       lastName,
-      createdAt: Timestamp.now()
+      createdAt: Timestamp.now(),
     });
-  }
-  else {
-    console.log(`User ${authUserObj.uid} already exists in firestore`);
+  } else {
+    console.log(`User ${authUser.uid} already exists in firestore`);
     return userDocSnap;
   }
 }

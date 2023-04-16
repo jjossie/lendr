@@ -1,20 +1,22 @@
 import React, {useState} from 'react';
 import {Button, Center, Column, FormControl, Input, ScrollView} from 'native-base';
-import {logInUser} from "../../controllers/auth";
+import {registerUser} from "../../controllers/auth";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 
 const Login: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
 
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState(route.params?.email ?? "");
   const [password, setPassword] = useState(route.params?.password ?? "");
 
   const handleLogIn = async () => {
-    console.log("Trying to sign in");
-    logInUser(email, password);
+    navigation.navigate("Login", {email, password})
   };
 
   const handleRegister = async () => {
-    navigation.navigate("Register", {email, password});
+    console.log("Trying to register new user");
+    registerUser(firstName, lastName, email, password);
   };
 
 
@@ -22,6 +24,32 @@ const Login: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
       <ScrollView>
         <Center h="100%" w="100%" py={12}>
           <Column w={80} space={4}>
+
+            {/* Name Entry */}
+            <FormControl isRequired>
+              <FormControl.Label>First Name</FormControl.Label>
+              <Input
+                  onChangeText={value => {
+                    setFirstName(value);
+                  }}
+                  size="lg"
+                  variant="filled"
+                  value={firstName}
+                  placeholder="Jane"/>
+            </FormControl>
+            <FormControl isRequired>
+              <FormControl.Label>Last Name</FormControl.Label>
+              <Input
+                  onChangeText={value => {
+                    setLastName(value);
+                  }}
+                  size="lg"
+                  variant="filled"
+                  placeholder="Doe"
+                  value={lastName}/>
+            </FormControl>
+
+            {/* Email & Password Entry */}
             <FormControl isRequired>
               <FormControl.Label>Email</FormControl.Label>
               <Input
@@ -42,12 +70,11 @@ const Login: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
                   size="lg"
                   variant="filled"
                   type="password"
-                  value={password}
-              />
+                  value={password}/>
             </FormControl>
 
-            <Button size="lg" onPress={handleLogIn} variant="solid">Sign In</Button>
-            <Button size="lg" onPress={handleRegister} variant="outline">Register</Button>
+            <Button size="lg" onPress={handleRegister} variant="solid">Register</Button>
+            <Button size="lg" onPress={handleLogIn} variant="outline">Sign In</Button>
           </Column>
         </Center>
       </ScrollView>
