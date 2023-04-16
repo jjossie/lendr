@@ -1,5 +1,5 @@
 import {createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut, User} from "firebase/auth";
-import {doc, getDoc, setDoc, Timestamp} from "firebase/firestore";
+import {doc, DocumentData, getDoc, setDoc, Timestamp} from "firebase/firestore";
 import {db} from "../config/firebase";
 
 
@@ -69,4 +69,9 @@ async function createUserInDB(authUser: User, firstName: string = "Joe", lastNam
     console.log(`User ${authUser.uid} already exists in firestore`);
     return userDocSnap;
   }
+}
+
+export async function getUserFromAuth(authUser: User): Promise<DocumentData | undefined> {
+  const docSnap = await getDoc(doc(db, "users", authUser.uid));
+  return docSnap.data();
 }

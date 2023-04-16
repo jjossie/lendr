@@ -16,8 +16,13 @@ export async function createTool(newTool: IToolForm) {
   ))
     throw new Error("Missing properties on newTool");
 
-  // TODO  add logged-in user as the lender and holder
+  const auth = getAuth();
+  if (!auth.currentUser)
+    throw new AuthError();
+
   return addDoc(collection(db, "tools"), {
+    ownerUid: auth.currentUser.uid,
+    currentHolderUid: auth.currentUser.uid,
     ...newTool,
   });
 }
@@ -37,12 +42,11 @@ export async function editTool(toolId: string, newTool: IToolForm) {
   if (!auth.currentUser)
     throw new AuthError("Must be logged in 😱");
 
-  // TODO add logged-in user as the lender and holder
-  // auth.currentUser.uid;
-
   return setDoc(doc(db, "tools", toolId), {
+    ownerUid: auth.currentUser.uid,
+    currentHolderUid: auth.currentUser.uid,
     ...newTool,
-  }, {merge: true});
+  }, {merge: false});
 }
 
 export async function getAllTools(): Promise<ITool[]> {
@@ -54,10 +58,6 @@ export async function getAllTools(): Promise<ITool[]> {
   } as ITool));
   return tools;
 }
-
-// export async function getToolById(toolId: string): Promise<ITool> {
-//   const querySnapshot = await getDoc<ITool>()
-// }
 
 
 export async function getToolById(toolId: string = "T2FSjG3CFvmnxylUtDdu"): Promise<ITool | undefined> {
