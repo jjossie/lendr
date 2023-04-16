@@ -1,28 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {Button, Column, ScrollView, Text} from 'native-base';
-import {getAllTools} from "../../controllers/Tool";
-import {ITool} from "../../models/Tool";
 import LenderInventoryItem from "../LenderInventoryItem";
 import Spacer from "../utilities/Spacer";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
-
-export interface LenderInventoryProps {
-  navigation: any
-}
+import {useMyTools} from "../../utils/hooks/useMyTools";
 
 const LenderInventory: React.FC<NativeStackScreenProps<any>> = ({navigation}) => {
 
-  const [toolsList, setToolsList]: [ITool[], any] = useState([]);
-
+  // State
+  const toolsList = useMyTools();
   const {user} = useAuthentication();
 
   // Side Effects
-  useEffect(() => {
-    getAllTools().then(tools => {
-      setToolsList(tools);
-    });
-  }, [setToolsList]);
 
   // Callbacks
   // const onToolAdded = (newTool: ITool) => {
