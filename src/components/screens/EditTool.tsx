@@ -81,7 +81,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       });
     } else {
       // Save existing tool
-      editTool("someId", newTool).then(() => {
+      editTool(route.params?.tool?.id, newTool).then(() => {
         console.log("Tool Saved!");
         setIsLoading(false);
         navigation.goBack();

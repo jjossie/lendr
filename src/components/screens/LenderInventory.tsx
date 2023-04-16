@@ -22,7 +22,7 @@ const LenderInventory: React.FC<NativeStackScreenProps<any>> = ({navigation}) =>
     getAllTools().then(tools => {
       setToolsList(tools);
     });
-  }, [toolsList]);
+  }, [setToolsList]);
 
   // Callbacks
   // const onToolAdded = (newTool: ITool) => {
@@ -35,7 +35,7 @@ const LenderInventory: React.FC<NativeStackScreenProps<any>> = ({navigation}) =>
           <Text p={4} bold fontSize="4xl">My Tools</Text>
           {toolsList.map(tool => { // Key should be different probably
             return <LenderInventoryItem navigation={navigation}
-                                        key={tool.name}
+                                        key={tool.id + tool.name}
                                         tool={tool}/>;
           })}
           <Button w="50%"

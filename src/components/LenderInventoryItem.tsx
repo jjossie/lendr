@@ -1,17 +1,16 @@
 import React from 'react';
 import {Image, StyleSheet} from 'react-native';
 
-import '../../assets/stock-images/power-tool-accessories-og.png.webp';
 import {Column, Row, Text} from "native-base";
 import {ITool} from "../models/Tool";
 import Card from "./Card";
 
-export type Props = {
+export type LenderInventoryItemProps = {
   tool: ITool
   navigation: any
 }
 
-const LenderInventoryItem: React.FC<Props> = (props: Props) => {
+const LenderInventoryItem: React.FC<LenderInventoryItemProps> = (props: LenderInventoryItemProps) => {
 
   return (
         <Card onPress={() => {

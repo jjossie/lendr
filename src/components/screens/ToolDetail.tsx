@@ -6,16 +6,21 @@ import {getToolById} from "../../controllers/Tool";
 import {ITool} from "../../models/Tool";
 
 
-const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation}) => {
+const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
 
-  const [toolData, setToolData] = useState<ITool | undefined>(undefined);
+  // State
+  const [toolData, setToolData] = useState<ITool | undefined>(route.params?.tool);
+
+
+  // Side Effect
   useEffect(() => {
-    getToolById()
+    getToolById(route.params?.toolId)
         .then(data => {
           setToolData(data!);
         })
-        .catch(() => {
+        .catch((e) => {
           console.log("Error in retrieving ToolData 👹");
+          console.log(e.message)
           navigation.goBack();
         });
   }, []);
