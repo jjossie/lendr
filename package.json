@@ -23,6 +23,7 @@
     "expo-status-bar": "~1.4.2",
     "firebase": "^9.19.1",
     "firebaseui": "^6.0.2",
+    "geofire-common": "^6.0.0",
     "native-base": "^3.4.28",
     "react": "18.1.0",
     "react-firebase-hooks": "^5.1.1",

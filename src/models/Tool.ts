@@ -1,4 +1,4 @@
-import {Location} from "./Location";
+import {ILocation, Location} from "./Location";
 
 export interface ITool {
   id?: string;
@@ -22,7 +22,7 @@ export interface ITool {
   }
   ownerUid: string;
   currentHolderUid: string;
-  location?: Location;
+  location?: ILocation;
 }
 
 export interface IToolForm {

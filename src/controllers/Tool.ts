@@ -16,10 +16,10 @@ import {
 import {db} from "../config/firebase";
 import {ITool, IToolForm} from "../models/Tool";
 import {getAuth} from "firebase/auth";
-import {AuthError} from "../utils/errors";
+import {AuthError, NotFoundError} from "../utils/errors";
 
 import geofire from "geofire-common";
-import {Location, metersFromMiles} from "../models/Location";
+import {distanceBetweenMi, getGeohashedLocation, ILocation, metersFromMiles} from "../models/Location";
 
 export async function createTool(newTool: IToolForm) {
 
@@ -41,6 +41,7 @@ export async function createTool(newTool: IToolForm) {
     currentHolderUid: auth.currentUser.uid,
     createdAt: serverTimestamp(),
     modifiedAt: serverTimestamp(),
+    location: getGeohashedLocation(43.823791, -111.777649), // Hardcoded rexburg location for now
     ...newTool,
   });
 }
@@ -64,6 +65,7 @@ export async function editTool(toolId: string, newTool: IToolForm) {
     ownerUid: auth.currentUser.uid,
     currentHolderUid: auth.currentUser.uid,
     modifiedAt: serverTimestamp(),
+    location: getGeohashedLocation(43.823791, -111.777649), // Hardcoded rexburg location for now
     ...newTool,
   }, {merge: false});
 }
@@ -79,28 +81,28 @@ export async function getAllTools(): Promise<ITool[]> {
 }
 
 
-export async function getToolById(toolId: string = "T2FSjG3CFvmnxylUtDdu"): Promise<ITool | undefined> {
+export async function getToolById(toolId: string): Promise<ITool | undefined> {
   const toolDocRef = doc(db, "tools", toolId);
   const toolDocSnap = await getDoc(toolDocRef);
 
   if (!toolDocSnap.exists())
-    throw new Error(`Tool with id ${toolId} does not exist in database 🫢`);
+    throw new NotFoundError(`Tool with id ${toolId} does not exist in database 🫢`);
 
   console.log(toolDocSnap.data());
   return toolDocSnap.data() as ITool;
 }
 
 
-export async function getToolsWithinRadius(radiusMi: number, center: Location) {
+export async function getToolsWithinRadius(radiusMi: number, center: ILocation) {
   const radiusM = metersFromMiles(radiusMi);
 
-  const bounds = geofire.geohashQueryBounds(center.coordinates(), radiusM);
+  const bounds = geofire.geohashQueryBounds([center.latitude, center.longitude], radiusM);
   const promises: Promise<QuerySnapshot<DocumentData>>[] = [];
 
   bounds.forEach((bound: any) => {
     const q = query(
         collection(db, "tools"),
-        orderBy("location.geohash"), // TODO this is gonna need a converter for firestore
+        orderBy("location.geohash"),
         startAt(bound[0]),
         endAt(bound[1]),
     );
@@ -113,7 +115,7 @@ export async function getToolsWithinRadius(radiusMi: number, center: Location) {
   snapshots.forEach(snapshot => {
     snapshot.forEach(document => {
       const tool: ITool = document.data() as ITool;
-      if (tool.location!.distanceBetweenMi(center) > radiusMi)
+      if (distanceBetweenMi(center, tool.location!) > radiusMi)
         tools.push(tool);
     });
   });

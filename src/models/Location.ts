@@ -1,6 +1,12 @@
 import geofire from "geofire-common";
 
-export const KM_TO_MILE = 0.62; // TODO check and confirm this
+export const KM_TO_MILE = 0.621371;
+
+export interface ILocation {
+  latitude: number;
+  longitude: number;
+  geohash: string;
+}
 
 export class Location {
   latitude: number;
@@ -29,10 +35,26 @@ export class Location {
 
 }
 
+export function getGeohashedLocation(latitude: number, longitude: number): ILocation {
+  return {
+    latitude, longitude,
+    geohash: geofire.geohashForLocation([latitude, longitude])
+  }
+}
+
+export function distanceBetweenMi(lhs: ILocation, rhs: ILocation): number {
+  const distanceKm = geofire.distanceBetween(
+      [lhs.latitude, lhs.longitude],
+      [rhs.latitude, rhs.longitude],
+  );
+  return distanceKm * KM_TO_MILE;
+}
+
 export function metersFromMiles(miles: number): number {
   return miles / KM_TO_MILE * 1000;
 }
 
 function getCity(latitude: number, longitude: number): string{
+  // TODO implement
   return "Rexburg";
 }
