@@ -9,13 +9,18 @@ import {DocumentData} from 'firebase/firestore';
 const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
 
   const {user} = useAuthentication();
-  const [fsUser, setFsUser] = useState<DocumentData | undefined>( undefined );
+  const [fsUser, setFsUser] = useState<DocumentData | undefined>(undefined);
 
   useEffect(() => {
-    getUserFromAuth(user!)
-        .then(u => setFsUser(u))
-        .catch(e => console.log(e.message));
-  }, [user])
+    if (!user)
+      console.log("User not initialized yet");
+    else {
+      console.log("ok now user is initialized");
+      getUserFromAuth(user)
+          .then(u => setFsUser(u))
+          .catch(e => console.log(e.message));
+    }
+  }, [user]);
 
   return (
       <ScrollView p={8}>

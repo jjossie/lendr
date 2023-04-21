@@ -29,7 +29,7 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
 
           <Row flexWrap="wrap">
             {toolsList.map(tool => {
-              return <BorrowBrowseItem tool={tool} navigation={navigation}/>;
+              return <BorrowBrowseItem key={tool.id} tool={tool} navigation={navigation}/>;
             })}
           </Row>
         </Column>

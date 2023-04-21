@@ -9,8 +9,8 @@ import {useMyTools} from "../../utils/hooks/useMyTools";
 const LenderInventory: React.FC<NativeStackScreenProps<any>> = ({navigation}) => {
 
   // State
-  const toolsList = useMyTools();
   const {user} = useAuthentication();
+  const toolsList = useMyTools(user);
 
   // Side Effects
 
@@ -40,7 +40,6 @@ const LenderInventory: React.FC<NativeStackScreenProps<any>> = ({navigation}) =>
         <Spacer/>
       </ScrollView>
   );
-}
-  ;
+};
 
-  export default LenderInventory;
+export default LenderInventory;
