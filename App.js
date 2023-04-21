@@ -27,15 +27,15 @@ export default function App() {
     }
   }, [])
 
-  const {user} = useAuthentication();
+  const {authUser} = useAuthentication();
 
   if (initializing) return null;
-  if (user) console.log(user.email);
+  if (authUser) console.log(authUser.email);
 
   return (
     <CustomNativeBaseProvider>
       <NavigationContainer>
-        {user
+        {authUser
           ? <MainTabNavigator/>
           : <AuthStack/>
         }

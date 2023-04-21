@@ -9,8 +9,8 @@ import {useMyTools} from "../../utils/hooks/useMyTools";
 const LenderInventory: React.FC<NativeStackScreenProps<any>> = ({navigation}) => {
 
   // State
-  const {user} = useAuthentication();
-  const toolsList = useMyTools(user);
+  const {authUser} = useAuthentication();
+  const toolsList = useMyTools(authUser);
 
   // Side Effects
 

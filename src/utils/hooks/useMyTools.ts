@@ -7,7 +7,6 @@ import {User} from "firebase/auth";
 export function useMyTools(user?: User) {
   const [list, setList] = React.useState<ITool[]>([]);
   console.log("🛠️useMyTools()");
-  console.log(user);
 
   React.useEffect(() => {
     // This might run before user is initialized - just skip if that's the case
