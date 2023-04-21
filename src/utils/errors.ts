@@ -4,7 +4,6 @@ export class LendrBaseError extends Error {
   }
 }
 
-
 export class AuthError extends LendrBaseError {
   constructor(message?: string) {
     super(message ?? "Must be logged in. 🫠");

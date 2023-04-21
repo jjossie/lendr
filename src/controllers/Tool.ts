@@ -16,10 +16,11 @@ import {
 import {db} from "../config/firebase";
 import {ITool, IToolForm} from "../models/Tool";
 import {getAuth} from "firebase/auth";
-import {AuthError, NotFoundError} from "../utils/errors";
+import {AuthError, NotFoundError, ObjectValidationError} from "../utils/errors";
 
 import geofire from "geofire-common";
 import {distanceBetweenMi, getGeohashedLocation, ILocation, metersFromMiles} from "../models/Location";
+import {getRefFromUid} from "../models/LendrUser";
 
 export async function createTool(newTool: IToolForm) {
 
@@ -30,15 +31,15 @@ export async function createTool(newTool: IToolForm) {
       newTool.rate.timeUnit &&
       newTool.preferences
   ))
-    throw new Error("Missing properties on newTool");
+    throw new ObjectValidationError("Missing properties on newTool");
 
   const auth = getAuth();
   if (!auth.currentUser)
     throw new AuthError();
 
   return addDoc(collection(db, "tools"), {
-    ownerUid: auth.currentUser.uid,
-    currentHolderUid: auth.currentUser.uid,
+    lenderRef: getRefFromUid(auth.currentUser.uid),
+    holderRef: getRefFromUid(auth.currentUser.uid),
     createdAt: serverTimestamp(),
     modifiedAt: serverTimestamp(),
     location: getGeohashedLocation(43.823791, -111.777649), // Hardcoded rexburg location for now
@@ -47,7 +48,8 @@ export async function createTool(newTool: IToolForm) {
 }
 
 export async function editTool(toolId: string, newTool: IToolForm) {
-
+  console.log(`Editing tool ${toolId}`);
+  // Validate Fields
   if (!(
       newTool.description &&
       newTool.name &&
@@ -55,15 +57,15 @@ export async function editTool(toolId: string, newTool: IToolForm) {
       newTool.rate.timeUnit &&
       newTool.preferences
   ))
-    throw new Error("Missing properties on newTool");
+    throw new ObjectValidationError("Missing properties on newTool");
 
   const auth = getAuth();
   if (!auth.currentUser)
     throw new AuthError("Must be logged in 😱");
 
   return setDoc(doc(db, "tools", toolId), {
-    ownerUid: auth.currentUser.uid,
-    currentHolderUid: auth.currentUser.uid,
+    lenderRef: getRefFromUid(auth.currentUser.uid),
+    holderRef: getRefFromUid(auth.currentUser.uid),
     modifiedAt: serverTimestamp(),
     location: getGeohashedLocation(43.823791, -111.777649), // Hardcoded rexburg location for now
     ...newTool,
@@ -88,8 +90,10 @@ export async function getToolById(toolId: string): Promise<ITool | undefined> {
   if (!toolDocSnap.exists())
     throw new NotFoundError(`Tool with id ${toolId} does not exist in database 🫢`);
 
-  console.log(toolDocSnap.data());
-  return toolDocSnap.data() as ITool;
+  return {
+    id: toolId,
+    ...toolDocSnap.data()
+  } as ITool;
 }
 
 

@@ -1,4 +1,6 @@
-import geofire from "geofire-common";
+// import geofire from "geofire-common";
+
+import {distanceBetween, geohashForLocation} from "geofire-common";
 
 export const KM_TO_MILE = 0.621371;
 
@@ -8,42 +10,47 @@ export interface ILocation {
   geohash: string;
 }
 
-export class Location {
-  latitude: number;
-  longitude: number;
-  geohash: string;
-  city?: string;
 
-  constructor(latitude: number, longitude: number, geohash?: string, city?: string) {
-    this.latitude = latitude;
-    this.longitude = longitude;
-    this.geohash = geohash ?? geofire.geohashForLocation([latitude, longitude]);
-    this.city = city ?? getCity(latitude, longitude);
-  }
+console.log(geohashForLocation([43.823791, -111.777649]));
 
-  distanceBetweenMi(coordinates: [number, number] | Location): number {
-    const distanceKm = geofire.distanceBetween(
-        [this.latitude, this.longitude],
-        (coordinates instanceof Location) ? coordinates.coordinates() : coordinates,
-    );
-    return distanceKm * KM_TO_MILE;
-  }
-
-  coordinates(): [number, number] {
-    return [this.latitude, this.longitude];
-  }
-
-}
+// export class Location {
+//   latitude: number;
+//   longitude: number;
+//   geohash: string;
+//   city?: string;
+//
+//   constructor(latitude: number, longitude: number, geohash?: string, city?: string) {
+//     this.latitude = latitude;
+//     this.longitude = longitude;
+//     this.geohash = geohash ?? geofire.geohashForLocation([latitude, longitude]);
+//     this.city = city ?? getCity(latitude, longitude);
+//   }
+//
+//   distanceBetweenMi(coordinates: [number, number] | Location): number {
+//     const distanceKm = geofire.distanceBetween(
+//         [this.latitude, this.longitude],
+//         (coordinates instanceof Location) ? coordinates.coordinates() : coordinates,
+//     );
+//     return distanceKm * KM_TO_MILE;
+//   }
+//
+//   coordinates(): [number, number] {
+//     return [this.latitude, this.longitude];
+//   }
+//
+// }
 
 export function getGeohashedLocation(latitude: number, longitude: number): ILocation {
+  const geohash = geohashForLocation([latitude, longitude]);
   return {
-    latitude, longitude,
-    geohash: geofire.geohashForLocation([latitude, longitude])
+    latitude,
+    longitude,
+    geohash
   }
 }
 
 export function distanceBetweenMi(lhs: ILocation, rhs: ILocation): number {
-  const distanceKm = geofire.distanceBetween(
+  const distanceKm = distanceBetween(
       [lhs.latitude, lhs.longitude],
       [rhs.latitude, rhs.longitude],
   );

@@ -17,6 +17,7 @@ import {
 import {ExchangePreferences, ITool, IToolForm, TimeUnit} from "../../models/Tool";
 import {createTool, editTool} from "../../controllers/Tool";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
+import {useAuthentication} from "../../utils/hooks/useAuthentication";
 
 
 const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
@@ -25,9 +26,10 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const {authUser} = useAuthentication();
 
   // Form state
-  const [name, setName] = useState("Hammer");
+  const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(25);
   const [timeUnit, setTimeUnit]: [TimeUnit, any] = useState("day");
@@ -36,6 +38,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     localPickup: false,
     useOnSite: false,
   });
+
 
   // Side Effects
   useEffect(() => {
