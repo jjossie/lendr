@@ -15,7 +15,6 @@ const LenderInventoryItem: React.FC<LenderInventoryItemProps> = (props: LenderIn
   return (
         <Card onPress={() => {
           props.navigation.navigate("EditTool", {
-            toolId: "f",
             tool: props.tool,
           });
         }}>

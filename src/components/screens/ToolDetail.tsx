@@ -14,7 +14,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
 
   // Side Effect
   useEffect(() => {
-    getToolById(route.params?.toolId)
+    getToolById(route.params?.tool?.id)
         .then(data => {
           setToolData(data!);
         })
