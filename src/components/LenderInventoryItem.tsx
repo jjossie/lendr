@@ -17,7 +17,7 @@ const LenderInventoryItem: React.FC<LenderInventoryItemProps> = ({tool, navigati
   return (
         <Card onPress={() => {
           navigation.navigate("EditTool", {
-            tool: tool,
+            toolId: tool.id,
           });
         }}>
           <Row w="100%" h={32}>

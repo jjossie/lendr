@@ -15,9 +15,8 @@ import {
   theme,
 } from "native-base";
 import {ExchangePreferences, ITool, IToolForm, TimeUnit} from "../../models/Tool";
-import {createTool, editTool} from "../../controllers/Tool";
+import {createTool, editTool, getToolById} from "../../controllers/Tool";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {useAuthentication} from "../../utils/hooks/useAuthentication";
 
 
 const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
@@ -26,7 +25,6 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const {authUser} = useAuthentication();
 
   // Form state
   const [name, setName] = useState("");
@@ -43,15 +41,24 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   // Side Effects
   useEffect(() => {
     // Get data for this tool if editing one, or leave blank if not editing a tool
-    if (route.params?.tool) {
+    if (route.params?.toolId) {
+
+      // We're editing a tool, so fetch it
       setIsEditing(true);
-      const tool: ITool = route.params.tool;
-      setName(tool.name);
-      setDescription(tool.description);
-      setPrice(tool.rate.price);
-      setTimeUnit(tool.rate.timeUnit);
-      setPreferences(tool.preferences);
+      setIsLoading(true)
+      getToolById(route.params?.toolId)
+          .then((tool: ITool | undefined) => {
+            setName(tool!.name);
+            setDescription(tool!.description);
+            setPrice(tool!.rate.price);
+            setTimeUnit(tool!.rate.timeUnit);
+            setPreferences(tool!.preferences);
+            setIsLoading(false);
+          })
+          .catch(e => console.error(e));
+
     } else {
+      // Not editing - creating a new one
       setIsEditing(false);
     }
   }, []);
@@ -84,7 +91,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       });
     } else {
       // Save existing tool
-      editTool(route.params?.tool?.id, newTool).then(() => {
+      editTool(route.params?.toolId, newTool).then(() => {
         console.log("Tool Saved!");
         setIsLoading(false);
         navigation.goBack();

@@ -91,7 +91,7 @@ export async function getToolById(toolId: string): Promise<ITool | undefined> {
     throw new NotFoundError(`Tool with id ${toolId} does not exist in database 🫢`);
 
   return {
-    id: toolId,
+    id: toolDocSnap.id,
     ...toolDocSnap.data()
   } as ITool;
 }
@@ -118,7 +118,10 @@ export async function getToolsWithinRadius(radiusMi: number, center: ILocation) 
   const tools: ITool[] = [];
   snapshots.forEach(snapshot => {
     snapshot.forEach(document => {
-      const tool: ITool = document.data() as ITool;
+      const tool: ITool = {
+        id: document.id,
+        ...document.data(),
+      } as ITool;
       if (distanceBetweenMi(center, tool.location!) > radiusMi)
         tools.push(tool);
     });

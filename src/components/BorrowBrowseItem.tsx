@@ -14,7 +14,7 @@ const BorrowBrowseItem: React.FC<BorrowBrowseItemProps> = (props: BorrowBrowseIt
   return (
       <Card onPress={() => {
         props.navigation.navigate("ToolDetail", {
-          tool: props.tool,
+          toolId: props.tool.id,
         });
       }}>
         {/*TODO This styling is probably wrong*/}

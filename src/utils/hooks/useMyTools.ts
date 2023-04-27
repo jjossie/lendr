@@ -17,13 +17,10 @@ export function useMyTools(): ITool[] {
     if (!authUser) return;
 
     const refFromUid = getRefFromUid(authUser.uid);
-    console.log(refFromUid);
     const q = query(collection(db, "tools"), where("lenderRef", "==", refFromUid));
     const unsub = onSnapshot(q, (snapshot) => {
-      console.log(snapshot);
       const docDataList: ITool[] = [];
       snapshot.forEach(document => {
-        console.log(`found tool ${document.id}`);
         docDataList.push({id: document.id, ...document.data()} as ITool);
       });
       setList(docDataList);

@@ -7,14 +7,13 @@ import {ITool} from "../../models/Tool";
 
 
 const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
-
   // State
-  const [toolData, setToolData] = useState<ITool | undefined>(route.params?.tool);
-
+  const [toolData, setToolData] = useState<ITool | undefined>();
+  console.debug(`ToolDetail rendering with Tool: ${toolData?.name}`);
 
   // Side Effect
   useEffect(() => {
-    getToolById(route.params?.tool?.id)
+    getToolById(route.params?.toolId)
         .then(data => {
           setToolData(data!);
         })
@@ -32,7 +31,6 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
           <Text fontWeight={500} fontSize={"lg"}>${toolData.rate?.price}/{toolData.rate?.timeUnit}</Text>
           <Text fontSize="md">{toolData.description}</Text>
           <Text>{toolData.lender?.name} - {toolData.lender?.rating}/5 stars</Text>
-          {/*<Text>{JSON.stringify(toolData)}</Text>*/}
 
           <Text>
           {toolData.preferences?.localPickup ? "✅ Local pickup" : "❌ No Local Pickup" }
