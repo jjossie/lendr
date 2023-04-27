@@ -10,23 +10,25 @@ export type LenderInventoryItemProps = {
   navigation: any
 }
 
-const LenderInventoryItem: React.FC<LenderInventoryItemProps> = (props: LenderInventoryItemProps) => {
+const LenderInventoryItem: React.FC<LenderInventoryItemProps> = ({tool, navigation}) => {
 
+  const keywords = tool.name.split(" ");
+  const keywordString = keywords.join(",");
   return (
         <Card onPress={() => {
-          props.navigation.navigate("EditTool", {
-            tool: props.tool,
+          navigation.navigate("EditTool", {
+            tool: tool,
           });
         }}>
           <Row w="100%" h={32}>
             <Column py={4} w="50%" h="100%">
-              <Text fontSize="lg">{props.tool.name}</Text>
+              <Text fontSize="lg">{tool.name}</Text>
               <Row alignItems="center">
-                <Text fontSize="4xl" bold>${props.tool.rate.price}</Text><Text
-                  fontSize="md">/{props.tool.rate.timeUnit}</Text>
+                <Text fontSize="4xl" bold>${tool.rate.price}</Text><Text
+                  fontSize="md">/{tool.rate.timeUnit}</Text>
               </Row>
             </Column>
-            <Image source={{uri: "https://source.unsplash.com/random/640×480/?hammer,saw,woodworking,"}} style={style.image}/>
+            <Image source={{uri: `https://source.unsplash.com/random/640×480/?${keywordString}`}} style={style.image}/>
           </Row>
         </Card>
   );
