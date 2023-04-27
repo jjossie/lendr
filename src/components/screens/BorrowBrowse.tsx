@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Column, Input, Row, ScrollView} from 'native-base';
+import {Column, Input, Row, ScrollView, theme} from 'native-base';
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import BorrowBrowseItem from "../BorrowBrowseItem";
 import {ITool} from "../../models/Tool";
@@ -21,19 +21,24 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
   const [searchTerm, setSearchTerm] = useState("");
 
   return (
-      <ScrollView>
-        <Column space="xs">
-          <Input variant="filled"
-                 value={searchTerm}
-                 onChangeText={text => setSearchTerm(text)}/>
+      <Column>
+        <Input variant="filled"
+               value={searchTerm}
+               size="lg"
+               mx={4}
+               my={2}
+               backgroundColor={theme.colors.white}
+               placeholder="Search"
+               onChangeText={text => setSearchTerm(text)}/>
 
-          <Row flexWrap="wrap">
+        <ScrollView>
+          <Row flexWrap="wrap" px={2}>
             {toolsList.map(tool => {
               return <BorrowBrowseItem key={tool.id} tool={tool} navigation={navigation}/>;
             })}
           </Row>
-        </Column>
-      </ScrollView>
+        </ScrollView>
+      </Column>
   );
 };
 

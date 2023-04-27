@@ -17,7 +17,7 @@ const Card: React.FC<CardProps> = (props: CardProps) => {
           onPressOut={() => {setIsPressed(false);}}
           onPress={(e) => {props.onPress(e)}}
           overflow="hidden"
-          m={4}
+          m={2}
           backgroundColor={isPressed ? theme.colors.light["100"] : theme.colors.white}
           shadow={3}
           borderRadius="md"

@@ -44,6 +44,5 @@ const style = StyleSheet.create({
   },
   image: {
     width: 200,
-    borderRadius: 10,
   },
 });

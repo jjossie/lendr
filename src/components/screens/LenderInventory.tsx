@@ -12,16 +12,11 @@ const LenderInventory: React.FC<NativeStackScreenProps<any>> = ({navigation}) =>
 
   // Side Effects
 
-  // Callbacks
-  // const onToolAdded = (newTool: ITool) => {
-  //   setToolsList((old: ITool[]) => [...old, newTool]);
-  // }
-
   return (
       <ScrollView>
-        <Column>
+        <Column p={4}>
           <Text p={4} bold fontSize="4xl">My Tools</Text>
-          {toolsList.map(tool => { // Key should be different probably
+          {toolsList.map(tool => {
             return <LenderInventoryItem navigation={navigation}
                                         key={tool.id + tool.name}
                                         tool={tool}/>;

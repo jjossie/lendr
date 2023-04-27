@@ -6,8 +6,8 @@ import {NavigationProp} from "@react-navigation/native";
 import {ITool} from "../models/Tool";
 
 export interface BorrowBrowseItemProps {
-  navigation: NavigationProp<any>
-  tool: ITool
+  navigation: NavigationProp<any>;
+  tool: ITool;
 }
 
 const BorrowBrowseItem: React.FC<BorrowBrowseItemProps> = ({navigation, tool}) => {
@@ -18,16 +18,16 @@ const BorrowBrowseItem: React.FC<BorrowBrowseItemProps> = ({navigation, tool}) =
       <Card
           px={0} py={0}
           onPress={() => {
-        navigation.navigate("ToolDetail", {
-          toolId: tool.id,
-        });
-      }}>
-        <Column w="100%" h={72}>
+            navigation.navigate("ToolDetail", {
+              toolId: tool.id,
+            });
+          }}>
+        <Column w="100%" h={64}>
           <Image source={{uri: `https://source.unsplash.com/random/320x320/?${keywordString}`}} style={style.image}/>
           <Column w="100%" h="50%" p={2}>
             <Text fontSize="md">{tool.name}</Text>
             <Row alignItems="center">
-              <Text fontSize="2xl" bold>${tool.rate.price}</Text><Text
+              <Text fontSize="xl" bold>${tool.rate.price}</Text><Text
                 fontSize="md">/{tool.rate.timeUnit}</Text>
             </Row>
             <Text fontSize="sm">8 mi away</Text>
@@ -41,8 +41,7 @@ export default BorrowBrowseItem;
 
 const style = StyleSheet.create({
   image: {
-    width: 174,
-    height: 174,
-    borderRadius: 10,
+    width: 182,
+    height: 158,
   },
 });
