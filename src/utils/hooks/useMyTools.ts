@@ -2,29 +2,33 @@ import React from 'react';
 import {collection, onSnapshot, query, where} from "firebase/firestore";
 import {db} from "../../config/firebase";
 import {ITool} from "../../models/Tool";
-import {User} from "firebase/auth";
 import {getRefFromUid} from "../../models/LendrUser";
+import {useAuthentication} from "./useAuthentication";
 
-export function useMyTools(user?: User) {
+export function useMyTools(): ITool[] {
+
   const [list, setList] = React.useState<ITool[]>([]);
+  const {authUser} = useAuthentication();
+
   console.log("🛠️useMyTools()");
 
   React.useEffect(() => {
     // This might run before user is initialized - just skip if that's the case
-    if (!user) return;
+    if (!authUser) return;
 
-    const refFromUid = getRefFromUid(user?.uid);
+    const refFromUid = getRefFromUid(authUser.uid);
     console.log(refFromUid);
     const q = query(collection(db, "tools"), where("lenderRef", "==", refFromUid));
     const unsub = onSnapshot(q, (snapshot) => {
-
+      console.log(snapshot);
       const docDataList: ITool[] = [];
       snapshot.forEach(document => {
+        console.log(`found tool ${document.id}`);
         docDataList.push({id: document.id, ...document.data()} as ITool);
       });
       setList(docDataList);
     });
-  }, []);
+  }, [authUser]);
 
   return list;
 }

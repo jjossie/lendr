@@ -2,15 +2,13 @@ import React from 'react';
 import {Button, Column, ScrollView, Text} from 'native-base';
 import LenderInventoryItem from "../LenderInventoryItem";
 import Spacer from "../utilities/Spacer";
-import {useAuthentication} from "../../utils/hooks/useAuthentication";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {useMyTools} from "../../utils/hooks/useMyTools";
 
 const LenderInventory: React.FC<NativeStackScreenProps<any>> = ({navigation}) => {
 
   // State
-  const {authUser} = useAuthentication();
-  const toolsList = useMyTools(authUser);
+  const toolsList = useMyTools();
 
   // Side Effects
 
