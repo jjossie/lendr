@@ -5,6 +5,8 @@ import {GestureResponderEvent} from "react-native";
 export interface CardProps {
   children: any;
   onPress: (e?: GestureResponderEvent) => void;
+  px?: number;
+  py?: number;
 }
 
 const Card: React.FC<CardProps> = (props: CardProps) => {
@@ -25,7 +27,7 @@ const Card: React.FC<CardProps> = (props: CardProps) => {
             }],
           }}
       >
-        <Box px="4">
+        <Box px={props.px || 0} py={props.py || 0}>
           {props.children}
         </Box>
       </Pressable>

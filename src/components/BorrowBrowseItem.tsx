@@ -10,23 +10,27 @@ export interface BorrowBrowseItemProps {
   tool: ITool
 }
 
-const BorrowBrowseItem: React.FC<BorrowBrowseItemProps> = (props: BorrowBrowseItemProps) => {
+const BorrowBrowseItem: React.FC<BorrowBrowseItemProps> = ({navigation, tool}) => {
+
+  const keywordString = tool.name.split(" ").join(",");
+
   return (
-      <Card onPress={() => {
-        props.navigation.navigate("ToolDetail", {
-          toolId: props.tool.id,
+      <Card
+          px={0} py={0}
+          onPress={() => {
+        navigation.navigate("ToolDetail", {
+          toolId: tool.id,
         });
       }}>
-        {/*TODO This styling is probably wrong*/}
-        <Column w="50%" h={32}>
-          <Image source={{uri: "https://source.unsplash.com/random/640×480/?hammer,saw,woodworking,"}} style={style.image}/>
-          <Column py={4} w="100%" h="50%">
-            <Text fontSize="lg">{props.tool.name}</Text>
+        <Column w="100%" h={72}>
+          <Image source={{uri: `https://source.unsplash.com/random/320x320/?${keywordString}`}} style={style.image}/>
+          <Column w="100%" h="50%" p={2}>
+            <Text fontSize="md">{tool.name}</Text>
             <Row alignItems="center">
-              <Text fontSize="2xl" bold>${props.tool.rate.price}</Text><Text
-                fontSize="md">/{props.tool.rate.timeUnit}</Text>
+              <Text fontSize="2xl" bold>${tool.rate.price}</Text><Text
+                fontSize="md">/{tool.rate.timeUnit}</Text>
             </Row>
-            <Text fontSize="md">8 mi away</Text>
+            <Text fontSize="sm">8 mi away</Text>
           </Column>
         </Column>
       </Card>
@@ -37,7 +41,8 @@ export default BorrowBrowseItem;
 
 const style = StyleSheet.create({
   image: {
-    width: 200,
+    width: 174,
+    height: 174,
     borderRadius: 10,
   },
 });

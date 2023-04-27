@@ -12,8 +12,7 @@ export type LenderInventoryItemProps = {
 
 const LenderInventoryItem: React.FC<LenderInventoryItemProps> = ({tool, navigation}) => {
 
-  const keywords = tool.name.split(" ");
-  const keywordString = keywords.join(",");
+  const keywordString = tool.name.split(" ").join(",");
   return (
         <Card onPress={() => {
           navigation.navigate("EditTool", {
@@ -21,7 +20,7 @@ const LenderInventoryItem: React.FC<LenderInventoryItemProps> = ({tool, navigati
           });
         }}>
           <Row w="100%" h={32}>
-            <Column py={4} w="50%" h="100%">
+            <Column p={4} w="50%" h="100%">
               <Text fontSize="lg">{tool.name}</Text>
               <Row alignItems="center">
                 <Text fontSize="4xl" bold>${tool.rate.price}</Text><Text

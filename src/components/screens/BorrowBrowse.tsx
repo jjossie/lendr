@@ -21,8 +21,8 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
   const [searchTerm, setSearchTerm] = useState("");
 
   return (
-      <ScrollView p={8}>
-        <Column space="sm">
+      <ScrollView>
+        <Column space="xs">
           <Input variant="filled"
                  value={searchTerm}
                  onChangeText={text => setSearchTerm(text)}/>
