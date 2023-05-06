@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import {getAuth, onAuthStateChanged, signOut, User} from 'firebase/auth';
 import {AuthError} from "../errors";
 import {getUserFromAuth} from "../../controllers/auth";
-import {DocumentData} from "firebase/firestore";
+import {LendrUser} from "../../models/LendrUser";
 
 const auth = getAuth();
 
@@ -15,7 +15,7 @@ const auth = getAuth();
  * @returns {{user: User | undefined}}
  */
 export function useAuthentication() {
-  const [user, setUser] = useState<DocumentData | undefined>(undefined);
+  const [user, setUser] = useState<LendrUser | undefined>(undefined);
   const [authUser, setAuthUser] = useState<User>();
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export function useAuthentication() {
 
         // Get the Lendr foundUser from Firestore
         getUserFromAuth(foundUser)
-            .then(u => setUser(u))
+            .then(u => setUser(u as LendrUser))
             .catch(e => console.log(e.message));
 
       } else {
