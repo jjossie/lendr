@@ -4,12 +4,14 @@ import {Column, Heading, Text} from "native-base";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {getToolById} from "../../controllers/Tool";
 import {ITool} from "../../models/Tool";
+import LenderProfilePreview from "../LenderProfilePreview";
 
 
 const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
   // State
   const [toolData, setToolData] = useState<ITool | undefined>();
   console.debug(`ToolDetail rendering with Tool: ${toolData?.name}`);
+  console.debug(toolData);
 
   // Side Effect
   useEffect(() => {
@@ -19,7 +21,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
         })
         .catch((e) => {
           console.log("Error in retrieving ToolData 👹");
-          console.log(e.message)
+          console.log(e.message);
           navigation.goBack();
         });
   }, []);
@@ -28,18 +30,22 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
       <ScrollView>
         {toolData ? <Column bg="#FFF" p={5} space={3}>
           <Heading>{toolData.brand} {toolData.name}</Heading>
-          <Text fontWeight={500} fontSize={"lg"}>${toolData.rate?.price}/{toolData.rate?.timeUnit}</Text>
+          <Text fontWeight={500}
+                fontSize={"lg"}><Text bold fontSize={"2xl"}>${toolData.rate?.price}</Text>/{toolData.rate?.timeUnit}</Text>
           <Text fontSize="md">{toolData.description}</Text>
-          <Text>{toolData.lender?.name} - {toolData.lender?.rating}/5 stars</Text>
 
+          <Heading paddingTop={4} size="sm">Lender</Heading>
+          <LenderProfilePreview user={toolData.lender!}/>
+
+          <Heading paddingTop={4} size="sm">Details</Heading>
           <Text>
-          {toolData.preferences?.localPickup ? "✅ Local pickup" : "❌ No Local Pickup" }
+            {toolData.preferences?.localPickup ? "✅ Local pickup" : "❌ No Local Pickup"}
           </Text>
           <Text>
-          {toolData.preferences?.delivery ? "✅ Will deliver" : "❌ No delivery" }
+            {toolData.preferences?.delivery ? "✅ Will deliver" : "❌ No delivery"}
           </Text>
           <Text>
-          {toolData.preferences?.useOnSite ? "✅ Available to use at lender location" : "❌ Not available to use at lender location" }
+            {toolData.preferences?.useOnSite ? "✅ Available to use at lender location" : "❌ Not available to use at lender location"}
           </Text>
         </Column> : null}
       </ScrollView>

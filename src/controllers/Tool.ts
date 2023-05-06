@@ -90,9 +90,16 @@ export async function getToolById(toolId: string): Promise<ITool | undefined> {
   if (!toolDocSnap.exists())
     throw new NotFoundError(`Tool with id ${toolId} does not exist in database 🫢`);
 
+  const toolData = toolDocSnap.data() as ITool;
+  const lenderSnap = await getDoc(toolData.lenderRef);
+
+  if (!lenderSnap.exists())
+    throw new NotFoundError(`Lender with id ${toolData.lenderRef.id} not found ⁉️`);
+
   return {
     id: toolDocSnap.id,
-    ...toolDocSnap.data()
+    lender: lenderSnap.data(),
+    ...toolData
   } as ITool;
 }
 

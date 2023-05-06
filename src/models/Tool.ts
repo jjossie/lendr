@@ -1,5 +1,6 @@
 import {ILocation} from "./Location";
 import {DocumentReference} from "firebase/firestore";
+import {LendrUser} from "./LendrUser";
 
 export interface ITool {
   id?: string;
@@ -7,12 +8,7 @@ export interface ITool {
   brand?: string;
   description: string;
   lenderRef: DocumentReference;
-  lender?: {
-    uid?: string;
-    name: string;
-    profileImgPath: string;
-    rating: number;
-  },
+  lender?: LendrUser,
 
   rate: {
     price: number;
