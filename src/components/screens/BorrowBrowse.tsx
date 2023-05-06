@@ -3,7 +3,7 @@ import {Column, Input, Row, ScrollView, Spacer, theme} from 'native-base';
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import BorrowBrowseItem from "../BorrowBrowseItem";
 import {ITool} from "../../models/Tool";
-import {getAllTools} from "../../controllers/Tool";
+import {getToolsWithinRadius} from "../../controllers/Tool";
 
 
 const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
@@ -12,7 +12,7 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
 
   // Side Effects
   useEffect(() => {
-    getAllTools().then(tools => {
+    getToolsWithinRadius(50, [43.823669, -111.777553]).then(tools => {
       setToolsList(tools);
     });
   }, [setToolsList]);

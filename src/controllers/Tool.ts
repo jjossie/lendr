@@ -18,9 +18,13 @@ import {ITool, IToolForm} from "../models/Tool";
 import {getAuth} from "firebase/auth";
 import {AuthError, NotFoundError, ObjectValidationError} from "../utils/errors";
 
-import geofire from "geofire-common";
-import {distanceBetweenMi, getGeohashedLocation, ILocation, metersFromMiles} from "../models/Location";
+import {Geopoint} from "geofire-common";
+import {distanceBetweenMi, getGeohashedLocation, getRandomCityGeopoint, metersFromMiles} from "../models/Location";
 import {getRefFromUid} from "../models/LendrUser";
+
+const geofire = require("geofire-common");
+
+
 
 export async function createTool(newTool: IToolForm) {
 
@@ -36,13 +40,12 @@ export async function createTool(newTool: IToolForm) {
   const auth = getAuth();
   if (!auth.currentUser)
     throw new AuthError();
-
   return addDoc(collection(db, "tools"), {
     lenderRef: getRefFromUid(auth.currentUser.uid),
     holderRef: getRefFromUid(auth.currentUser.uid),
     createdAt: serverTimestamp(),
     modifiedAt: serverTimestamp(),
-    location: getGeohashedLocation(43.823791, -111.777649), // Hardcoded rexburg location for now
+    location: getGeohashedLocation(getRandomCityGeopoint()),
     ...newTool,
   });
 }
@@ -67,7 +70,7 @@ export async function editTool(toolId: string, newTool: IToolForm) {
     lenderRef: getRefFromUid(auth.currentUser.uid),
     holderRef: getRefFromUid(auth.currentUser.uid),
     modifiedAt: serverTimestamp(),
-    location: getGeohashedLocation(43.823791, -111.777649), // Hardcoded rexburg location for now
+    location: getGeohashedLocation(getRandomCityGeopoint()),
     ...newTool,
   }, {merge: false});
 }
@@ -104,10 +107,14 @@ export async function getToolById(toolId: string): Promise<ITool | undefined> {
 }
 
 
-export async function getToolsWithinRadius(radiusMi: number, center: ILocation) {
+export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
+  if (!radiusMi || !center)
+    return;
+  console.log(`Getting tools within ${radiusMi} miles of ${center[0]}, ${center[1]}`);
   const radiusM = metersFromMiles(radiusMi);
 
-  const bounds = geofire.geohashQueryBounds([center.latitude, center.longitude], radiusM);
+  const bounds = geofire.geohashQueryBounds(center, radiusM);
+  console.log(`Bounds: ${bounds}`);
   const promises: Promise<QuerySnapshot<DocumentData>>[] = [];
 
   bounds.forEach((bound: any) => {
@@ -129,7 +136,7 @@ export async function getToolsWithinRadius(radiusMi: number, center: ILocation) 
         id: document.id,
         ...document.data(),
       } as ITool;
-      if (distanceBetweenMi(center, tool.location!) > radiusMi)
+      if (distanceBetweenMi(center, [tool.location!.latitude, tool.location!.longitude]) < radiusMi)
         tools.push(tool);
     });
   });
