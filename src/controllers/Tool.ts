@@ -19,11 +19,16 @@ import {getAuth} from "firebase/auth";
 import {AuthError, NotFoundError, ObjectValidationError} from "../utils/errors";
 
 import {Geopoint} from "geofire-common";
-import {distanceBetweenMi, getGeohashedLocation, getRandomCityGeopoint, metersFromMiles} from "../models/Location";
+import {
+  distanceBetweenMi,
+  getCityNameFromGeopoint,
+  getGeohashedLocation,
+  getRandomCityGeopoint,
+  metersFromMiles,
+} from "../models/Location";
 import {getRefFromUid} from "../models/LendrUser";
 
 const geofire = require("geofire-common");
-
 
 
 export async function createTool(newTool: IToolForm) {
@@ -102,7 +107,7 @@ export async function getToolById(toolId: string): Promise<ITool | undefined> {
   return {
     id: toolDocSnap.id,
     lender: lenderSnap.data(),
-    ...toolData
+    ...toolData,
   } as ITool;
 }
 
@@ -114,7 +119,6 @@ export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
   const radiusM = metersFromMiles(radiusMi);
 
   const bounds = geofire.geohashQueryBounds(center, radiusM);
-  console.log(`Bounds: ${bounds}`);
   const promises: Promise<QuerySnapshot<DocumentData>>[] = [];
 
   bounds.forEach((bound: any) => {
@@ -131,13 +135,25 @@ export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
   const snapshots = await Promise.all(promises);
   const tools: ITool[] = [];
   snapshots.forEach(snapshot => {
-    snapshot.forEach(document => {
-      const tool: ITool = {
-        id: document.id,
-        ...document.data(),
-      } as ITool;
-      if (distanceBetweenMi(center, [tool.location!.latitude, tool.location!.longitude]) < radiusMi)
+    snapshot.forEach(async document => {
+      const toolData = document.data() as ITool;
+      // Get geopoint from tool data
+      const geopoint: Geopoint = [toolData.location.latitude, toolData.location.longitude];
+      // Check if geopoint is within radius
+      if (distanceBetweenMi(center, geopoint) < radiusMi) {
+        // Get city name from geopoint
+        const city = await getCityNameFromGeopoint(geopoint);
+        // Populate tool fields
+        const tool: ITool = {
+          id: document.id,
+          ...toolData,
+          location: {
+            ...toolData.location,
+            city: city,
+          },
+        } ;
         tools.push(tool);
+      }
     });
   });
   return tools;

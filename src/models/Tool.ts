@@ -19,7 +19,7 @@ export interface ITool {
     localPickup: boolean;
     useOnSite: boolean;
   }
-  location?: ILocation;
+  location: ILocation;
 }
 
 /**

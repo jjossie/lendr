@@ -4,15 +4,18 @@ import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import BorrowBrowseItem from "../BorrowBrowseItem";
 import {ITool} from "../../models/Tool";
 import {getToolsWithinRadius} from "../../controllers/Tool";
+import {REXBURG} from "../../models/Location";
 
 
 const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
 
   const [toolsList, setToolsList]: [ITool[], any] = useState([]);
+  const [searchRadius, setSearchRadius] = useState(80);
+  const [searchLocation, setSearchLocation] = useState(REXBURG);
 
   // Side Effects
   useEffect(() => {
-    getToolsWithinRadius(50, [43.823669, -111.777553]).then(tools => {
+    getToolsWithinRadius(searchRadius, searchLocation).then(tools => {
       setToolsList(tools);
     });
   }, [setToolsList]);

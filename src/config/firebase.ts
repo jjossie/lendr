@@ -2,6 +2,8 @@ import {initializeApp} from 'firebase/app';
 import {getFirestore} from 'firebase/firestore';
 import {getAuth} from "firebase/auth";
 import Constants from "expo-constants";
+import Geocoder from 'react-native-geocoding';
+
 
 const firebaseConfig = {
   apiKey: Constants.manifest?.extra?.firebaseApiKey,
@@ -17,3 +19,5 @@ export const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+
+Geocoder.init(Constants.manifest?.extra?.firebaseApiKey);

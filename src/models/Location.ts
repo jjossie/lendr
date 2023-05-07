@@ -1,6 +1,6 @@
-// import geofire from "geofire-common";
-
 import {distanceBetween, geohashForLocation, Geopoint} from "geofire-common";
+
+import Geocoder from "react-native-geocoding";
 
 export const KM_TO_MILE = 0.621371;
 
@@ -13,11 +13,13 @@ export const SANTA_CLARA: Geopoint = [37.354167, -121.955278];
 export const SANTA_ANA: Geopoint = [34.020833, -118.479167];
 
 export const IDAHO_LOCATIONS = [REXBURG, IDAHOFALLS, POCATELLO, DRIGGS];
+export const CALIFORNIA_LOCATIONS = [SANJOSE, SANTA_CLARA, SANTA_ANA];
 
 export interface ILocation {
   latitude: number;
   longitude: number;
   geohash: string;
+  city?: string;
 }
 
 export interface ICoordinates {
@@ -73,9 +75,17 @@ export function metersFromMiles(miles: number): number {
   return miles / KM_TO_MILE * 1000;
 }
 
-function getCity(geopoint: Geopoint): string {
-  // TODO implement
-  return "Rexburg";
+export async function getCityNameFromGeopoint(geopoint: Geopoint): Promise<string> {
+  // Given a latitude and longitude, find the nearest city name
+  const response = await Geocoder.from(geopoint[0], geopoint[1]);
+  const result = response.results[0];
+  const city = result.address_components.find(component => {
+    return component.types.includes("locality");
+  })?.long_name;
+  const stateCode = result.address_components.find(component => {
+    return component.types.includes("administrative_area_level_1");
+  })?.short_name;
+  return (city && stateCode) ? `${city}, ${stateCode}` : "Unknown";
 }
 
 export function getRandomCityGeopoint() {
