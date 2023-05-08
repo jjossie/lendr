@@ -32,6 +32,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
           <Text fontWeight={500}
                 fontSize={"lg"}><Text bold fontSize={"2xl"}>${toolData.rate?.price}</Text>/{toolData.rate?.timeUnit}</Text>
           <Text fontSize="md">{toolData.description}</Text>
+          <Text fontSize="sm">{toolData.location.city}</Text>
 
           <Heading pt={4} size="sm">Lender</Heading>
           <LenderProfilePreview user={toolData.lender!}/>

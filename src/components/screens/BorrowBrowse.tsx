@@ -10,12 +10,13 @@ import {REXBURG} from "../../models/Location";
 const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
 
   const [toolsList, setToolsList]: [ITool[], any] = useState([]);
-  const [searchRadius, setSearchRadius] = useState(80);
+  const [searchRadius, setSearchRadius] = useState(50);
   const [searchLocation, setSearchLocation] = useState(REXBURG);
 
   // Side Effects
   useEffect(() => {
     getToolsWithinRadius(searchRadius, searchLocation).then(tools => {
+      console.log(tools);
       setToolsList(tools);
     });
   }, [setToolsList]);
