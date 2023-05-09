@@ -30,7 +30,7 @@ const BorrowBrowseItem: React.FC<BorrowBrowseItemProps> = ({navigation, tool}) =
               <Text fontSize="xl" bold>${tool.rate.price}</Text><Text
                 fontSize="md">/{tool.rate.timeUnit}</Text>
             </Row>
-            <Text fontSize="sm">8 mi away</Text>
+            <Text fontSize="sm">{tool.location.relativeDistance} mi away</Text>
           </Column>
         </Column>
       </Card>

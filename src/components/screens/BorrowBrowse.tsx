@@ -16,7 +16,6 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
   // Side Effects
   useEffect(() => {
     getToolsWithinRadius(searchRadius, searchLocation).then(tools => {
-      console.log(tools);
       setToolsList(tools);
     });
   }, [setToolsList]);

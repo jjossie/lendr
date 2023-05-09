@@ -108,6 +108,10 @@ export async function getToolById(toolId: string): Promise<ITool | undefined> {
     id: toolDocSnap.id,
     lender: lenderSnap.data(),
     ...toolData,
+    location: {
+      ...toolData.location,
+      city: await getCityNameFromGeopoint([toolData.location.latitude, toolData.location.longitude]),
+    }
   } as ITool;
 }
 
@@ -135,21 +139,19 @@ export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
   const snapshots = await Promise.all(promises);
   const tools: ITool[] = [];
   snapshots.forEach(snapshot => {
-    snapshot.forEach(async document => {
+    snapshot.forEach(document => {
       const toolData = document.data() as ITool;
       // Get geopoint from tool data
       const geopoint: Geopoint = [toolData.location.latitude, toolData.location.longitude];
       // Check if geopoint is within radius
       if (distanceBetweenMi(center, geopoint) < radiusMi) {
-        // Get city name from geopoint
-        const city = await getCityNameFromGeopoint(geopoint);
         // Populate tool fields
         const tool: ITool = {
           id: document.id,
           ...toolData,
           location: {
             ...toolData.location,
-            city: city,
+            relativeDistance: distanceBetweenMi(geopoint, center)
           },
         } ;
         tools.push(tool);

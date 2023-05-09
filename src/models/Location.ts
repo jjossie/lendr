@@ -20,6 +20,7 @@ export interface ILocation {
   longitude: number;
   geohash: string;
   city?: string;
+  relativeDistance?: number;
 }
 
 export interface ICoordinates {
@@ -68,7 +69,7 @@ export function getGeohashedLocation(geopoint: Geopoint): ILocation {
 
 export function distanceBetweenMi(lhs: Geopoint, rhs: Geopoint): number {
   const distanceKm = distanceBetween(lhs, rhs);
-  return distanceKm * KM_TO_MILE;
+  return Math.round(distanceKm * KM_TO_MILE);
 }
 
 export function metersFromMiles(miles: number): number {
