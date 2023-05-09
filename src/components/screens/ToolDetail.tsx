@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView} from 'react-native';
+import {Image, ScrollView, StyleSheet} from 'react-native';
 import {Button, Column, Heading, Text} from "native-base";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {getToolById} from "../../controllers/Tool";
@@ -25,36 +25,54 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
         });
   }, []);
 
+
+  const keywordString = toolData?.name.split(" ").join(",");
+
   return (
       <ScrollView>
-        {toolData ? <Column bg="#FFF" p={5} space={3}>
-          <Heading>{toolData.brand} {toolData.name}</Heading>
-          <Text fontWeight={500}
-                fontSize={"lg"}><Text bold fontSize={"2xl"}>${toolData.rate?.price}</Text>/{toolData.rate?.timeUnit}</Text>
-          <Text fontSize="md">{toolData.description}</Text>
-          <Text fontSize="sm">{toolData.location.city}</Text>
+        {toolData ?
+            <>
+              <Image source={{uri: `https://source.unsplash.com/random/?${keywordString},tool,tool-repair`}} style={style.image}/>
+              <Column bg="#FFF" p={5} space={3}>
+                <Heading>{toolData.brand} {toolData.name}</Heading>
+                <Text fontWeight={500}
+                      fontSize={"lg"}><Text bold
+                                            fontSize={"2xl"}>${toolData.rate?.price}</Text>/{toolData.rate?.timeUnit}
+                </Text>
+                <Text fontSize="md">{toolData.description}</Text>
 
-          <Heading pt={4} size="sm">Lender</Heading>
-          <LenderProfilePreview user={toolData.lender!}/>
+                <Heading pt={4} size="sm">Location</Heading>
+                <Text fontSize="sm">📍{toolData.location.city}</Text>
 
-          <Button onPress={() => navigation.navigate("")} mt={4}>Message Lender</Button>
+                <Heading pt={4} size="sm">Lender</Heading>
+                <LenderProfilePreview user={toolData.lender!}/>
 
-          <Heading pt={4} size="sm">Details</Heading>
-          <Text>
-            {toolData.preferences?.localPickup ? "✅ Local pickup" : "❌ No Local Pickup"}
-          </Text>
-          <Text>
-            {toolData.preferences?.delivery ? "✅ Will deliver" : "❌ No delivery"}
-          </Text>
-          <Text>
-            {toolData.preferences?.useOnSite ? "✅ Available to use at lender location" : "❌ Not available to use at lender location"}
-          </Text>
+                <Button onPress={() => navigation.navigate("")} mt={4}>Message Lender</Button>
+
+                <Heading pt={4} size="sm">Details</Heading>
+                <Text>
+                  {toolData.preferences?.localPickup ? "✅ Local pickup" : "❌ No Local Pickup"}
+                </Text>
+                <Text>
+                  {toolData.preferences?.delivery ? "✅ Will deliver" : "❌ No delivery"}
+                </Text>
+                <Text>
+                  {toolData.preferences?.useOnSite ? "✅ Available to use at lender location" : "❌ Not available to use at lender location"}
+                </Text>
 
 
-        </Column> : null}
+              </Column>
+            </> : null}
 
       </ScrollView>
   );
 };
 
 export default ToolDetail;
+
+const style = StyleSheet.create({
+  image: {
+    width: "100%",
+    height: 240,
+  },
+});

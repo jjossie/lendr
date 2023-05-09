@@ -94,3 +94,11 @@ export function getRandomCityGeopoint() {
   const randomCityIndex = Math.floor(Math.random() * IDAHO_LOCATIONS.length);
   return IDAHO_LOCATIONS[randomCityIndex];
 }
+
+export async function getGeopointFromCityName(cityName: string): Promise<Geopoint> {
+  // Given a city name, find the geopoint
+  const response = await Geocoder.from(cityName);
+  const result = response.results[0];
+  const geopoint = result.geometry.location;
+  return [geopoint.lat, geopoint.lng];
+}

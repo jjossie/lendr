@@ -104,13 +104,14 @@ export async function getToolById(toolId: string): Promise<ITool | undefined> {
   if (!lenderSnap.exists())
     throw new NotFoundError(`Lender with id ${toolData.lenderRef.id} not found ⁉️`);
 
+  const geopoint: Geopoint = [toolData.location.latitude, toolData.location.longitude];
   return {
     id: toolDocSnap.id,
     lender: lenderSnap.data(),
     ...toolData,
     location: {
       ...toolData.location,
-      city: await getCityNameFromGeopoint([toolData.location.latitude, toolData.location.longitude]),
+      city: await getCityNameFromGeopoint(geopoint),
     }
   } as ITool;
 }
