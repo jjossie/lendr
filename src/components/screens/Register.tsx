@@ -21,7 +21,7 @@ const Login: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
 
 
   return (
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps="handled">
         <Center h="100%" w="100%" py={12}>
           <Column w={80} space={4}>
 

@@ -18,6 +18,7 @@ import {
 import {ExchangePreferences, ITool, IToolForm, TimeUnit} from "../../models/Tool";
 import {createTool, deleteTool, editTool, getToolById} from "../../controllers/Tool";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
+import {Keyboard} from "react-native";
 
 
 const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
@@ -130,7 +131,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   }, [route.params?.toolId, navigation]);
 
   return (
-      <ScrollView bg={theme.colors.white}>
+      <ScrollView bg={theme.colors.white} onScroll={() => Keyboard.dismiss()} >
         <Column alignItems="center" space={4} mx={3} my={4} py={12}>
           {/* Basic Text Input */}
           <FormControl isRequired>
