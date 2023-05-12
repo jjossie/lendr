@@ -91,7 +91,7 @@ export async function getAllTools(): Promise<ITool[]> {
 }
 
 
-export async function getToolById(toolId: string): Promise<ITool | undefined> {
+export async function getToolById(toolId: string, userGeopoint?: Geopoint): Promise<ITool | undefined> {
   const toolDocRef = doc(db, "tools", toolId);
   const toolDocSnap = await getDoc(toolDocRef);
 
@@ -105,7 +105,7 @@ export async function getToolById(toolId: string): Promise<ITool | undefined> {
     throw new NotFoundError(`Lender with id ${toolData.lenderRef.id} not found ⁉️`);
 
   const geopoint: Geopoint = [toolData.location.latitude, toolData.location.longitude];
-  return {
+  let result: ITool = {
     id: toolDocSnap.id,
     lender: lenderSnap.data(),
     ...toolData,
@@ -114,6 +114,9 @@ export async function getToolById(toolId: string): Promise<ITool | undefined> {
       city: await getCityNameFromGeopoint(geopoint),
     }
   } as ITool;
+  if (userGeopoint)
+    result.location.relativeDistance = distanceBetweenMi(userGeopoint, geopoint);
+  return result
 }
 
 
