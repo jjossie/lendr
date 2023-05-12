@@ -80,6 +80,31 @@ export async function editTool(toolId: string, newTool: IToolForm) {
   }, {merge: false});
 }
 
+export async function deleteTool(toolId: string) {
+  console.log(`Deleting tool ${toolId}`);
+
+  // Confirm user is logged in
+  const auth = getAuth();
+  if (!auth.currentUser)
+    throw new AuthError("Must be logged in 🤬");
+
+  // Confirm this tool exists
+  const toolRef = doc(db, "tools", toolId);
+  const toolSnap = await getDoc(toolRef);
+  if (!toolSnap.exists())
+    throw new NotFoundError(`Tool with id ${toolId} not found 🤷‍`);
+
+  // Confirm this user owns it
+  const tool = toolSnap.data() as ITool;
+  if (tool.lenderRef.path != getRefFromUid(auth.currentUser.uid).path)
+    throw new AuthError("You are not authorized to delete this tool 🤨");
+
+  // Actually Delete the tool
+  return setDoc(toolRef, {
+    deletedAt: serverTimestamp(),
+  }, {merge: false});
+}
+
 export async function getAllTools(): Promise<ITool[]> {
   const querySnapshot = await getDocs(collection(db, "tools"));
   let tools: ITool[] = [];

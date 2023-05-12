@@ -1,6 +1,7 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {
   Alert,
+  AlertDialog,
   Button,
   Center,
   Column,
@@ -15,7 +16,7 @@ import {
   theme,
 } from "native-base";
 import {ExchangePreferences, ITool, IToolForm, TimeUnit} from "../../models/Tool";
-import {createTool, editTool, getToolById} from "../../controllers/Tool";
+import {createTool, deleteTool, editTool, getToolById} from "../../controllers/Tool";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 
 
@@ -24,7 +25,9 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   // Component UI state
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("Failed to create tool. 👹");
   const [isEditing, setIsEditing] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   // Form state
   const [name, setName] = useState("");
@@ -37,6 +40,8 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     useOnSite: false,
   });
 
+  // References
+  const cancelRef = useRef(null);
 
   // Side Effects
   useEffect(() => {
@@ -45,7 +50,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
 
       // We're editing a tool, so fetch it
       setIsEditing(true);
-      setIsLoading(true)
+      setIsLoading(true);
       getToolById(route.params?.toolId)
           .then((tool: ITool | undefined) => {
             setName(tool!.name);
@@ -85,9 +90,10 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
         navigation.goBack();
       }).catch((e) => {
         console.log("Failed to create tool");
+        console.log(e);
+        setErrorMessage("Failed to create tool");
         setIsError(true);
         setIsLoading(false);
-        console.log(e);
       });
     } else {
       // Save existing tool
@@ -97,12 +103,31 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
         navigation.goBack();
       }).catch((e) => {
         console.log("Failed to edit tool");
+        console.log(e);
+        setErrorMessage("Failed to edit tool");
         setIsError(true);
         setIsLoading(false);
-        console.log(e);
       });
     }
-  }, [name, description, price, timeUnit, preferences]);
+  }, [name, description, price, timeUnit, preferences, isEditing]);
+
+
+  const handleDeleteTool = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      await deleteTool(route.params?.toolId);
+      setIsLoading(false);
+      setIsAlertOpen(false);
+      navigation.goBack();
+    } catch (e) {
+      console.log(e);
+      setIsError(true);
+      setErrorMessage("Failed to delete tool. 👺")
+      setIsAlertOpen(false);
+      setIsLoading(false);
+    }
+  }, [route.params?.toolId, navigation]);
 
   return (
       <ScrollView bg={theme.colors.white}>
@@ -210,7 +235,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
             </Row>
           </Column>
 
-          {isError && <Alert w="100%" status="error">Failed to create tool. 👹</Alert>}
+          {isError && <Alert w="100%" status="error">{errorMessage}</Alert>}
 
           <Button w="50%"
                   variant="solid"
@@ -220,6 +245,38 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
                   spinnerPlacement="start"
                   onPress={handleSaveTool}>{isEditing ? "Save Edits" : "Publish Tool"}</Button>
 
+          {isEditing &&
+            <>
+              <Button w="50%"
+                      variant="outline"
+                      colorScheme="danger"
+                      size="lg"
+                      isLoading={isLoading}
+                      isLoadingText=""
+                      spinnerPlacement="start"
+                      onPress={() => setIsAlertOpen(true)}>{"Delete Tool"}</Button>
+
+              <AlertDialog leastDestructiveRef={cancelRef} isOpen={isAlertOpen} onClose={() => setIsAlertOpen(false)}>
+                <AlertDialog.Content>
+                  <AlertDialog.CloseButton/>
+                  <AlertDialog.Header>Delete Tool</AlertDialog.Header>
+                  <AlertDialog.Body>
+                    This will permanently delete this tool. Are you sure?
+                  </AlertDialog.Body>
+                  <AlertDialog.Footer>
+                    <Button.Group space={2}>
+                      <Button variant="unstyled" colorScheme="coolGray" onPress={() => setIsAlertOpen(false)} ref={cancelRef}>
+                        Cancel
+                      </Button>
+                      <Button colorScheme="danger" onPress={handleDeleteTool}>
+                        Delete
+                      </Button>
+                    </Button.Group>
+                  </AlertDialog.Footer>
+                </AlertDialog.Content>
+              </AlertDialog>
+            </>
+          }
         </Column>
       </ScrollView>
   );
