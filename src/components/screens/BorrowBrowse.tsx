@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Column, Input, Row, ScrollView, Spacer, theme} from 'native-base';
+import {Column, Row, ScrollView, Spacer} from 'native-base';
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import BorrowBrowseItem from "../BorrowBrowseItem";
 import {ITool} from "../../models/Tool";
@@ -25,17 +25,21 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
 
   return (
       <Column>
-        <Input variant="filled"
-               value={searchTerm}
-               size="lg"
-               mx={4}
-               my={2}
-               backgroundColor={theme.colors.white}
-               placeholder="Search"
-               onChangeText={text => setSearchTerm(text)}/>
+        {/*<Input variant="filled"*/}
+        {/*       value={searchTerm}*/}
+        {/*       size="lg"*/}
+        {/*       mx={4}*/}
+        {/*       my={2}*/}
+        {/*       backgroundColor={theme.colors.white}*/}
+        {/*       placeholder="Search"*/}
+        {/*       onChangeText={text => setSearchTerm(text)}/>*/}
+
+        {/*<InstantSearch indexName={ALGOLIA_INDEX_NAME} searchClient={searchClient}>*/}
+        {/*  <SearchBox/>*/}
+        {/*</InstantSearch>*/}
 
         {/*<Input placeholder="Search" variant="filled" width="100%" borderRadius="10" py="1" px="2"*/}
-        {/*       InputLeftElement={<Icon ml="2" size="4" color="gray.400" as={<Ionicons name="ios-search"/>}/>}/>*/}
+        {/*       InputLeftElement={<Icon ml="2" size="4" color="gray.400" as={<Ionicons name="ios-algolia"/>}/>}/>*/}
 
         <ScrollView>
           <Row flexWrap="wrap" px={2}>
