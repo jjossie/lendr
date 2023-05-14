@@ -32,7 +32,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
       <ScrollView>
         {toolData ?
             <>
-              <Image source={{uri: `https://source.unsplash.com/random/?${keywordString},tool,tool-repair`}} style={style.image}/>
+              <Image source={{uri: `https://source.unsplash.com/random/?${keywordString},tool`}} style={style.image}/>
               <Column bg="#FFF" p={5} space={3}>
                 <Heading>{toolData.brand} {toolData.name}</Heading>
                 <Text fontWeight={500}
