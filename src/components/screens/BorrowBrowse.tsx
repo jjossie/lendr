@@ -1,24 +1,33 @@
 import React, {useEffect, useState} from 'react';
-import {Column, Row, ScrollView, Spacer} from 'native-base';
+import {Column, Row, ScrollView, Select, Spacer} from 'native-base';
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import BorrowBrowseItem from "../BorrowBrowseItem";
 import {ITool} from "../../models/Tool";
 import {getToolsWithinRadius} from "../../controllers/Tool";
-import {REXBURG} from "../../models/Location";
+import {useLocation} from "../../utils/hooks/useLocation";
 
 
 const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
 
   const [toolsList, setToolsList]: [ITool[], any] = useState([]);
-  const [searchRadius, setSearchRadius] = useState(50);
-  const [searchLocation, setSearchLocation] = useState(REXBURG);
+  const [searchRadius, setSearchRadius] = useState(5);
+  const [searchRadiusString, setSearchRadiusString] = useState<SearchRadiusString>("5");
+
+  const {geopoint, city} = useLocation();
 
   // Side Effects
   useEffect(() => {
-    getToolsWithinRadius(searchRadius, searchLocation).then(tools => {
-      setToolsList(tools);
-    });
-  }, [setToolsList]);
+    // getToolsWithinRadius(searchRadius, geopoint).then(tools => {
+    //   setToolsList(tools);
+    // });
+
+    (async () => {
+      if (geopoint.length === 2 && geopoint[0] !== undefined && geopoint[1] !== undefined && city !== undefined) {
+        const tools = await getToolsWithinRadius(searchRadius, geopoint);
+        setToolsList(tools);
+      }
+    })();
+  }, [searchRadiusString]);
 
   // State
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,6 +51,23 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
         {/*       InputLeftElement={<Icon ml="2" size="4" color="gray.400" as={<Ionicons name="ios-algolia"/>}/>}/>*/}
 
         <ScrollView>
+          <ScrollView w="200%" horizontal={true} showsHorizontalScrollIndicator={false}>
+            <Row>
+              <Select selectedValue={searchRadiusString}
+                      mx={4}
+                      my={2}
+                      onValueChange={(selectValue) => {
+                        setSearchRadiusString(selectValue as SearchRadiusString);
+                        setSearchRadius(parseInt(selectValue));
+                      }}>
+                <Select.Item label="5 miles" value="5"/>
+                <Select.Item label="10 miles" value="10"/>
+                <Select.Item label="20 miles" value="20"/>
+                <Select.Item label="30 miles" value="30"/>
+                <Select.Item label="50 miles" value="50"/>
+              </Select>
+            </Row>
+          </ScrollView>
           <Row flexWrap="wrap" px={2}>
             {toolsList.map(tool => {
               return <BorrowBrowseItem key={tool.id} tool={tool} navigation={navigation}/>;
@@ -54,3 +80,5 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
 };
 
 export default BorrowBrowse;
+
+type SearchRadiusString = "5" | "10" | "20" | "30" | "50" | "100";
