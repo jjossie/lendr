@@ -19,6 +19,7 @@ import {ExchangePreferences, ITool, IToolForm, TimeUnit} from "../../models/Tool
 import {createTool, deleteTool, editTool, getToolById} from "../../controllers/Tool";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {Keyboard} from "react-native";
+import {useLocation} from "../../utils/hooks/useLocation";
 
 
 const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
@@ -40,6 +41,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     localPickup: false,
     useOnSite: false,
   });
+  const {geopoint} = useLocation();
 
   // References
   const cancelRef = useRef(null);
@@ -74,7 +76,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     setIsLoading(true);
     setIsError(false);
 
-    const newTool: IToolForm = {
+    const toolForm: IToolForm = {
       name,
       description,
       rate: {
@@ -82,10 +84,11 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
         timeUnit: timeUnit,
       },
       preferences,
+      geopoint
     };
     if (!isEditing) {
       // Create new tool
-      createTool(newTool).then(() => {
+      createTool(toolForm).then(() => {
         console.log("Tool Created!");
         setIsLoading(false);
         navigation.goBack();
@@ -98,7 +101,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       });
     } else {
       // Save existing tool
-      editTool(route.params?.toolId, newTool).then(() => {
+      editTool(route.params?.toolId, toolForm).then(() => {
         console.log("Tool Saved!");
         setIsLoading(false);
         navigation.goBack();
@@ -110,7 +113,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
         setIsLoading(false);
       });
     }
-  }, [name, description, price, timeUnit, preferences, isEditing]);
+  }, [name, description, price, timeUnit, preferences, geopoint, isEditing]);
 
 
   const handleDeleteTool = useCallback(async () => {

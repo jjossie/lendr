@@ -19,26 +19,21 @@ import {getAuth} from "firebase/auth";
 import {AuthError, NotFoundError, ObjectValidationError} from "../utils/errors";
 
 import {Geopoint} from "geofire-common";
-import {
-  distanceBetweenMi,
-  getCityNameFromGeopoint,
-  getGeohashedLocation,
-  getRandomCityGeopoint,
-  metersFromMiles,
-} from "../models/Location";
+import {distanceBetweenMi, getCityNameFromGeopoint, getGeohashedLocation, metersFromMiles} from "../models/Location";
 import {getRefFromUid} from "../models/LendrUser";
 
 const geofire = require("geofire-common");
 
 
-export async function createTool(newTool: IToolForm) {
+export async function createTool(toolForm: IToolForm) {
 
   if (!(
-      newTool.description &&
-      newTool.name &&
-      newTool.rate.price &&
-      newTool.rate.timeUnit &&
-      newTool.preferences
+      toolForm.description &&
+      toolForm.name &&
+      toolForm.rate.price &&
+      toolForm.rate.timeUnit &&
+      toolForm.preferences &&
+      toolForm.geopoint
   ))
     throw new ObjectValidationError("Missing properties on newTool");
 
@@ -50,20 +45,27 @@ export async function createTool(newTool: IToolForm) {
     holderRef: getRefFromUid(auth.currentUser.uid),
     createdAt: serverTimestamp(),
     modifiedAt: serverTimestamp(),
-    location: getGeohashedLocation(getRandomCityGeopoint()),
-    ...newTool,
+    location: getGeohashedLocation(toolForm.geopoint),
+
+    // ...toolForm properties
+    name: toolForm.name,
+    description: toolForm.description,
+    rate: toolForm.rate,
+    preferences: toolForm.preferences,
+
   });
 }
 
-export async function editTool(toolId: string, newTool: IToolForm) {
+export async function editTool(toolId: string, toolForm: IToolForm) {
   console.log(`Editing tool ${toolId}`);
   // Validate Fields
   if (!(
-      newTool.description &&
-      newTool.name &&
-      newTool.rate.price &&
-      newTool.rate.timeUnit &&
-      newTool.preferences
+      toolForm.description &&
+      toolForm.name &&
+      toolForm.rate.price &&
+      toolForm.rate.timeUnit &&
+      toolForm.preferences &&
+      toolForm.geopoint
   ))
     throw new ObjectValidationError("Missing properties on newTool");
 
@@ -72,12 +74,18 @@ export async function editTool(toolId: string, newTool: IToolForm) {
     throw new AuthError("Must be logged in 😱");
 
   return setDoc(doc(db, "tools", toolId), {
-    lenderRef: getRefFromUid(auth.currentUser.uid),
-    holderRef: getRefFromUid(auth.currentUser.uid),
+    // lenderRef: getRefFromUid(auth.currentUser.uid), // TODO this might not be necessary
+    // holderRef: getRefFromUid(auth.currentUser.uid), // TODO this might not be necessary
     modifiedAt: serverTimestamp(),
-    location: getGeohashedLocation(getRandomCityGeopoint()),
-    ...newTool,
-  }, {merge: false});
+    location: getGeohashedLocation(toolForm.geopoint),
+
+    // ...toolForm properties
+    name: toolForm.name,
+    description: toolForm.description,
+    rate: toolForm.rate,
+    preferences: toolForm.preferences,
+
+  }, {merge: true});
 }
 
 export async function deleteTool(toolId: string) {
@@ -137,11 +145,11 @@ export async function getToolById(toolId: string, userGeopoint?: Geopoint): Prom
     location: {
       ...toolData.location,
       city: await getCityNameFromGeopoint(geopoint),
-    }
+    },
   } as ITool;
   if (userGeopoint)
     result.location.relativeDistance = distanceBetweenMi(userGeopoint, geopoint);
-  return result
+  return result;
 }
 
 
@@ -180,9 +188,9 @@ export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
           ...toolData,
           location: {
             ...toolData.location,
-            relativeDistance: distanceBetweenMi(geopoint, center)
+            relativeDistance: distanceBetweenMi(geopoint, center),
           },
-        } ;
+        };
         tools.push(tool);
       }
     });
