@@ -17,17 +17,20 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
 
   // Side Effects
   useEffect(() => {
-    // getToolsWithinRadius(searchRadius, geopoint).then(tools => {
-    //   setToolsList(tools);
-    // });
-
     (async () => {
-      if (geopoint.length === 2 && geopoint[0] !== undefined && geopoint[1] !== undefined && city !== undefined) {
+      if (geopoint &&
+          geopoint.length === 2 &&
+          geopoint[0] !== undefined &&
+          geopoint[1] !== undefined &&
+          city !== undefined) {
         const tools = await getToolsWithinRadius(searchRadius, geopoint);
         setToolsList(tools);
+      }else{
+        console.log("Cannot fetch tools - Location is uninitialized");
+        setToolsList([]);
       }
     })();
-  }, [searchRadiusString]);
+  }, [searchRadiusString, searchRadius]);
 
   // State
   const [searchTerm, setSearchTerm] = useState("");

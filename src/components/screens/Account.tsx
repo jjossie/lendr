@@ -11,34 +11,13 @@ const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
 
   const {authUser, user} = useAuthentication();
 
-  // const [location, setLocation] = useState<Location.LocationObject>();
-  // const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
-  // const [city, setCity]  = useState<string | undefined>(undefined);
-  //
-  // useEffect(() => {
-  //   // Courtesy of ChatGPT
-  //   (async () => {
-  //     let { status } = await Location.requestForegroundPermissionsAsync();
-  //     if (status !== 'granted') {
-  //       setErrorMsg('Permission to access location was denied');
-  //       return;
-  //     }
-  //
-  //     const location = await Location.getCurrentPositionAsync({});
-  //     setLocation(location);
-  //     setCity(await getCityNameFromGeopoint([location!.coords.latitude, location.coords.longitude]));
-  //   })();
-  // }, []);
-  const {geopoint, city} = useLocation();
+  const {city} = useLocation();
 
   return (
       <ScrollView p={8}>
         <Column space="lg">
           {user && <LenderProfilePreview user={user!}/>}
           <Text fontSize="md">{authUser?.email}</Text>
-
-          <Text>Latitude: {geopoint[0]}</Text>
-          <Text>Longitude: {geopoint[1]}</Text>
 
           <Text>City: {city}</Text>
 

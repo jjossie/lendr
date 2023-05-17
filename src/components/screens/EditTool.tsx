@@ -33,6 +33,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
 
   // Form state
   const [name, setName] = useState("");
+  const [brand, setBrand] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(25);
   const [timeUnit, setTimeUnit]: [TimeUnit, any] = useState("day");
@@ -76,7 +77,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     setIsLoading(true);
     setIsError(false);
 
-    const toolForm: IToolForm = {
+    let toolForm: IToolForm = {
       name,
       description,
       rate: {
@@ -86,6 +87,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       preferences,
       geopoint
     };
+    if (brand) toolForm.brand = brand;
     if (!isEditing) {
       // Create new tool
       createTool(toolForm).then(() => {
@@ -113,7 +115,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
         setIsLoading(false);
       });
     }
-  }, [name, description, price, timeUnit, preferences, geopoint, isEditing]);
+  }, [name, description, price, timeUnit, preferences, geopoint, brand, isEditing]);
 
 
   const handleDeleteTool = useCallback(async () => {
@@ -147,6 +149,17 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
                 variant="filled"
                 value={name}
                 placeholder="Hammer"/>
+          </FormControl>
+          <FormControl>
+            <FormControl.Label>Brand</FormControl.Label>
+            <Input
+                onChangeText={value => {
+                  setBrand(value);
+                }}
+                size="lg"
+                placeholder={"DeWalt"}
+                value={brand}
+                variant="filled"/>
           </FormControl>
           <FormControl isRequired>
             <FormControl.Label>Description</FormControl.Label>

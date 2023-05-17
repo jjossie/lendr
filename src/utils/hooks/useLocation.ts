@@ -8,14 +8,17 @@ export function useLocation() {
   console.log("🛠useLocation()");
 
   const [location, setLocation] = useState<LocationObject>();
+  const [geopoint, setGeopoint] = useState<Geopoint>();
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
   const [city, setCity]  = useState<string | undefined>(undefined);
 
   useEffect(() => {
     (async () => {
       try {
+        console.log("🛠️useLocation() - useEffect");
         const {location, city} = await getDeviceLocation();
         setLocation(location);
+        setGeopoint([location?.coords.latitude, location?.coords.longitude]);
         setCity(city);
       } catch (e: LendrBaseError | any) {
         setErrorMsg(e.message);
@@ -24,7 +27,7 @@ export function useLocation() {
   }, []);
 
   return {
-    geopoint: [location?.coords.latitude, location?.coords.longitude] as Geopoint,
+    geopoint,
     city,
     errorMsg
   };
