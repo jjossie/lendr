@@ -1,6 +1,7 @@
 import {ILocation} from "./Location";
 import {DocumentReference} from "firebase/firestore";
 import {LendrUser} from "./LendrUser";
+import {Geopoint} from "geofire-common";
 
 export interface ITool {
   id?: string;
@@ -37,7 +38,7 @@ export interface IToolForm {
     timeUnit: TimeUnit
   },
   preferences: ExchangePreferences
-  location?: ILocation
+  geopoint?: Geopoint
 }
 
 

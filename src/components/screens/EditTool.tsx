@@ -19,6 +19,7 @@ import {ExchangePreferences, ITool, IToolForm, TimeUnit} from "../../models/Tool
 import {createTool, deleteTool, editTool, getToolById} from "../../controllers/Tool";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {Keyboard} from "react-native";
+import {useLocation} from "../../utils/hooks/useLocation";
 
 
 const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
@@ -32,6 +33,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
 
   // Form state
   const [name, setName] = useState("");
+  const [brand, setBrand] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(25);
   const [timeUnit, setTimeUnit]: [TimeUnit, any] = useState("day");
@@ -40,6 +42,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     localPickup: false,
     useOnSite: false,
   });
+  const {geopoint} = useLocation();
 
   // References
   const cancelRef = useRef(null);
@@ -74,7 +77,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     setIsLoading(true);
     setIsError(false);
 
-    const newTool: IToolForm = {
+    let toolForm: IToolForm = {
       name,
       description,
       rate: {
@@ -82,10 +85,12 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
         timeUnit: timeUnit,
       },
       preferences,
+      geopoint
     };
+    if (brand) toolForm.brand = brand;
     if (!isEditing) {
       // Create new tool
-      createTool(newTool).then(() => {
+      createTool(toolForm).then(() => {
         console.log("Tool Created!");
         setIsLoading(false);
         navigation.goBack();
@@ -98,7 +103,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       });
     } else {
       // Save existing tool
-      editTool(route.params?.toolId, newTool).then(() => {
+      editTool(route.params?.toolId, toolForm).then(() => {
         console.log("Tool Saved!");
         setIsLoading(false);
         navigation.goBack();
@@ -110,7 +115,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
         setIsLoading(false);
       });
     }
-  }, [name, description, price, timeUnit, preferences, isEditing]);
+  }, [name, description, price, timeUnit, preferences, geopoint, brand, isEditing]);
 
 
   const handleDeleteTool = useCallback(async () => {
@@ -144,6 +149,17 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
                 variant="filled"
                 value={name}
                 placeholder="Hammer"/>
+          </FormControl>
+          <FormControl>
+            <FormControl.Label>Brand</FormControl.Label>
+            <Input
+                onChangeText={value => {
+                  setBrand(value);
+                }}
+                size="lg"
+                placeholder={"DeWalt"}
+                value={brand}
+                variant="filled"/>
           </FormControl>
           <FormControl isRequired>
             <FormControl.Label>Description</FormControl.Label>

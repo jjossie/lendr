@@ -28,9 +28,6 @@ export interface ICoordinates {
   longitude: number;
 }
 
-
-console.log(geohashForLocation(REXBURG));
-
 // export class Location {
 //   latitude: number;
 //   longitude: number;
