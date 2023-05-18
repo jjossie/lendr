@@ -15,7 +15,7 @@ export function useLocation() {
   useEffect(() => {
     (async () => {
       try {
-        console.log("🛠️useLocation() - useEffect");
+        console.log("🛠useLocation() - useEffect");
         const {location, city} = await getDeviceLocation();
         setLocation(location);
         setGeopoint([location?.coords.latitude, location?.coords.longitude]);
