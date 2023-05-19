@@ -2,7 +2,7 @@ import React from 'react';
 import {collection, onSnapshot, query, where} from "firebase/firestore";
 import {db} from "../../config/firebase";
 import {ITool} from "../../models/Tool";
-import {getRefFromUid} from "../../models/LendrUser";
+import {getRefFromUid} from "../../models/ILendrUser";
 import {useAuthentication} from "./useAuthentication";
 
 export function useMyTools(): ITool[] {

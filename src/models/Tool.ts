@@ -1,6 +1,6 @@
 import {ILocation} from "./Location";
 import {DocumentReference} from "firebase/firestore";
-import {LendrUser} from "./LendrUser";
+import {ILendrUser} from "./ILendrUser";
 import {Geopoint} from "geofire-common";
 
 export interface ITool {
@@ -9,7 +9,7 @@ export interface ITool {
   brand?: string;
   description: string;
   lenderRef: DocumentReference;
-  lender?: LendrUser,
+  lender?: ILendrUser,
 
   rate: {
     price: number;

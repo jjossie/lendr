@@ -1,9 +1,9 @@
 import React from 'react';
 import {Avatar, Row, Text, theme} from 'native-base';
-import {LendrUser} from "../models/LendrUser";
+import {ILendrUser} from "../models/ILendrUser";
 
 export interface LenderProfilePreviewProps {
-  user: LendrUser
+  user: ILendrUser
 }
 
 const LenderProfilePreview: React.FC<LenderProfilePreviewProps> = ({user}) => {

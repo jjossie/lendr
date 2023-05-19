@@ -20,7 +20,7 @@ import {AuthError, NotFoundError, ObjectValidationError} from "../utils/errors";
 
 import {Geopoint} from "geofire-common";
 import {distanceBetweenMi, getCityNameFromGeopoint, getGeohashedLocation, metersFromMiles} from "../models/Location";
-import {getRefFromUid} from "../models/LendrUser";
+import {getRefFromUid} from "../models/ILendrUser";
 
 const geofire = require("geofire-common");
 

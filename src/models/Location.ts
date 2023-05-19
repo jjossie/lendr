@@ -23,10 +23,10 @@ export interface ILocation {
   relativeDistance?: number;
 }
 
-export interface ICoordinates {
-  latitude: number;
-  longitude: number;
-}
+// export interface ICoordinates {
+//   latitude: number;
+//   longitude: number;
+// }
 
 // export class Location {
 //   latitude: number;
