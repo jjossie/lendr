@@ -5,7 +5,7 @@ import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {getToolById} from "../../controllers/Tool";
 import {ITool} from "../../models/Tool";
 import LenderProfilePreview from "../LenderProfilePreview";
-import {createRelation} from "../../controllers/Relation";
+import {createRelation, sendChatMessage} from "../../controllers/Relation";
 
 
 const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
@@ -30,10 +30,10 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
   // Callbacks
   const handleSendMessage = async () => {
     try {
-      await createRelation(toolData!.lenderUid.id, toolData!.id!);
-    }
-    catch (e) {
-      console.log("Failed to create relation");
+      await createRelation(toolData!.lenderUid, toolData!.id!);
+      await sendChatMessage(toolData!.lenderUid,"Hey, I'm interested in this tool!" );
+    } catch (e) {
+      console.log("Failed to create relation", e);
     }
   };
 

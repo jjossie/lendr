@@ -1,6 +1,4 @@
-import {DocumentReference, Timestamp} from "firebase/firestore";
-import {ILendrUser} from "./ILendrUser";
-import {ITool} from "./Tool";
+import {Timestamp} from "firebase/firestore";
 
 export interface IRelation {
   loans: ILoan[];
@@ -12,24 +10,29 @@ export interface IRelation {
  * probably change that in the future.
  */
 export interface ILoan {
-  toolRef: DocumentReference<ITool>;
+  toolId: string;
   loanDate: Timestamp;
   returnDate: Timestamp;
   returnStatus: boolean;
-  lenderRef: DocumentReference<ILendrUser>;
-  borrowerRef: DocumentReference<ILendrUser>;
+  lenderUid: string;
+  borrowerUid: string;
 }
 
 export interface IChatMessage {
   text: string;
-  senderRef: DocumentReference<ILendrUser>; // TODO for the sake of firestore security, should we be using UIDs instead of Refs?
-  timestamp: Timestamp;
-  replyingTo?: DocumentReference<IChatMessage>;
+  senderUid: string;
+  receiverUid: string;
+  createdAt: Timestamp;
+  replyingToId?: string;
   reaction?: IChatReaction;
   media?: any;
 }
 
+export interface IChatMessageForm {
+
+}
+
 export interface IChatReaction {
   emoji: string;
-  userRef: DocumentReference<ILendrUser>;
+  userRef: string;
 }
