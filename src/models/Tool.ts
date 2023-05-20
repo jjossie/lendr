@@ -1,16 +1,26 @@
 import {ILocation} from "./Location";
-import {DocumentReference} from "firebase/firestore";
+// import {DocumentReference} from "firebase/firestore";
 import {ILendrUser} from "./ILendrUser";
 import {Geopoint} from "geofire-common";
+import {DocumentReference, Timestamp} from "firebase/firestore";
 
 export interface ITool {
-  id?: string;
+  // Only for backward compatibility
+  // TODO remove after data migration
+  lenderRef?: DocumentReference<ILendrUser>;
+  holderRef?: DocumentReference<ILendrUser>;
+
+
+  id?: string; // Added after retrieving from firestore
   name: string;
   brand?: string;
   description: string;
-  lenderRef: DocumentReference;
-  lender?: ILendrUser,
-
+  lenderUid: string;
+  holderUid: string;
+  lender?: ILendrUser, // Hydrated after retrieving from firestore
+  holder?: ILendrUser, // Must be hydrated... after retrieving from firestore?
+  createdAt: Timestamp;
+  modifiedAt: Timestamp;
   rate: {
     price: number;
     timeUnit: TimeUnit
@@ -44,9 +54,9 @@ export interface IToolForm {
 
 
 export interface ExchangePreferences {
-  delivery?: boolean;
-  localPickup?: boolean;
-  useOnSite?: boolean;
+  delivery: boolean;
+  localPickup: boolean;
+  useOnSite: boolean;
 }
 
 export type TimeUnit = "hour" | "day" | "week";

@@ -18,9 +18,9 @@ export const CALIFORNIA_LOCATIONS = [SANJOSE, SANTA_CLARA, SANTA_ANA];
 export interface ILocation {
   latitude: number;
   longitude: number;
-  geohash: string;
-  city?: string;
-  relativeDistance?: number;
+  geohash: string; // Added after retrieving from firestore
+  city?: string; // Added (asynchronously) after retrieving from firestore
+  relativeDistance?: number; // Added after retrieving from firestore
 }
 
 // export interface ICoordinates {

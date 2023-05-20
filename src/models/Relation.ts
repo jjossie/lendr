@@ -22,7 +22,14 @@ export interface ILoan {
 
 export interface IChatMessage {
   text: string;
-  senderRef: DocumentReference<ILendrUser>;
+  senderRef: DocumentReference<ILendrUser>; // TODO for the sake of firestore security, should we be using UIDs instead of Refs?
   timestamp: Timestamp;
+  replyingTo?: DocumentReference<IChatMessage>;
+  reaction?: IChatReaction;
   media?: any;
+}
+
+export interface IChatReaction {
+  emoji: string;
+  userRef: DocumentReference<ILendrUser>;
 }

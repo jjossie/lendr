@@ -30,7 +30,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
   // Callbacks
   const handleSendMessage = async () => {
     try {
-      await createRelation(toolData!.lenderRef.id, toolData!.id!);
+      await createRelation(toolData!.lenderUid.id, toolData!.id!);
     }
     catch (e) {
       console.log("Failed to create relation");

@@ -60,6 +60,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
             setName(tool!.name);
             setDescription(tool!.description);
             setPrice(tool!.rate.price);
+            setBrand(tool!.brand ?? "");
             setTimeUnit(tool!.rate.timeUnit);
             setPreferences(tool!.preferences);
             setIsLoading(false);
