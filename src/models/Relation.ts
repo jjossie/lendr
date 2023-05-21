@@ -1,8 +1,10 @@
-import {Timestamp} from "firebase/firestore";
+import {FieldValue, Timestamp} from "firebase/firestore";
+import {ILendrUser} from "./ILendrUser";
 
 export interface IRelation {
   id?: string // Added after retrieving from firestore
-  loans: ILoan[];
+  users: ILendrUser[];
+  loans: ILoan[] | FieldValue;
   createdAt: Timestamp;
 }
 
@@ -12,9 +14,10 @@ export interface IRelation {
  */
 export interface ILoan {
   toolId: string;
-  loanDate: Timestamp;
-  returnDate: Timestamp;
-  returnStatus: boolean;
+  inquiryDate?: Timestamp;
+  loanDate?: Timestamp;
+  returnDate?: Timestamp;
+  returnStatus?: boolean;
   lenderUid: string;
   borrowerUid: string;
 }
