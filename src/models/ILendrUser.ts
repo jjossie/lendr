@@ -7,6 +7,7 @@ export interface ILendrUser {
   createdAt: Timestamp | string,
   firstName: string,
   lastName: string,
+  relations: string[],
   _id: string
 }
 

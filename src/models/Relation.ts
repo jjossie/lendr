@@ -1,6 +1,7 @@
 import {Timestamp} from "firebase/firestore";
 
 export interface IRelation {
+  id?: string // Added after retrieving from firestore
   loans: ILoan[];
   createdAt: Timestamp;
 }
@@ -26,10 +27,6 @@ export interface IChatMessage {
   replyingToId?: string;
   reaction?: IChatReaction;
   media?: any;
-}
-
-export interface IChatMessageForm {
-
 }
 
 export interface IChatReaction {
