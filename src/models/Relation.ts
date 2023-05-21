@@ -1,11 +1,12 @@
-import {FieldValue, Timestamp} from "firebase/firestore";
+import {Timestamp} from "firebase/firestore";
 import {ILendrUser} from "./ILendrUser";
 
 export interface IRelation {
   id?: string // Added after retrieving from firestore
   users: ILendrUser[];
-  loans: ILoan[] | FieldValue;
   createdAt: Timestamp;
+  lastMessage?: IChatMessage; // Hydrated after retrieval
+  // Need to figure out how to include subcollection data. Or don't do it at all?
 }
 
 /**
