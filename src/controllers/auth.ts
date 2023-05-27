@@ -74,10 +74,16 @@ async function createUserInDB(authUser: User, firstName: string = "Joe", lastNam
 
 export async function getUserFromAuth(authUser: User): Promise<ILendrUser| undefined> {
   const docSnap = await getDoc(doc(db, "users", authUser.uid));
-  return docSnap.data() as ILendrUser;
+  return {
+    uid: docSnap.id,
+    ...docSnap.data()
+  } as ILendrUser;
 }
 
 export async function getUserFromUid(uid: string): Promise<ILendrUser| undefined> {
   const docSnap = await getDoc(doc(db, "users", uid));
-  return docSnap.data() as ILendrUser;
+  return {
+    uid: docSnap.id,
+    ...docSnap.data()
+  } as ILendrUser;
 }

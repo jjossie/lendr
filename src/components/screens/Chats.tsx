@@ -10,29 +10,33 @@ export interface ChatsProps {
 }
 
 const Chats: React.FC<ChatsProps> = (props: ChatsProps) => {
+  console.log("🛠️< Chats > Component Rendering");
 
+  // Custom Hooks
   const {user} = useAuthentication();
+  const {chats, isLoaded} = useMyChats();
 
-  const chats = useMyChats();
+  // State
   const [listData, setListData] = useState<any[] | undefined>([]);
 
   useEffect(() => {
     if (user && chats && chats.length !== 0) {
       const data = chats.map((chat) => {
-        console.log("Chat: ", chat);
-        const recipient = chat.users.filter((chatUser) => chatUser != user)[0];
-        if (!recipient) return null;
-        const fullName = recipient.firstName + ' ' + recipient.lastName;
+        // Convert data from useMyTools() to display info for each ChatListItem
+        if (!chat.otherUser) return null;
+        const fullName = chat.otherUser.firstName + ' ' + chat.otherUser.lastName;
+        const timeStampSeconds = chat.lastMessage ? chat.lastMessage.createdAt.seconds : chat.createdAt.seconds;
+        const timeStamp = new Date(timeStampSeconds * 1000).toLocaleTimeString();
         return {
           key: chat.id,
           fullName,
-          timeStamp: new Date(chat.createdAt.seconds * 1000).toLocaleTimeString(), // TODO change this to the actual time of last message
+          timeStamp,
           recentText: chat.lastMessage?.text,
         };
       });
       setListData(data);
     }
-  }, [chats]);
+  }, [chats, isLoaded]);
 
   const closeRow = (rowMap: any[], rowKey: any) => {
     // if (rowMap[rowKey]) {

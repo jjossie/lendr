@@ -8,7 +8,7 @@ export interface ILendrUser {
   firstName: string,
   lastName: string,
   relations: string[],
-  _id: string
+  uid: string
 }
 
 

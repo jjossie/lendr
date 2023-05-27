@@ -6,7 +6,16 @@ export interface IRelation {
   users: ILendrUser[];
   createdAt: Timestamp;
   lastMessage?: IChatMessage; // Hydrated after retrieval
+  otherUser?: ILendrUser; // Hydrated after retrieval
   // Need to figure out how to include subcollection data. Or don't do it at all?
+}
+
+export interface IChatViewListItem {
+  id: string // Added after retrieving from firestore
+  users?: ILendrUser[];
+  createdAt: Timestamp;
+  lastMessage?: IChatMessage; // Hydrated after retrieval
+  otherUser: ILendrUser;
 }
 
 /**
