@@ -8,7 +8,7 @@ export const ChatListItem = ({
   const initials = item.fullName.split(" ").map((name: string) => name[0]).join("");
 
   return (
-      <Pressable key={index} onPress={() => console.log("You touched me")} _dark={{
+      <Pressable key={index} onPress={item.onPressCallback} _dark={{
         bg: "coolGray.800",
       }} _light={{
         bg: "white",

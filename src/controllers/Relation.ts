@@ -1,9 +1,27 @@
-import {addDoc, arrayUnion, collection, doc, serverTimestamp, setDoc, Timestamp, updateDoc} from "firebase/firestore";
+import {
+  addDoc,
+  arrayUnion,
+  collection,
+  doc,
+  DocumentData,
+  getDoc,
+  getDocs,
+  limit,
+  onSnapshot,
+  orderBy,
+  query,
+  QuerySnapshot,
+  serverTimestamp,
+  setDoc,
+  Timestamp,
+  updateDoc,
+} from "firebase/firestore";
 import {app, db} from "../config/firebase";
-import {getAuth} from "firebase/auth";
-import {AuthError, LendrBaseError} from "../utils/errors";
-import {IChatMessage, ILoan, IRelation} from "../models/Relation";
+import {getAuth, User} from "firebase/auth";
+import {AuthError, LendrBaseError, NotFoundError, ObjectValidationError} from "../utils/errors";
+import {IChatMessage, IChatViewListItem, ILoan, IRelation} from "../models/Relation";
 import {getUserFromAuth, getUserFromUid} from "./auth";
+import {ILendrUser} from "../models/ILendrUser";
 
 
 // TODO: This is all very stateful. Let's make it into a class.
@@ -97,6 +115,15 @@ export async function createRelation(otherUserId: string, toolId: string) {
   });
 }
 
+export async function getRelationById(relationId: string): Promise<IRelation> {
+  const relationsCollection = collection(db, "relations");
+  const relationDocRef = doc(relationsCollection, relationId);
+  const relationDoc = await getDoc(relationDocRef);
+  if (!relationDoc.exists())
+    throw new NotFoundError(`Relation with id ${relationId} does not exist ⭕️`);
+  return {id: relationId, ...relationDoc.data()} as IRelation;
+}
+
 export async function sendChatMessage(receiverUid: string,
                                       text: string,
                                       replyingToId?: string,
@@ -121,4 +148,103 @@ export async function sendChatMessage(receiverUid: string,
     newMessage.media = media;
 
   await addDoc(messagesCollection, newMessage);
+}
+
+
+/**
+ * Oops my abstraction is leaking 🫠 Anyway this takes a query snapshot of the relations
+ * in the database and then hydrates them into a list of chat view objects.
+ *
+ * @param {QuerySnapshot<DocumentData>} snapshot
+ * @param {User} authUser
+ * @param {(chats: any) => any} setChats
+ * @param {(isLoaded: boolean) => void} setIsLoaded
+ */
+export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentData>,
+                                             authUser: User,
+                                             setChats: ((chats: any) => any),
+                                             setIsLoaded: (isLoaded: boolean) => void): void {
+  console.log("🛠️useMyChats() - onSnapshot() called");
+
+  if (!authUser) return;
+
+  const docDataList: IChatViewListItem[] = [];
+  const lastMessagePromises: Promise<any>[] = [];
+  snapshot.forEach(async relationDocument => {
+    // Extract the data from the document
+    const relationDocumentData: IRelation = relationDocument.data() as IRelation;
+
+    // Get the info of the other user to be displayed in the chats list
+    const otherUser = relationDocumentData.users.filter((chatUser) => chatUser.uid != authUser.uid)[0];
+    if (!otherUser) return null;
+
+    // Get the most recent message for each relation
+    const lastMessageQuery = query(collection(relationDocument.ref, "messages"),
+        orderBy("createdAt", "desc"), limit(1));
+    lastMessagePromises.push(getDocs(lastMessageQuery));
+
+    // Add the (incomplete) relation to the list
+    docDataList.push({
+      id: relationDocument.id,
+      otherUser: otherUser,
+      ...relationDocumentData,
+    } as IChatViewListItem);
+  });
+
+  // Tack on the data for the last message of each relation
+  Promise.all(lastMessagePromises).then(lastMessages => {
+    for (let i = 0; i < docDataList.length; i++) {
+      docDataList[i].lastMessage = lastMessages[i].docs[0].data();
+    }
+    // It appears that although we are properly setting the list here with newly hydrated
+    // objects, JS thinks the list is unchanged. So we must also set loading state:
+    setChats((oldList: any) => {
+      return docDataList;
+    });
+    setIsLoaded(true);
+  });
+
+  // Don't use this yet because it will screw up the loop in the Promise.all() call.
+  // docDataList.sort((a, b) => a.createdAt.seconds - b.createdAt.seconds)
+
+  setChats(docDataList);
+}
+
+
+/**
+ * Gets the messages for a relation and calls the setMessages function with the messages.
+ * Supports the useChatMessages hook.
+ *
+ * @param {(messages: any) => any} setMessages The React setState function to set the messages
+ * @param {User} authUser
+ * @param {ILendrUser} user
+ * @param {IRelation} relation
+ */
+export function getLiveMessages(setMessages: ((messages: any) => any),
+                                authUser: User,
+                                user: ILendrUser,
+                                relation: IRelation): void {
+
+  // This might run before user is initialized - just skip if that's the case
+  if (!authUser || !user) return;
+  if (!relation.id) throw new ObjectValidationError("Relation passed into getLiveMessages with no ID");
+
+  // Identify parties ... for some reason?
+  const otherUser = relation.users.filter(u => u.uid != authUser.uid)[0];
+
+  const messagesQuery = query(
+      collection(db, "relations", relation.id, "messages"),
+      orderBy("createdAt", "desc"),
+      limit(20),
+  );
+  let messages: IChatMessage[] = [];
+  const unsub = onSnapshot(messagesQuery, (snapshot: QuerySnapshot<DocumentData>) => {
+    snapshot.forEach(messageSnap => {
+      messages.push({
+        id: messageSnap.id,
+        ...messageSnap.data()
+      } as IChatMessage);
+    });
+    setMessages(messages);
+  });
 }

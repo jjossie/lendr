@@ -4,12 +4,13 @@ import {ChatListItem} from "../ChatListItem";
 import {SwipeListView} from "react-native-swipe-list-view";
 import {useMyChats} from "../../utils/hooks/useMyChats";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
+import {NativeStackScreenProps} from "@react-navigation/native-stack";
 
 export interface ChatsProps {
 
 }
 
-const Chats: React.FC<ChatsProps> = (props: ChatsProps) => {
+const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
   console.log("🛠️< Chats > Component Rendering");
 
   // Custom Hooks
@@ -32,6 +33,7 @@ const Chats: React.FC<ChatsProps> = (props: ChatsProps) => {
           fullName,
           timeStamp,
           recentText: chat.lastMessage?.text,
+          onPressCallback: () => {navigation.navigate("ChatConversation", {relationId: chat.id})}
         };
       });
       setListData(data);

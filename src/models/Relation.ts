@@ -33,6 +33,7 @@ export interface ILoan {
 }
 
 export interface IChatMessage {
+  id?: string;
   text: string;
   senderUid: string;
   receiverUid: string;
