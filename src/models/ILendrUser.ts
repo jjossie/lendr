@@ -8,7 +8,8 @@ export interface ILendrUser {
   firstName: string,
   lastName: string,
   relations: string[],
-  uid: string
+  uid: string,
+  providerData?: any
 }
 
 
