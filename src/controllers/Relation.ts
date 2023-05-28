@@ -121,7 +121,14 @@ export async function getRelationById(relationId: string): Promise<IRelation> {
   const relationDoc = await getDoc(relationDocRef);
   if (!relationDoc.exists())
     throw new NotFoundError(`Relation with id ${relationId} does not exist ⭕️`);
-  return {id: relationId, ...relationDoc.data()} as IRelation;
+
+  const relationDocumentData = relationDoc.data();
+
+  return {id: relationId, ...relationDocumentData} as IRelation;
+}
+
+export function getOtherUserInRelation(relation: IRelation, user: ILendrUser | User): ILendrUser {
+  return relation.users.filter((chatUser) => chatUser.uid != user.uid)[0];
 }
 
 export async function sendChatMessage(receiverUid: string,
@@ -175,8 +182,7 @@ export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentDat
     const relationDocumentData: IRelation = relationDocument.data() as IRelation;
 
     // Get the info of the other user to be displayed in the chats list
-    const otherUser = relationDocumentData.users.filter((chatUser) => chatUser.uid != authUser.uid)[0];
-    if (!otherUser) return null;
+    const otherUser = getOtherUserInRelation(relationDocumentData, authUser);
 
     // Get the most recent message for each relation
     const lastMessageQuery = query(collection(relationDocument.ref, "messages"),

@@ -1,36 +1,82 @@
-import React from 'react';
-import {Box, Column, Input, KeyboardAvoidingView, ScrollView} from 'native-base';
+import React, {useEffect, useState} from 'react';
+import {
+  Box,
+  ChevronRightIcon,
+  Column,
+  IconButton,
+  Input,
+  KeyboardAvoidingView,
+  Row,
+  ScrollView,
+  theme,
+} from 'native-base';
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {useChatMessages} from "../../utils/hooks/useChatMessages";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
 import ChatMessage from "../ChatMessage";
+import {getOtherUserInRelation, getRelationById, sendChatMessage} from "../../controllers/Relation";
+import {IRelation} from "../../models/Relation";
+import {LendrBaseError} from "../../utils/errors";
 
 
 const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
-  console.log("Route parameters passed to < ChatConversation > : ", route.params);
+
+  // State
+  const [messageText, setMessageText] = useState<string>("");
+  const [relation, setRelation] = useState<IRelation>();
+
   const {messages} = useChatMessages(route.params?.relationId);
+
+  useEffect( () => {
+    getRelationById(route.params?.relationId).then(r => {
+      console.log("Setting relation to: ", r);
+      setRelation(r);
+    });
+  }, [])
+
   const {user} = useAuthentication();
   if (!user) return null;
+
+  const handleSendMessage = async () => {
+    if (!relation) throw new LendrBaseError("Relation not initialized yet");
+
+    const receiverUid = getOtherUserInRelation(relation, user).uid;
+    if (!receiverUid) throw new LendrBaseError("Receiver didn't have a UID :(");
+
+    await sendChatMessage(receiverUid , messageText);
+  };
+
   return (
       <ScrollView h={"100%"}>
         <Column h={"100%"}
                 w={"100%"}
-                p={4}
                 justifyContent={'flex-end'}
                 alignContent={'flex-end'}>
-          {/*alignContent={messages.length > 0 ? 'flex-start' : 'center'}>*/}
 
           {messages.map((message, index) => (
-            <ChatMessage message={message} key={index} />
+              <ChatMessage message={message} key={index}/>
           ))
           }
 
           <KeyboardAvoidingView>
-            <Box>
-              <Input
-                placeholder={"Type a message..."}
-                variant={"rounded"}>
-              </Input>
+            <Box w={"100%"}>
+              <Row p={2} w={"100%"} space={2} justifyContent={"center"}>
+                <Input
+                    flexGrow={1}
+                    bgColor={theme.colors.white}
+                    size={"lg"}
+                    placeholder={"Type a message..."}
+                    rounded={"xl"}
+                    variant={"solid"}
+                    value={messageText}
+                    onChangeText={(text) => {setMessageText(text)}}
+                />
+                <IconButton variant={"solid"}
+                            rounded={"xl"}
+                            icon={<ChevronRightIcon/>}
+                            onPress={handleSendMessage}
+                />
+              </Row>
             </Box>
           </KeyboardAvoidingView>
 

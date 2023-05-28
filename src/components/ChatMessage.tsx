@@ -1,7 +1,8 @@
 import React from 'react';
-import {Box, Card, Text, theme} from 'native-base';
+import {Box, Card, Row, Text, theme} from 'native-base';
 import {useAuthentication} from "../utils/hooks/useAuthentication";
 import {IChatMessage} from "../models/Relation";
+import AvatarImage from "./AvatarImage";
 
 export interface ChatMessageProps {
   message: IChatMessage,
@@ -19,17 +20,23 @@ const ChatMessage: React.FC<ChatMessageProps> = ({message}) => {
 
   return (
       <Card>
-        <Box
-            bgColor={theme.colors.white}
-            p={2}
-            rounded="lg"
-            maxW={64}
-            alignSelf={receivedMessage ? 'flex-end' : 'flex-start'}
-        >
-          <Text textAlign={receivedMessage ? 'left' : 'right'}>
-            {message.text}
-          </Text>
-        </Box>
+
+        <Row alignSelf={receivedMessage ? 'flex-start' : 'flex-end'}
+             alignItems={"center"}
+          space={2}>
+          {receivedMessage ? <AvatarImage user={user}/> : null}
+          {/*This should be the Sending user, not the receiving user ^^^*/}
+          <Box
+              bgColor={theme.colors.white}
+              p={2}
+              rounded="lg"
+              maxW={64}
+          >
+            <Text textAlign={receivedMessage ? 'left' : 'right'}>
+              {message.text}
+            </Text>
+          </Box>
+        </Row>
       </Card>
   );
 };
