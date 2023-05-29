@@ -204,7 +204,7 @@ export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentDat
     }
     // It appears that although we are properly setting the list here with newly hydrated
     // objects, JS thinks the list is unchanged. So we must also set loading state:
-    setChats((oldList: any) => {
+    setChats((_oldList: any) => {
       return docDataList;
     });
     setIsLoaded(true);
