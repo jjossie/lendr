@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   Box,
   ChevronRightIcon,
@@ -14,8 +14,7 @@ import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {useChatMessages} from "../../utils/hooks/useChatMessages";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
 import ChatMessage from "../ChatMessage";
-import {getOtherUserInRelation, getRelationById, sendChatMessage} from "../../controllers/Relation";
-import {IRelation} from "../../models/Relation";
+import {getOtherUserInRelation, sendChatMessage} from "../../controllers/Relation";
 import {LendrBaseError} from "../../utils/errors";
 
 
@@ -23,19 +22,11 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
 
   // State
   const [messageText, setMessageText] = useState<string>("");
-  const [relation, setRelation] = useState<IRelation>();
-
-  const {messages} = useChatMessages(route.params?.relationId);
-
-  useEffect( () => {
-    getRelationById(route.params?.relationId).then(r => {
-      console.log("Setting relation to: ", r);
-      setRelation(r);
-    });
-  }, [])
-
+  const {messages, relation} = useChatMessages(route.params?.relationId);
   const {user} = useAuthentication();
-  if (!user) return null;
+
+  // State Guards
+  if (!user || !relation) return null;
 
   const handleSendMessage = async () => {
     if (!relation) throw new LendrBaseError("Relation not initialized yet");
@@ -54,7 +45,7 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
                 alignContent={'flex-end'}>
 
           {messages.map((message, index) => (
-              <ChatMessage message={message} key={index}/>
+              <ChatMessage message={message} relation={relation} key={index}/>
           ))
           }
 

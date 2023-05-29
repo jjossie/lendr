@@ -236,11 +236,11 @@ export function getLiveMessages(setMessages: ((messages: any) => any),
   if (!relation.id) throw new ObjectValidationError("Relation passed into getLiveMessages with no ID");
 
   // Identify parties ... for some reason?
-  const otherUser = relation.users.filter(u => u.uid != authUser.uid)[0];
+  // const otherUser = relation.users.filter(u => u.uid != authUser.uid)[0];
 
   const messagesQuery = query(
       collection(db, "relations", relation.id, "messages"),
-      orderBy("createdAt", "desc"),
+      orderBy("createdAt", "asc"),
       limit(20),
   );
   let messages: IChatMessage[] = [];
