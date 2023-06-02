@@ -19,8 +19,9 @@ export class NotFoundError extends LendrBaseError {
 }
 
 export class ObjectValidationError extends LendrBaseError {
-  constructor(message?: string) {
+  constructor(message?: string, object?: object) {
     super(message ?? "Object missing one or more required properties. 👻");
-    this.name = "NotFoundError";
+    console.log("⚠️🛠Invalid Object 🛠⚠️", object);
+    this.name = "ObjectValidationError";
   }
 }

@@ -19,6 +19,7 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
   useEffect(() => {
     console.log("BorrowBrowse - useEffect - geopoint: ", geopoint);
     (async () => {
+      console.log("BorrowBrowse - useEffect - (async) geopoint: ", geopoint);
       if (geopoint &&
           geopoint.length === 2 &&
           geopoint[0] !== undefined &&

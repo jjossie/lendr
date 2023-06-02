@@ -1,6 +1,7 @@
 import {createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut, User} from "firebase/auth";
-import {doc, DocumentData, getDoc, setDoc, Timestamp} from "firebase/firestore";
+import {doc, getDoc, setDoc, Timestamp} from "firebase/firestore";
 import {db} from "../config/firebase";
+import {ILendrUser} from "../models/ILendrUser";
 
 
 export function registerUser(firstName: string, lastName: string, email: string, password: string,) {
@@ -71,7 +72,18 @@ async function createUserInDB(authUser: User, firstName: string = "Joe", lastNam
   }
 }
 
-export async function getUserFromAuth(authUser: User): Promise<DocumentData | undefined> {
+export async function getUserFromAuth(authUser: User): Promise<ILendrUser| undefined> {
   const docSnap = await getDoc(doc(db, "users", authUser.uid));
-  return docSnap.data();
+  return {
+    uid: docSnap.id,
+    ...docSnap.data()
+  } as ILendrUser;
+}
+
+export async function getUserFromUid(uid: string): Promise<ILendrUser| undefined> {
+  const docSnap = await getDoc(doc(db, "users", uid));
+  return {
+    uid: docSnap.id,
+    ...docSnap.data()
+  } as ILendrUser;
 }

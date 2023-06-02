@@ -5,6 +5,7 @@ import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {getToolById} from "../../controllers/Tool";
 import {ITool} from "../../models/Tool";
 import LenderProfilePreview from "../LenderProfilePreview";
+import {createRelation, sendChatMessage} from "../../controllers/Relation";
 
 
 const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
@@ -25,6 +26,16 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
         });
   }, []);
 
+
+  // Callbacks
+  const handleSendMessage = async () => {
+    try {
+      await createRelation(toolData!.lenderUid, toolData!.id!);
+      await sendChatMessage(toolData!.lenderUid,"Hey, I'm interested in this tool!" );
+    } catch (e) {
+      console.log("Failed to create relation", e);
+    }
+  };
 
   const keywordString = toolData?.name.split(" ").join(",");
 
@@ -47,7 +58,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
                 <Heading pt={4} size="sm">Lender</Heading>
                 <LenderProfilePreview user={toolData.lender!}/>
 
-                <Button onPress={() => navigation.navigate("")} mt={4}>Message Lender</Button>
+                <Button onPress={handleSendMessage} mt={4}>Message Lender</Button>
 
                 <Heading pt={4} size="sm">Details</Heading>
                 <Text>
