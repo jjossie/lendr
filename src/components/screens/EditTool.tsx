@@ -6,6 +6,7 @@ import {
   Center,
   Column,
   FormControl,
+  Image,
   Input,
   Row,
   ScrollView,
@@ -20,6 +21,7 @@ import {createTool, deleteTool, editTool, getToolById} from "../../controllers/T
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {Keyboard} from "react-native";
 import {useLocation} from "../../utils/hooks/useLocation";
+import * as ImagePicker from "expo-image-picker";
 
 
 const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
@@ -30,6 +32,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   const [errorMessage, setErrorMessage] = useState("Failed to create tool. 👹");
   const [isEditing, setIsEditing] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // Form state
   const [name, setName] = useState("");
@@ -118,7 +121,6 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     }
   }, [name, description, price, timeUnit, preferences, geopoint, brand, isEditing]);
 
-
   const handleDeleteTool = useCallback(async () => {
     setIsLoading(true);
 
@@ -136,9 +138,33 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     }
   }, [route.params?.toolId, navigation]);
 
+  const pickImageAsync = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      console.log(result);
+      setSelectedImage(result.assets[0].uri);
+    } else {
+      alert('You did not select any image.');
+    }
+  };
+
+  console.log("Selected Image: " + selectedImage);
+
   return (
-      <ScrollView bg={theme.colors.white} onScroll={() => Keyboard.dismiss()} >
+      <ScrollView bg={theme.colors.white} onScroll={() => Keyboard.dismiss()} scrollEventThrottle={2} >
         <Column alignItems="center" space={4} mx={3} my={4} py={12}>
+
+          <Button
+              onPress={pickImageAsync}
+              w="75%"
+              h={12}>Pick an Image</Button>
+
+          {selectedImage && <Image source={{uri: selectedImage}} alt={`${name} primary`}/>}
+
           {/* Basic Text Input */}
           <FormControl isRequired>
             <FormControl.Label>Tool Name</FormControl.Label>
