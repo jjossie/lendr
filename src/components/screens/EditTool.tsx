@@ -6,7 +6,6 @@ import {
   Center,
   Column,
   FormControl,
-  Image,
   Input,
   Row,
   ScrollView,
@@ -21,7 +20,9 @@ import {createTool, deleteTool, editTool, getToolById} from "../../controllers/T
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {Keyboard} from "react-native";
 import {useLocation} from "../../utils/hooks/useLocation";
-import * as ImagePicker from "expo-image-picker";
+import ToolImagePicker from "../ToolImagePicker";
+import {deleteToolImageFromFirebase, uploadToolImageToFirebase} from "../../controllers/storage";
+import {LendrBaseError} from "../../utils/errors";
 
 
 const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
@@ -32,7 +33,6 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   const [errorMessage, setErrorMessage] = useState("Failed to create tool. 👹");
   const [isEditing, setIsEditing] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // Form state
   const [name, setName] = useState("");
@@ -89,7 +89,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
         timeUnit: timeUnit,
       },
       preferences,
-      geopoint
+      geopoint,
     };
     if (brand) toolForm.brand = brand;
     if (!isEditing) {
@@ -132,38 +132,44 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     } catch (e) {
       console.log(e);
       setIsError(true);
-      setErrorMessage("Failed to delete tool. 👺")
+      setErrorMessage("Failed to delete tool. 👺");
       setIsAlertOpen(false);
       setIsLoading(false);
     }
   }, [route.params?.toolId, navigation]);
 
-  const pickImageAsync = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      quality: 1,
-    });
 
-    if (!result.canceled) {
-      console.log(result);
-      setSelectedImage(result.assets[0].uri);
-    } else {
-      alert('You did not select any image.');
+  const handleSelectImage = async (uri: string) => {
+    console.log("handleSelectImage()");
+    if (!route.params?.toolId)
+      throw new LendrBaseError("Cannot upload image without a tool ID");
+
+    const imageUrl = await uploadToolImageToFirebase(uri, route.params.toolId);
+    console.log("Downloadable Image URL: " + imageUrl);
+  };
+
+  const handleDeleteImage = async (uri: string) => {
+    console.log("handleDeleteImage()");
+    if (!route.params?.toolId)
+      throw new LendrBaseError("Cannot upload image without a tool ID");
+
+    try {
+      await deleteToolImageFromFirebase(route.params.toolId);
+      console.log("Tool deleted successfully");
+    } catch (e) {
+      throw new LendrBaseError("Failed to delete tool image");
     }
   };
 
-  console.log("Selected Image: " + selectedImage);
-
   return (
-      <ScrollView bg={theme.colors.white} onScroll={() => Keyboard.dismiss()} scrollEventThrottle={2} >
-        <Column alignItems="center" space={4} mx={3} my={4} py={12}>
+      <ScrollView bg={theme.colors.white} onScroll={() => Keyboard.dismiss()} scrollEventThrottle={2} paddingTop={10}>
+        <ToolImagePicker
+            onRemoveImage={handleDeleteImage}
+            onSelectImage={handleSelectImage}
+        />
 
-          <Button
-              onPress={pickImageAsync}
-              w="75%"
-              h={12}>Pick an Image</Button>
+        <Column alignItems="center" space={4} mx={3} my={4} paddingY={12}>
 
-          {selectedImage && <Image source={{uri: selectedImage}} alt={`${name} primary`}/>}
 
           {/* Basic Text Input */}
           <FormControl isRequired>
@@ -309,7 +315,8 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
                   </AlertDialog.Body>
                   <AlertDialog.Footer>
                     <Button.Group space={2}>
-                      <Button variant="unstyled" colorScheme="coolGray" onPress={() => setIsAlertOpen(false)} ref={cancelRef}>
+                      <Button variant="unstyled" colorScheme="coolGray" onPress={() => setIsAlertOpen(false)}
+                              ref={cancelRef}>
                         Cancel
                       </Button>
                       <Button colorScheme="danger" onPress={handleDeleteTool}>
