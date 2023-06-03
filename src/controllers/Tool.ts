@@ -68,8 +68,7 @@ export async function editTool(toolId: string, toolForm: IToolForm) {
       toolForm.name &&
       toolForm.rate.price &&
       toolForm.rate.timeUnit &&
-      toolForm.preferences &&
-      toolForm.geopoint
+      toolForm.preferences
   ))
     throw new ObjectValidationError("Missing properties on newTool", toolForm);
 
