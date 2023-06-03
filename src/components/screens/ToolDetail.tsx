@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Image, ScrollView, StyleSheet} from 'react-native';
-import {Button, Column, Heading, Text} from "native-base";
+import {Button, Column, Heading, Image, ScrollView, Text} from "native-base";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {getToolById} from "../../controllers/Tool";
 import {ITool} from "../../models/Tool";
@@ -31,7 +30,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
   const handleSendMessage = async () => {
     try {
       await createRelation(toolData!.lenderUid, toolData!.id!);
-      await sendChatMessage(toolData!.lenderUid,"Hey, I'm interested in this tool!" );
+      await sendChatMessage(toolData!.lenderUid, "Hey, I'm interested in this tool!");
     } catch (e) {
       console.log("Failed to create relation", e);
     }
@@ -39,11 +38,14 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
 
   const keywordString = toolData?.name.split(" ").join(",");
 
+  const imageUrl = toolData?.imageUrls && toolData.imageUrls.length > 0
+      ? toolData.imageUrls[0]
+      : `https://source.unsplash.com/random/?${keywordString},tool`;
   return (
       <ScrollView>
         {toolData ?
             <>
-              <Image source={{uri: `https://source.unsplash.com/random/?${keywordString},tool`}} style={style.image}/>
+              <Image source={{uri: imageUrl}} w={"100%"} h={280} alt={toolData.name}/>
               <Column bg="#FFF" p={5} space={3}>
                 <Heading>{toolData.brand} {toolData.name}</Heading>
                 <Text fontWeight={500}
@@ -81,9 +83,3 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
 
 export default ToolDetail;
 
-const style = StyleSheet.create({
-  image: {
-    width: "100%",
-    height: 240,
-  },
-});

@@ -58,6 +58,7 @@ const ToolImagePicker: React.FC<ImagePickerProps> = ({onSelectImage, onRemoveIma
                 <Button
                     isLoading={isLoading}
                     isLoadingText={"Uploading"}
+                    variant="outline"
                     onPress={pickImageAsync}
                     w="50%"
                     h={12}>Pick an Image</Button>

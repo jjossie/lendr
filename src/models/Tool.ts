@@ -15,6 +15,7 @@ export interface ITool {
   name: string;
   brand?: string;
   description: string;
+  imageUrls: string[];
   lenderUid: string;
   holderUid: string;
   lender?: ILendrUser, // Hydrated after retrieving from firestore
@@ -43,6 +44,7 @@ export interface IToolForm {
   name: string;
   brand?: string;
   description: string;
+  imageUrls: string[];
   rate: {
     price: number;
     timeUnit: TimeUnit

@@ -45,6 +45,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     localPickup: false,
     useOnSite: false,
   });
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const {geopoint} = useLocation();
 
   // References
@@ -83,6 +84,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
 
     let toolForm: IToolForm = {
       name,
+      imageUrls,
       description,
       rate: {
         price: price,
@@ -119,7 +121,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
         setIsLoading(false);
       });
     }
-  }, [name, description, price, timeUnit, preferences, geopoint, brand, isEditing]);
+  }, [name, imageUrls, description, price, timeUnit, preferences, geopoint, brand, isEditing]);
 
   const handleDeleteTool = useCallback(async () => {
     setIsLoading(true);
@@ -145,6 +147,10 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       throw new LendrBaseError("Cannot upload image without a tool ID");
 
     const imageUrl = await uploadToolImageToFirebase(uri, route.params.toolId);
+    if (!imageUrl)
+      throw new LendrBaseError(`Image url was blank: ${imageUrl}`);
+
+    setImageUrls([imageUrl]);
     console.log("Downloadable Image URL: " + imageUrl);
   };
 

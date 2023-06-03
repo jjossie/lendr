@@ -14,6 +14,10 @@ const BorrowBrowseItem: React.FC<BorrowBrowseItemProps> = ({navigation, tool}) =
 
   const keywordString = tool.name.split(" ").join(",");
 
+  const imageUrl = tool?.imageUrls && tool.imageUrls.length > 0
+      ? tool.imageUrls[0]
+      : `https://source.unsplash.com/random/?${keywordString},tool`;
+
   return (
       <Card
           px={0} py={0}
@@ -23,7 +27,7 @@ const BorrowBrowseItem: React.FC<BorrowBrowseItemProps> = ({navigation, tool}) =
             });
           }}>
         <Column w="100%" h={64}>
-          <Image source={{uri: `https://source.unsplash.com/random/320x320/?${keywordString}`}} style={style.image}/>
+          <Image source={{uri: imageUrl}} style={style.image}/>
           <Column w="100%" h="50%" p={2}>
             <Text fontSize="md">{tool.name}</Text>
             <Row alignItems="center">

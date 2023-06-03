@@ -33,7 +33,9 @@ export async function createTool(toolForm: IToolForm) {
       toolForm.rate.price &&
       toolForm.rate.timeUnit &&
       toolForm.preferences &&
-      toolForm.geopoint
+      toolForm.geopoint &&
+      toolForm.imageUrls &&
+      toolForm.imageUrls.length > 0
   ))
     throw new ObjectValidationError("Missing properties on newTool");
 
@@ -53,6 +55,7 @@ export async function createTool(toolForm: IToolForm) {
     description: toolForm.description,
     rate: toolForm.rate,
     preferences: toolForm.preferences,
+    imageUrls: toolForm.imageUrls,
   };
   return addDoc(collection(db, "tools"), toolData);
 }
@@ -82,11 +85,12 @@ export async function editTool(toolId: string, toolForm: IToolForm) {
     description: toolForm.description,
     rate: toolForm.rate,
     preferences: toolForm.preferences,
+    imageUrls: toolForm.imageUrls
   };
 
   if (toolForm.brand)
     toolDataDiff.brand = toolForm.brand;
-  return setDoc(doc(db, "tools", toolId), toolDataDiff, {merge: false});
+  return setDoc(doc(db, "tools", toolId), toolDataDiff, {merge: true});
 }
 
 export async function deleteTool(toolId: string) {
