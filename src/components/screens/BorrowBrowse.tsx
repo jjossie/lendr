@@ -17,9 +17,9 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
 
   // Side Effects
   useEffect(() => {
-    console.log("BorrowBrowse - useEffect - geopoint: ", geopoint);
+    // console.log("BorrowBrowse - useEffect - geopoint: ", geopoint);
     (async () => {
-      console.log("BorrowBrowse - useEffect - (async) geopoint: ", geopoint);
+      // console.log("BorrowBrowse - useEffect - (async) geopoint: ", geopoint);
       if (geopoint &&
           geopoint.length === 2 &&
           geopoint[0] !== undefined &&
@@ -32,7 +32,7 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
         setToolsList([]);
       }
     })();
-  }, [searchRadiusString, searchRadius, geopoint]);
+  }, [searchRadiusString, searchRadius, geopoint, city]);
 
   // State
   const [searchTerm, setSearchTerm] = useState("");

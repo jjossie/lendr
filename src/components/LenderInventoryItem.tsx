@@ -13,7 +13,6 @@ export type LenderInventoryItemProps = {
 const LenderInventoryItem: React.FC<LenderInventoryItemProps> = ({tool, navigation}) => {
 
   const keywordString = tool.name.split(" ").join(",");
-  console.log("Image URLs: ", tool.imageUrls);
   const imageUri = tool.imageUrls && tool.imageUrls.length > 0
       ? tool.imageUrls[0]
       : `https://source.unsplash.com/random/640×480/?${keywordString}`;

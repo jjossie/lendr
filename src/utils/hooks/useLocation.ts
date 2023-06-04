@@ -22,6 +22,7 @@ export function useLocation() {
         setCity(city);
       } catch (e: LendrBaseError | any) {
         setErrorMsg(e.message);
+        console.log("🛠useLocation() - Error: getDeviceLocation() probably failed");
       }
     })();
   }, []);
