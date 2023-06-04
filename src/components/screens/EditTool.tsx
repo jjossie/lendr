@@ -22,7 +22,7 @@ import {Keyboard} from "react-native";
 import {useLocation} from "../../utils/hooks/useLocation";
 import ToolImagePicker from "../ToolImagePicker";
 import {deleteToolImageFromFirebase, uploadToolImageToFirebase} from "../../controllers/storage";
-import {LendrBaseError} from "../../utils/errors";
+import {LendrBaseError, NotFoundError} from "../../utils/errors";
 
 
 const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
@@ -61,13 +61,16 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       setIsLoading(true);
       getToolById(route.params?.toolId)
           .then((tool: ITool | undefined) => {
-            setName(tool!.name);
-            setDescription(tool!.description);
-            setPrice(tool!.rate.price);
-            setBrand(tool!.brand ?? "");
-            setTimeUnit(tool!.rate.timeUnit);
-            setPreferences(tool!.preferences);
+            if (!tool)
+              throw new NotFoundError("Tool Object not returned by getToolById()");
+            setName(tool.name);
+            setDescription(tool.description);
+            setPrice(tool.rate.price);
+            setBrand(tool.brand ?? "");
+            setTimeUnit(tool.rate.timeUnit);
+            setPreferences(tool.preferences);
             setIsLoading(false);
+            setImageUrls(tool.imageUrls);
           })
           .catch(e => console.error(e));
 
@@ -167,11 +170,14 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     }
   };
 
+  console.log("Image URLs: ", imageUrls);
+
   return (
       <ScrollView bg={theme.colors.white} onScroll={() => Keyboard.dismiss()} scrollEventThrottle={2} paddingTop={10}>
         <ToolImagePicker
-            onRemoveImage={handleDeleteImage}
             onSelectImage={handleSelectImage}
+            onRemoveImage={handleDeleteImage}
+            existingImageUrl={imageUrls[0]}
         />
 
         <Column alignItems="center" space={4} mx={3} my={4} paddingY={12}>

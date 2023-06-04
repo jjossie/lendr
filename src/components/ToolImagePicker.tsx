@@ -5,13 +5,15 @@ import * as ImagePicker from "expo-image-picker";
 export interface ImagePickerProps {
   onSelectImage: (_: any) => Promise<any>;
   onRemoveImage: (_: any) => Promise<any>;
+  existingImageUrl?: string | undefined;
 }
 
-const ToolImagePicker: React.FC<ImagePickerProps> = ({onSelectImage, onRemoveImage}) => {
+const ToolImagePicker: React.FC<ImagePickerProps> = ({onSelectImage, onRemoveImage, existingImageUrl}) => {
 
   // State
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
   const [isLoading,  setIsLoading] = useState<boolean>(false);
+  const [hasUserChangedImage, setHasUserChangedImage] = useState<boolean>(false);
 
   // Callbacks
   const pickImageAsync = async () => {
@@ -36,7 +38,14 @@ const ToolImagePicker: React.FC<ImagePickerProps> = ({onSelectImage, onRemoveIma
     setIsLoading(false);
   };
 
-  // console.log("Selected Image: " + selectedImage);
+  if (existingImageUrl && !hasUserChangedImage){
+    console.log("Using existing image: ", existingImageUrl);
+    setSelectedImage(existingImageUrl);
+    setHasUserChangedImage(true);
+  }else
+    console.log("Not using existing image: ", existingImageUrl);
+
+  console.log("Selected Image: " + selectedImage);
 
   return (
       <Center w={"100%"} h={320}>
