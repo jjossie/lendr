@@ -21,6 +21,7 @@ export interface ITool {
   lender?: ILendrUser, // Hydrated after retrieving from firestore
   holder?: ILendrUser, // Must be hydrated... after retrieving from firestore?
   createdAt: Timestamp;
+  deletedAt?: any; // Only for firestore use
   modifiedAt: Timestamp;
   rate: {
     price: number;
@@ -32,6 +33,7 @@ export interface ITool {
     useOnSite: boolean;
   }
   location: ILocation;
+  visibility: ToolVisibility;
 }
 
 /**
@@ -47,13 +49,14 @@ export interface IToolForm {
   imageUrls: string[];
   rate: {
     price: number;
-    timeUnit: TimeUnit
+    timeUnit: TimeUnit;
   },
-  preferences: ExchangePreferences
-  geopoint?: Geopoint
+  preferences: ExchangePreferences;
+  geopoint?: Geopoint;
+  visibility: ToolVisibility;
 }
 
-
+export type ToolVisibility = "draft" | "published";
 
 export interface ExchangePreferences {
   delivery: boolean;

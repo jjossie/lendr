@@ -1,3 +1,5 @@
+// noinspection ExceptionCaughtLocallyJS
+
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import {
   Alert,
@@ -15,7 +17,7 @@ import {
   TextArea,
   theme,
 } from "native-base";
-import {ExchangePreferences, ITool, IToolForm, TimeUnit} from "../../models/Tool";
+import {ExchangePreferences, IToolForm, TimeUnit} from "../../models/Tool";
 import {createTool, deleteTool, editTool, getToolById} from "../../controllers/Tool";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {Keyboard} from "react-native";
@@ -35,6 +37,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   // Form state
+  const [toolId, setToolId] = useState(route.params?.toolId ?? "");
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
   const [description, setDescription] = useState("");
@@ -52,36 +55,38 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   const cancelRef = useRef(null);
 
   // Side Effects
-  useEffect(() => {
+  useEffect(() => { (async () => {
     // Get data for this tool if editing one, or leave blank if not editing a tool
-    if (route.params?.toolId) {
-
+    if (toolId) {
       // We're editing a tool, so fetch it
       setIsEditing(true);
       setIsLoading(true);
-      getToolById(route.params?.toolId)
-          .then((tool: ITool | undefined) => {
-            if (!tool)
-              throw new NotFoundError("Tool Object not returned by getToolById()");
-            setName(tool.name);
-            setDescription(tool.description);
-            setPrice(tool.rate.price);
-            setBrand(tool.brand ?? "");
-            setTimeUnit(tool.rate.timeUnit);
-            setPreferences(tool.preferences);
-            setIsLoading(false);
-            setImageUrls(tool.imageUrls);
-          })
-          .catch(e => console.error(e));
+      try {
+        const tool = await getToolById(toolId);
+        if (!tool)
+          throw new NotFoundError("Tool Object not returned by getToolById()");
+        setName(tool.name);
+        setDescription(tool.description);
+        setPrice(tool.rate.price);
+        setBrand(tool.brand ?? "");
+        setTimeUnit(tool.rate.timeUnit);
+        setPreferences(tool.preferences);
+        setIsLoading(false);
+        setImageUrls(tool.imageUrls);
+      } catch (e) {
+        console.error(e);
+      }
 
     } else {
-      // Not editing - creating a new one
-      setIsEditing(false);
+      // First-time Page Open on Creating a new tool
+      await handleSaveTool();
     }
+  })();
+
   }, []);
 
   // Callbacks
-  const handleSaveTool = useCallback(() => {
+  const handleSaveTool = useCallback(async () => {
     setIsLoading(true);
     setIsError(false);
 
@@ -95,42 +100,44 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       },
       preferences,
       geopoint,
+      visibility: "draft"
     };
     if (brand) toolForm.brand = brand;
     if (!isEditing) {
-      // Create new tool
-      createTool(toolForm).then(() => {
-        console.log("Tool Created!");
+      try {
+        // Create new tool. This will be done immediately when "Add New Tool" is clicked.
+        const newTool = await createTool(toolForm);
         setIsLoading(false);
-        navigation.goBack();
-      }).catch((e) => {
-        console.log("Failed to create tool");
+      } catch (e) {
+        console.log("❇️Failed to create tool");
         console.log(e);
         setErrorMessage("Failed to create tool");
         setIsError(true);
         setIsLoading(false);
-      });
+      }
     } else {
-      // Save existing tool
-      editTool(route.params?.toolId, toolForm).then(() => {
-        console.log("Tool Saved!");
+      try {
+        // Save existing tool
+        toolForm.visibility = "published";
+        await editTool(toolId, toolForm);
+        console.log("❇️Tool Saved!");
         setIsLoading(false);
         navigation.goBack();
-      }).catch((e) => {
-        console.log("Failed to edit tool");
+      } catch (e) {
+        console.log("❇️Failed to edit tool 📛");
         console.log(e);
-        setErrorMessage("Failed to edit tool");
+        setErrorMessage("Failed to save tool");
         setIsError(true);
         setIsLoading(false);
-      });
+      }
     }
-  }, [name, imageUrls, description, price, timeUnit, preferences, geopoint, brand, isEditing]);
+  }, [name, imageUrls, description, price, timeUnit, preferences, geopoint, brand, isEditing, toolId, navigation]);
 
   const handleDeleteTool = useCallback(async () => {
     setIsLoading(true);
 
     try {
-      await deleteTool(route.params?.toolId);
+      await deleteTool(toolId);
       setIsLoading(false);
       setIsAlertOpen(false);
       navigation.goBack();
@@ -141,43 +148,42 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       setIsAlertOpen(false);
       setIsLoading(false);
     }
-  }, [route.params?.toolId, navigation]);
-
+  }, [toolId, navigation]);
 
   const handleSelectImage = async (uri: string) => {
-    console.log("handleSelectImage()");
-    if (!route.params?.toolId)
+    console.log("❇️handleSelectImage()");
+    if (!toolId)
       throw new LendrBaseError("Cannot upload image without a tool ID");
 
-    const imageUrl = await uploadToolImageToFirebase(uri, route.params.toolId);
+    const imageUrl = await uploadToolImageToFirebase(uri, toolId);
     if (!imageUrl)
       throw new LendrBaseError(`Image url was blank: ${imageUrl}`);
 
     setImageUrls([imageUrl]);
-    console.log("Downloadable Image URL: " + imageUrl);
+    console.log("❇️Downloadable Image URL: " + imageUrl);
   };
 
   const handleDeleteImage = async (uri: string) => {
-    console.log("handleDeleteImage()");
-    if (!route.params?.toolId)
-      throw new LendrBaseError("Cannot upload image without a tool ID");
+    console.log("❇️handleDeleteImage()");
+    if (!toolId)
+      throw new LendrBaseError("Cannot delete image without a tool ID");
 
     try {
-      await deleteToolImageFromFirebase(route.params.toolId);
-      console.log("Tool deleted successfully");
+      await deleteToolImageFromFirebase(toolId);
+      console.log("❇️Tool deleted successfully");
     } catch (e) {
       throw new LendrBaseError("Failed to delete tool image");
     }
   };
 
-  console.log("Image URLs: ", imageUrls);
+  // console.log("❇️Image URLs: ", imageUrls);
 
   return (
       <ScrollView bg={theme.colors.white} onScroll={() => Keyboard.dismiss()} scrollEventThrottle={2} paddingTop={10}>
         <ToolImagePicker
             onSelectImage={handleSelectImage}
             onRemoveImage={handleDeleteImage}
-            existingImageUrl={imageUrls[0]}
+            existingImageUrl={(imageUrls && imageUrls.length > 0) ? imageUrls[0] : undefined}
         />
 
         <Column alignItems="center" space={4} mx={3} my={4} paddingY={12}>
