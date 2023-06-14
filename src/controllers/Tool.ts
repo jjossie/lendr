@@ -28,21 +28,24 @@ const geofire = require("geofire-common");
 
 export async function createTool(toolForm: IToolForm) {
 
-  if (
-      (!( // Pretty sure this validation is now unnecessary because tools will always be created as drafts.
-          toolForm.description &&
-          toolForm.name &&
-          toolForm.rate.price &&
-          toolForm.rate.timeUnit &&
-          toolForm.preferences &&
-          toolForm.geopoint &&
-          toolForm.imageUrls &&
-          toolForm.imageUrls.length > 0
-      ) && toolForm.visibility == "published")
-      || // Validate fields for drafts
-      (!toolForm.geopoint)
-  )
+
+  // Pretty sure this validation is now unnecessary because tools will always be created as drafts.
+  const hasAllFields = (
+      toolForm.description &&
+      toolForm.name &&
+      toolForm.rate.price &&
+      toolForm.rate.timeUnit &&
+      toolForm.preferences &&
+      toolForm.geopoint &&
+      toolForm.imageUrls &&
+      toolForm.imageUrls.length > 0
+  );
+
+  if (!hasAllFields && toolForm.visibility == "published")
     throw new ObjectValidationError("Missing properties on newTool", toolForm);
+
+  else if (!toolForm.geopoint)
+    throw new ObjectValidationError("Draft tool must still have a geopoint", toolForm)
 
   if (toolForm.visibility != "published")
     toolForm.visibility = "draft";

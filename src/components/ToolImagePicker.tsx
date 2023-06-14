@@ -39,13 +39,13 @@ const ToolImagePicker: React.FC<ImagePickerProps> = ({onSelectImage, onRemoveIma
   };
 
   if (existingImageUrl && !hasUserChangedImage){
-    console.log("Using existing image: ", existingImageUrl);
+    console.log("❇️Using existing image: ", existingImageUrl);
     setSelectedImage(existingImageUrl);
     setHasUserChangedImage(true);
-  }else
-    console.log("Not using existing image: ", existingImageUrl);
+  }
+    // console.log("Not using existing image: ", existingImageUrl);
 
-  console.log("Selected Image: " + selectedImage);
+  // console.log("Selected Image: " + selectedImage);
 
   return (
       <Center w={"100%"} h={320}>

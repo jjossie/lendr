@@ -35,6 +35,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   const [errorMessage, setErrorMessage] = useState("Failed to create tool. 👹");
   const [isEditing, setIsEditing] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   // Form state
   const [toolId, setToolId] = useState(route.params?.toolId ?? "");
@@ -56,6 +57,8 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
 
   // Side Effects
   useEffect(() => { (async () => {
+    // setRetryCount(0);
+
     // Get data for this tool if editing one, or leave blank if not editing a tool
     if (toolId) {
       // We're editing a tool, so fetch it
@@ -79,11 +82,40 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
 
     } else {
       // First-time Page Open on Creating a new tool
-      await handleSaveTool();
+      // await handleSaveTool();
+      setRetryCount(1);
     }
   })();
 
   }, []);
+
+  /**
+   * Handles the initial saving of a tool with retries since geopoint is often uninitialized.
+   */
+  useEffect(() => {
+    // Define your callback function that relies on state variables
+    const attemptSave = async () => {
+      if (retryCount < 1) return;
+      try {
+        // Try saving the tool, most likely as a draft
+        setIsLoading(true);
+        await handleSaveTool();
+        setIsLoading(false);
+      } catch (error) {
+        console.error(`❇️HandleSaveTool Failed on attempt ${retryCount}:`, error);
+        // Retry the callback with a delay if an error occurs
+        if (retryCount < 3) {
+          setTimeout(() => setRetryCount(retryCount + 1), 3000); // Retry after 3 seconds
+        } else {
+          setErrorMessage("Failed to create tool")
+          setIsError(true);
+        }
+      }
+    };
+
+    attemptSave(); // Initial fetch
+  }, [retryCount, geopoint]); // Retry whenever retryCount changes
+
 
   // Callbacks
   const handleSaveTool = useCallback(async () => {
@@ -108,12 +140,12 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
         // Create new tool. This will be done immediately when "Add New Tool" is clicked.
         const newTool = await createTool(toolForm);
         setIsLoading(false);
+        setToolId(newTool.id);
       } catch (e) {
         console.log("❇️Failed to create tool");
         console.log(e);
-        setErrorMessage("Failed to create tool");
-        setIsError(true);
         setIsLoading(false);
+        throw e;
       }
     } else {
       try {
