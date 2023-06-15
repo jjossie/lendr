@@ -52,13 +52,13 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
                   h={"100%"}
       >
         <KeyboardAvoidingView
-            h={{
-              base: "100%",
-              lg: "300px"
-            }}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            // h={{
+            //   base: "100%",
+            //   lg: "300px"
+            // }}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 100 : -200}
+            behavior={Platform.OS === "ios" ? "height" : "height"}
         >
-
           <Column h={"100%"}
                   w={"100%"}
                   justifyContent={'flex-end'}
