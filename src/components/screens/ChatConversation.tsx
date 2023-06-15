@@ -20,10 +20,19 @@ import {LendrBaseError} from "../../utils/errors";
 
 const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
 
-  // State
+  console.log("❇️Rendering ChatConversation");
+
+  // Content State
   const [messageText, setMessageText] = useState<string>("");
   const {messages, relation} = useChatMessages(route.params?.relationId);
   const {user} = useAuthentication();
+
+  // UI State
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+
+
+  console.log("Messages: ", messages.length);
 
   // State Guards
   if (!user || !relation) return null;
@@ -34,11 +43,13 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
     const receiverUid = getOtherUserInRelation(relation, user).uid;
     if (!receiverUid) throw new LendrBaseError("Receiver didn't have a UID :(");
 
-    await sendChatMessage(receiverUid , messageText);
+    setIsLoading(true);
+    await sendChatMessage(receiverUid, messageText);
+    setIsLoading(false);
   };
 
   return (
-      <ScrollView h={"100%"}>
+      <ScrollView keyboardShouldPersistTaps="handled" h={"100%"}>
         <Column h={"100%"}
                 w={"100%"}
                 justifyContent={'flex-end'}
@@ -60,10 +71,14 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
                     rounded={"xl"}
                     variant={"solid"}
                     value={messageText}
-                    onChangeText={(text) => {setMessageText(text)}}
+                    onChangeText={(text) => {
+                      setMessageText(text);
+                    }}
                 />
                 <IconButton variant={"solid"}
                             rounded={"xl"}
+                            isDisabled={isLoading}
+                            // icon={isLoading ? <Spinner/> : <ChevronRightIcon/>}
                             icon={<ChevronRightIcon/>}
                             onPress={handleSendMessage}
                 />
