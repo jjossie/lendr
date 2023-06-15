@@ -20,14 +20,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({message, relation}) => {
   const messageBorderColor = receivedMessage ? 'blue.200' : 'green.200';
 
   return (
-      <Card>
+      <Box mx={2} my={1}>
 
         <Row alignSelf={receivedMessage ? 'flex-start' : 'flex-end'}
              alignItems={"center"}
           space={2}>
           {receivedMessage ? <AvatarImage user={relation.otherUser}/> : null}
           {/*This should be the Sending user, not the receiving user ^^^*/}
-          <Box
+          <Card
               bgColor={theme.colors.white}
               p={2}
               rounded="lg"
@@ -36,9 +36,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({message, relation}) => {
             <Text textAlign={receivedMessage ? 'left' : 'right'}>
               {message.text}
             </Text>
-          </Box>
+          </Card>
         </Row>
-      </Card>
+      </Box>
   );
 };
 

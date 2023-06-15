@@ -16,6 +16,7 @@ import {useAuthentication} from "../../utils/hooks/useAuthentication";
 import ChatMessage from "../ChatMessage";
 import {getOtherUserInRelation, sendChatMessage} from "../../controllers/Relation";
 import {LendrBaseError} from "../../utils/errors";
+import {Platform} from "react-native";
 
 
 const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
@@ -49,18 +50,30 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
   };
 
   return (
-      <ScrollView keyboardShouldPersistTaps="handled" h={"100%"}>
-        <Column h={"100%"}
-                w={"100%"}
-                justifyContent={'flex-end'}
-                alignContent={'flex-end'}>
+      <ScrollView contentContainerStyle={{height: "100%"}}
+                  keyboardShouldPersistTaps="handled"
+                  bgColor={theme.colors.fuchsia[50]}
+                  h={"100%"}
+      >
+        <KeyboardAvoidingView
+            bgColor={theme.colors.amber[100]}
+            h={{
+              base: "100%",
+              lg: "300px"
+            }}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
 
-          {messages.map((message, index) => (
-              <ChatMessage message={message} relation={relation} key={index}/>
-          ))
-          }
+          <Column h={"100%"}
+                  w={"100%"}
+                  bgColor={theme.colors.fuchsia[200]}
+                  justifyContent={'flex-end'}
+                  alignContent={'flex-end'}>
 
-          <KeyboardAvoidingView>
+            {messages.map((message, index) => (
+                <ChatMessage message={message} relation={relation} key={index}/>
+            ))
+            }
             <Box w={"100%"}>
               <Row p={2} w={"100%"} space={2} justifyContent={"center"}>
                 <Input
@@ -78,15 +91,14 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
                 <IconButton variant={"solid"}
                             rounded={"xl"}
                             isDisabled={isLoading}
-                            // icon={isLoading ? <Spinner/> : <ChevronRightIcon/>}
+                    // icon={isLoading ? <Spinner/> : <ChevronRightIcon/>}
                             icon={<ChevronRightIcon/>}
                             onPress={handleSendMessage}
                 />
               </Row>
             </Box>
-          </KeyboardAvoidingView>
-
-        </Column>
+          </Column>
+        </KeyboardAvoidingView>
       </ScrollView>
   );
 };
