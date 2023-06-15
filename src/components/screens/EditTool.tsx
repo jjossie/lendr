@@ -26,6 +26,17 @@ import ToolImagePicker from "../ToolImagePicker";
 import {deleteToolImageFromFirebase, uploadToolImageToFirebase} from "../../controllers/storage";
 import {LendrBaseError, NotFoundError} from "../../utils/errors";
 
+const DEFAULT_NAME = "";
+const DEFAULT_DESCRIPTION = "";
+const DEFAULT_PRICE = 25;
+const DEFAULT_TIME_UNIT = "day";
+const DEFAULT_BRAND = "";
+const DEFAULT_PREFERENCES: ExchangePreferences = {
+  delivery: false,
+  localPickup: false,
+  useOnSite: false,
+};
+
 
 const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
 
@@ -33,89 +44,109 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("Failed to create tool. 👹");
-  const [isEditing, setIsEditing] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
   // Form state
   const [toolId, setToolId] = useState(route.params?.toolId ?? "");
-  const [name, setName] = useState("");
-  const [brand, setBrand] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(25);
-  const [timeUnit, setTimeUnit]: [TimeUnit, any] = useState("day");
-  const [preferences, setPreferences]: [ExchangePreferences, any] = useState({
-    delivery: false,
-    localPickup: false,
-    useOnSite: false,
-  });
+  const [name, setName] = useState(DEFAULT_NAME);
+  const [brand, setBrand] = useState(DEFAULT_BRAND);
+  const [description, setDescription] = useState(DEFAULT_DESCRIPTION);
+  const [price, setPrice] = useState(DEFAULT_PRICE);
+  const [timeUnit, setTimeUnit] = useState<TimeUnit>(DEFAULT_TIME_UNIT);
+  const [preferences, setPreferences] = useState<ExchangePreferences>(DEFAULT_PREFERENCES);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const {geopoint} = useLocation();
+
+  // Derived Component UI state
+  const [isEditing, setIsEditing] = useState((toolId)); // Defines whether the EditTool window was opened on an
+                                                        // existing tool or a new tool
+
 
   // References
   const cancelRef = useRef(null);
 
   // Side Effects
-  useEffect(() => { (async () => {
-    // setRetryCount(0);
+  useEffect(() => {
+    (async () => {
+      // setRetryCount(0);
 
-    // Get data for this tool if editing one, or leave blank if not editing a tool
-    if (toolId) {
-      // We're editing a tool, so fetch it
-      setIsEditing(true);
-      setIsLoading(true);
-      try {
-        const tool = await getToolById(toolId);
-        if (!tool)
-          throw new NotFoundError("Tool Object not returned by getToolById()");
-        setName(tool.name);
-        setDescription(tool.description);
-        setPrice(tool.rate.price);
-        setBrand(tool.brand ?? "");
-        setTimeUnit(tool.rate.timeUnit);
-        setPreferences(tool.preferences);
-        setIsLoading(false);
-        setImageUrls(tool.imageUrls);
-      } catch (e) {
-        console.error(e);
+      // Get data for this tool if editing one, or leave blank if not editing a tool
+      if (toolId) {
+        // We're editing a tool, so fetch it
+        setIsEditing(true);
+        setIsLoading(true);
+        try {
+          const tool = await getToolById(toolId);
+          if (!tool)
+            throw new NotFoundError("Tool Object not returned by getToolById()");
+          setName(tool.name);
+          setDescription(tool.description);
+          setPrice(tool.rate.price);
+          setBrand(tool.brand ?? "");
+          setTimeUnit(tool.rate.timeUnit);
+          setPreferences(tool.preferences);
+          setIsLoading(false);
+          setImageUrls(tool.imageUrls);
+        } catch (e) {
+          console.log(e);
+        }
+
+      } else {
+        // First-time Page Open on Creating a new tool
+        // await handleSaveTool();
+        setRetryCount(1);
       }
-
-    } else {
-      // First-time Page Open on Creating a new tool
-      // await handleSaveTool();
-      setRetryCount(1);
-    }
-  })();
-
+    })();
   }, []);
 
-  /**
-   * Handles the initial saving of a tool with retries since geopoint is often uninitialized.
-   */
   useEffect(() => {
-    // Define your callback function that relies on state variables
-    const attemptSave = async () => {
+    /**
+     * Handles the initial saving of a tool with retries since geopoint is often uninitialized.
+     */
+    (async () => {
       if (retryCount < 1) return;
       try {
         // Try saving the tool, most likely as a draft
         setIsLoading(true);
         await handleSaveTool();
         setIsLoading(false);
+        setIsError(false);
       } catch (error) {
-        console.error(`❇️HandleSaveTool Failed on attempt ${retryCount}:`, error);
+        console.log(`❇️HandleSaveTool Failed on attempt ${retryCount}:`, error);
         // Retry the callback with a delay if an error occurs
         if (retryCount < 3) {
           setTimeout(() => setRetryCount(retryCount + 1), 3000); // Retry after 3 seconds
         } else {
-          setErrorMessage("Failed to create tool")
+          setErrorMessage("Failed to create tool");
           setIsError(true);
         }
       }
-    };
-
-    attemptSave(); // Initial fetch
+    })();
   }, [retryCount, geopoint]); // Retry whenever retryCount changes
 
+  const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+    console.log("❇️BeforeRemove");
+
+    // Delete the tool if the draft tool is unchanged
+    if (
+        !isEditing &&
+        name == DEFAULT_NAME &&
+        description == DEFAULT_DESCRIPTION &&
+        price == DEFAULT_PRICE &&
+        timeUnit == DEFAULT_TIME_UNIT &&
+        preferences == DEFAULT_PREFERENCES &&
+        imageUrls.length == 0 &&
+        brand == DEFAULT_BRAND
+        && toolId
+    ) {
+      // Delete the tool
+      deleteTool(toolId).then(() => {
+        console.log("❇️Deleted draft tool");
+      });
+    }
+
+  });
 
   // Callbacks
   const handleSaveTool = useCallback(async () => {
@@ -132,10 +163,10 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       },
       preferences,
       geopoint,
-      visibility: "draft"
+      visibility: "draft",
     };
     if (brand) toolForm.brand = brand;
-    if (!isEditing) {
+    if (!toolId) {
       try {
         // Create new tool. This will be done immediately when "Add New Tool" is clicked.
         const newTool = await createTool(toolForm);
@@ -163,7 +194,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
         setIsLoading(false);
       }
     }
-  }, [name, imageUrls, description, price, timeUnit, preferences, geopoint, brand, isEditing, toolId, navigation]);
+  }, [name, imageUrls, description, price, timeUnit, preferences, geopoint, brand, toolId, navigation]);
 
   const handleDeleteTool = useCallback(async () => {
     setIsLoading(true);
@@ -207,8 +238,6 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       throw new LendrBaseError("Failed to delete tool image");
     }
   };
-
-  // console.log("❇️Image URLs: ", imageUrls);
 
   return (
       <ScrollView bg={theme.colors.white} onScroll={() => Keyboard.dismiss()} scrollEventThrottle={2} paddingTop={10}>
