@@ -21,8 +21,6 @@ import {Platform} from "react-native";
 
 const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
 
-  console.log("❇️Rendering ChatConversation");
-
   // Content State
   const [messageText, setMessageText] = useState<string>("");
   const {messages, relation} = useChatMessages(route.params?.relationId);
@@ -32,12 +30,10 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-
-  console.log("Messages: ", messages.length);
-
   // State Guards
   if (!user || !relation) return null;
 
+  // Callbacks
   const handleSendMessage = async () => {
     if (!relation) throw new LendrBaseError("Relation not initialized yet");
 
@@ -47,16 +43,15 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
     setIsLoading(true);
     await sendChatMessage(receiverUid, messageText);
     setIsLoading(false);
+    setMessageText("");
   };
 
   return (
       <ScrollView contentContainerStyle={{height: "100%"}}
                   keyboardShouldPersistTaps="handled"
-                  bgColor={theme.colors.fuchsia[50]}
                   h={"100%"}
       >
         <KeyboardAvoidingView
-            bgColor={theme.colors.amber[100]}
             h={{
               base: "100%",
               lg: "300px"
@@ -66,7 +61,6 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
 
           <Column h={"100%"}
                   w={"100%"}
-                  bgColor={theme.colors.fuchsia[200]}
                   justifyContent={'flex-end'}
                   alignContent={'flex-end'}>
 

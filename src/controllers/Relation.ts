@@ -243,8 +243,8 @@ export function getLiveMessages(setMessages: ((messages: any) => any),
       orderBy("createdAt", "asc"),
       limit(20),
   );
-  let messages: IChatMessage[] = [];
   const unsub = onSnapshot(messagesQuery, (snapshot: QuerySnapshot<DocumentData>) => {
+    let messages: IChatMessage[] = [];
     snapshot.forEach(messageSnap => {
       messages.push({
         id: messageSnap.id,

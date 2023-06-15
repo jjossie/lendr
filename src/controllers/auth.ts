@@ -6,7 +6,7 @@ import {ILendrUser} from "../models/ILendrUser";
 
 export function registerUser(firstName: string, lastName: string, email: string, password: string,) {
   const auth = getAuth();
-  createUserWithEmailAndPassword(auth, email, password)
+  createUserWithEmailAndPassword(auth,  email.trim().toLowerCase(), password.trim())
       .then(async (userCredential) => {
         console.log('User account created & signed in 💯');
         console.log(userCredential);
@@ -31,7 +31,7 @@ export function registerUser(firstName: string, lastName: string, email: string,
 
 export function logInUser(email: string, password: string) {
   const auth = getAuth();
-  signInWithEmailAndPassword(auth, email, password)
+  signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password.trim())
       .then(async (userCredential) => {
         // Signed in
         console.log('User signed in ✅');
