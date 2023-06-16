@@ -73,7 +73,12 @@ export function metersFromMiles(miles: number): number {
   return miles / KM_TO_MILE * 1000;
 }
 
+let requestCount = 0;
+
 export async function getCityNameFromGeopoint(geopoint: Geopoint): Promise<string> {
+  requestCount++;
+  console.log(`📍Sending a Geocoder Request - ${requestCount} requests so far`);
+  // TODO: Cache this kind of thing. Might be a good way to reduce requests
   // Given a latitude and longitude, find the nearest city name
   const response = await Geocoder.from(geopoint[0], geopoint[1]);
   const result = response.results[0];

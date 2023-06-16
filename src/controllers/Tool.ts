@@ -13,6 +13,7 @@ import {
   setDoc,
   startAt,
   Timestamp,
+  where,
 } from "firebase/firestore";
 import {db} from "../config/firebase";
 import {ITool, IToolForm} from "../models/Tool";
@@ -27,15 +28,27 @@ const geofire = require("geofire-common");
 
 export async function createTool(toolForm: IToolForm) {
 
-  if (!(
+
+  // Pretty sure this validation is now unnecessary because tools will always be created as drafts.
+  const hasAllFields = (
       toolForm.description &&
       toolForm.name &&
       toolForm.rate.price &&
       toolForm.rate.timeUnit &&
       toolForm.preferences &&
-      toolForm.geopoint
-  ))
-    throw new ObjectValidationError("Missing properties on newTool");
+      toolForm.geopoint &&
+      toolForm.imageUrls &&
+      toolForm.imageUrls.length > 0
+  );
+
+  if (!hasAllFields && toolForm.visibility == "published")
+    throw new ObjectValidationError("Missing properties on newTool", toolForm);
+
+  else if (!toolForm.geopoint)
+    throw new ObjectValidationError("Draft tool must still have a geopoint", toolForm)
+
+  if (toolForm.visibility != "published")
+    toolForm.visibility = "draft";
 
   const auth = getAuth();
   if (!auth.currentUser)
@@ -53,6 +66,8 @@ export async function createTool(toolForm: IToolForm) {
     description: toolForm.description,
     rate: toolForm.rate,
     preferences: toolForm.preferences,
+    imageUrls: toolForm.imageUrls,
+    visibility: toolForm.visibility,
   };
   return addDoc(collection(db, "tools"), toolData);
 }
@@ -65,8 +80,7 @@ export async function editTool(toolId: string, toolForm: IToolForm) {
       toolForm.name &&
       toolForm.rate.price &&
       toolForm.rate.timeUnit &&
-      toolForm.preferences &&
-      toolForm.geopoint
+      toolForm.preferences
   ))
     throw new ObjectValidationError("Missing properties on newTool", toolForm);
 
@@ -82,11 +96,12 @@ export async function editTool(toolId: string, toolForm: IToolForm) {
     description: toolForm.description,
     rate: toolForm.rate,
     preferences: toolForm.preferences,
+    imageUrls: toolForm.imageUrls,
   };
 
   if (toolForm.brand)
     toolDataDiff.brand = toolForm.brand;
-  return setDoc(doc(db, "tools", toolId), toolDataDiff, {merge: false});
+  return setDoc(doc(db, "tools", toolId), toolDataDiff, {merge: true});
 }
 
 export async function deleteTool(toolId: string) {
@@ -162,8 +177,10 @@ export async function getToolById(toolId: string, userGeopoint?: Geopoint): Prom
 
 
 export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
+
   if (!radiusMi || !center)
     return;
+
   console.log(`Getting tools within ${radiusMi} miles of ${center[0]}, ${center[1]}`);
   const radiusM = metersFromMiles(radiusMi);
 
@@ -173,6 +190,7 @@ export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
   bounds.forEach((bound: any) => {
     const q = query(
         collection(db, "tools"),
+        where("visibility", "==", "published"),
         orderBy("location.geohash"),
         startAt(bound[0]),
         endAt(bound[1]),
@@ -204,4 +222,31 @@ export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
     });
   });
   return tools;
+}
+
+
+export function validateTools() {
+  getAllTools()
+      .then((tools) => {
+        tools.forEach((tool: ITool) => {
+
+          if (tool.deletedAt) {
+            console.log(`Skipping deleted tool ${tool.id}`);
+            return;
+          }
+
+          if (!tool.visibility) {
+            tool.visibility = "published";
+            console.log("Publishing tool: " + tool.name);
+            const id: string = tool.id!;
+            delete tool.id;
+            setDoc(doc(db, "tools", id), tool, {merge: false})
+                .then(() => {
+                  console.log("🔥Tool updated: " + tool.name);
+                });
+          } else {
+            console.log(`Skipping ${tool.visibility} tool: `, tool.name);
+          }
+        });
+      });
 }

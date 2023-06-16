@@ -13,6 +13,9 @@ export type LenderInventoryItemProps = {
 const LenderInventoryItem: React.FC<LenderInventoryItemProps> = ({tool, navigation}) => {
 
   const keywordString = tool.name.split(" ").join(",");
+  const imageUri = tool.imageUrls && tool.imageUrls.length > 0
+      ? tool.imageUrls[0]
+      : `https://source.unsplash.com/random/640×480/?${keywordString}`;
   return (
         <Card onPress={() => {
           navigation.navigate("EditTool", {
@@ -27,7 +30,7 @@ const LenderInventoryItem: React.FC<LenderInventoryItemProps> = ({tool, navigati
                   fontSize="md">/{tool.rate.timeUnit}</Text>
               </Row>
             </Column>
-            <Image source={{uri: `https://source.unsplash.com/random/640×480/?${keywordString}`}} style={style.image}/>
+            <Image source={{uri: imageUri}} style={style.image}/>
           </Row>
         </Card>
   );

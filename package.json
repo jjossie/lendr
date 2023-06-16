@@ -20,9 +20,10 @@
     "algoliasearch": "^4.17.0",
     "dotenv": "^16.0.3",
     "expo": "~48.0.15",
+    "expo-image-picker": "~14.1.1",
     "expo-location": "~15.1.1",
     "expo-splash-screen": "~0.18.2",
-    "expo-status-bar": "~1.4.2",
+    "expo-status-bar": "~1.4.4",
     "firebase": "^9.19.1",
     "firebaseui": "^6.0.2",
     "geofire-common": "^6.0.0",
@@ -39,13 +40,13 @@
     "react-native-swipe-list-view": "^3.2.9"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9",
+    "@babel/core": "^7.20.0",
     "@expo/ngrok": "^4.1.0",
     "@tsconfig/react-native": "^2.0.3",
     "@types/jest": "^29.4.0",
-    "@types/react": "^18.0.28",
+    "@types/react": "~18.0.27",
     "@types/react-test-renderer": "^18.0.0",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.4"
   },
   "private": true
 }

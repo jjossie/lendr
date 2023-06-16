@@ -1,3 +1,5 @@
+// noinspection ExceptionCaughtLocallyJS
+
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import {
   Alert,
@@ -15,11 +17,25 @@ import {
   TextArea,
   theme,
 } from "native-base";
-import {ExchangePreferences, ITool, IToolForm, TimeUnit} from "../../models/Tool";
+import {ExchangePreferences, IToolForm, TimeUnit} from "../../models/Tool";
 import {createTool, deleteTool, editTool, getToolById} from "../../controllers/Tool";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {Keyboard} from "react-native";
 import {useLocation} from "../../utils/hooks/useLocation";
+import ToolImagePicker from "../ToolImagePicker";
+import {deleteToolImageFromFirebase, uploadToolImageToFirebase} from "../../controllers/storage";
+import {LendrBaseError, NotFoundError} from "../../utils/errors";
+
+const DEFAULT_NAME = "";
+const DEFAULT_DESCRIPTION = "";
+const DEFAULT_PRICE = 25;
+const DEFAULT_TIME_UNIT = "day";
+const DEFAULT_BRAND = "";
+const DEFAULT_PREFERENCES: ExchangePreferences = {
+  delivery: false,
+  localPickup: false,
+  useOnSite: false,
+};
 
 
 const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
@@ -28,117 +44,212 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("Failed to create tool. 👹");
-  const [isEditing, setIsEditing] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   // Form state
-  const [name, setName] = useState("");
-  const [brand, setBrand] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(25);
-  const [timeUnit, setTimeUnit]: [TimeUnit, any] = useState("day");
-  const [preferences, setPreferences]: [ExchangePreferences, any] = useState({
-    delivery: false,
-    localPickup: false,
-    useOnSite: false,
-  });
+  const [toolId, setToolId] = useState(route.params?.toolId ?? "");
+  const [name, setName] = useState(DEFAULT_NAME);
+  const [brand, setBrand] = useState(DEFAULT_BRAND);
+  const [description, setDescription] = useState(DEFAULT_DESCRIPTION);
+  const [price, setPrice] = useState(DEFAULT_PRICE);
+  const [timeUnit, setTimeUnit] = useState<TimeUnit>(DEFAULT_TIME_UNIT);
+  const [preferences, setPreferences] = useState<ExchangePreferences>(DEFAULT_PREFERENCES);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const {geopoint} = useLocation();
+
+  // Derived Component UI state
+  const [isEditing, setIsEditing] = useState((toolId)); // Defines whether the EditTool window was opened on an
+                                                        // existing tool or a new tool
+
 
   // References
   const cancelRef = useRef(null);
 
   // Side Effects
   useEffect(() => {
-    // Get data for this tool if editing one, or leave blank if not editing a tool
-    if (route.params?.toolId) {
+    (async () => {
+      // setRetryCount(0);
 
-      // We're editing a tool, so fetch it
-      setIsEditing(true);
-      setIsLoading(true);
-      getToolById(route.params?.toolId)
-          .then((tool: ITool | undefined) => {
-            setName(tool!.name);
-            setDescription(tool!.description);
-            setPrice(tool!.rate.price);
-            setBrand(tool!.brand ?? "");
-            setTimeUnit(tool!.rate.timeUnit);
-            setPreferences(tool!.preferences);
-            setIsLoading(false);
-          })
-          .catch(e => console.error(e));
+      // Get data for this tool if editing one, or leave blank if not editing a tool
+      if (toolId) {
+        // We're editing a tool, so fetch it
+        setIsEditing(true);
+        setIsLoading(true);
+        try {
+          const tool = await getToolById(toolId);
+          if (!tool)
+            throw new NotFoundError("Tool Object not returned by getToolById()");
+          setName(tool.name);
+          setDescription(tool.description);
+          setPrice(tool.rate.price);
+          setBrand(tool.brand ?? "");
+          setTimeUnit(tool.rate.timeUnit);
+          setPreferences(tool.preferences);
+          setIsLoading(false);
+          setImageUrls(tool.imageUrls);
+        } catch (e) {
+          console.log(e);
+        }
 
-    } else {
-      // Not editing - creating a new one
-      setIsEditing(false);
-    }
+      } else {
+        // First-time Page Open on Creating a new tool
+        // await handleSaveTool();
+        setRetryCount(1);
+      }
+    })();
   }, []);
 
+  useEffect(() => {
+    /**
+     * Handles the initial saving of a tool with retries since geopoint is often uninitialized.
+     */
+    (async () => {
+      if (retryCount < 1) return;
+      try {
+        // Try saving the tool, most likely as a draft
+        setIsLoading(true);
+        await handleSaveTool();
+        setIsLoading(false);
+        setIsError(false);
+      } catch (error) {
+        console.log(`❇️HandleSaveTool Failed on attempt ${retryCount}:`, error);
+        // Retry the callback with a delay if an error occurs
+        if (retryCount < 3) {
+          setTimeout(() => setRetryCount(retryCount + 1), 3000); // Retry after 3 seconds
+        } else {
+          setErrorMessage("Failed to create tool");
+          setIsError(true);
+        }
+      }
+    })();
+  }, [retryCount, geopoint]); // Retry whenever retryCount changes
+
+  const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+    console.log("❇️BeforeRemove");
+
+    // Delete the tool if the draft tool is unchanged
+    if (
+        !isEditing &&
+        name == DEFAULT_NAME &&
+        description == DEFAULT_DESCRIPTION &&
+        price == DEFAULT_PRICE &&
+        timeUnit == DEFAULT_TIME_UNIT &&
+        preferences == DEFAULT_PREFERENCES &&
+        imageUrls.length == 0 &&
+        brand == DEFAULT_BRAND
+        && toolId
+    ) {
+      // Delete the tool
+      deleteTool(toolId).then(() => {
+        console.log("❇️Deleted draft tool");
+      });
+    }
+
+  });
+
   // Callbacks
-  const handleSaveTool = useCallback(() => {
+  const handleSaveTool = useCallback(async () => {
     setIsLoading(true);
     setIsError(false);
 
     let toolForm: IToolForm = {
       name,
+      imageUrls,
       description,
       rate: {
         price: price,
         timeUnit: timeUnit,
       },
       preferences,
-      geopoint
+      geopoint,
+      visibility: "draft",
     };
     if (brand) toolForm.brand = brand;
-    if (!isEditing) {
-      // Create new tool
-      createTool(toolForm).then(() => {
-        console.log("Tool Created!");
+    if (!toolId) {
+      try {
+        // Create new tool. This will be done immediately when "Add New Tool" is clicked.
+        const newTool = await createTool(toolForm);
         setIsLoading(false);
-        navigation.goBack();
-      }).catch((e) => {
-        console.log("Failed to create tool");
+        setToolId(newTool.id);
+      } catch (e) {
+        console.log("❇️Failed to create tool");
         console.log(e);
-        setErrorMessage("Failed to create tool");
-        setIsError(true);
         setIsLoading(false);
-      });
+        throw e;
+      }
     } else {
-      // Save existing tool
-      editTool(route.params?.toolId, toolForm).then(() => {
-        console.log("Tool Saved!");
+      try {
+        // Save existing tool
+        toolForm.visibility = "published";
+        await editTool(toolId, toolForm);
+        console.log("❇️Tool Saved!");
         setIsLoading(false);
         navigation.goBack();
-      }).catch((e) => {
-        console.log("Failed to edit tool");
+      } catch (e) {
+        console.log("❇️Failed to edit tool 📛");
         console.log(e);
-        setErrorMessage("Failed to edit tool");
+        setErrorMessage("Failed to save tool");
         setIsError(true);
         setIsLoading(false);
-      });
+      }
     }
-  }, [name, description, price, timeUnit, preferences, geopoint, brand, isEditing]);
-
+  }, [name, imageUrls, description, price, timeUnit, preferences, geopoint, brand, toolId, navigation]);
 
   const handleDeleteTool = useCallback(async () => {
     setIsLoading(true);
 
     try {
-      await deleteTool(route.params?.toolId);
+      await deleteTool(toolId);
       setIsLoading(false);
       setIsAlertOpen(false);
       navigation.goBack();
     } catch (e) {
       console.log(e);
       setIsError(true);
-      setErrorMessage("Failed to delete tool. 👺")
+      setErrorMessage("Failed to delete tool. 👺");
       setIsAlertOpen(false);
       setIsLoading(false);
     }
-  }, [route.params?.toolId, navigation]);
+  }, [toolId, navigation]);
+
+  const handleSelectImage = async (uri: string) => {
+    console.log("❇️handleSelectImage()");
+    if (!toolId)
+      throw new LendrBaseError("Cannot upload image without a tool ID");
+
+    const imageUrl = await uploadToolImageToFirebase(uri, toolId);
+    if (!imageUrl)
+      throw new LendrBaseError(`Image url was blank: ${imageUrl}`);
+
+    setImageUrls([imageUrl]);
+    console.log("❇️Downloadable Image URL: " + imageUrl);
+  };
+
+  const handleDeleteImage = async (uri: string) => {
+    console.log("❇️handleDeleteImage()");
+    if (!toolId)
+      throw new LendrBaseError("Cannot delete image without a tool ID");
+
+    try {
+      await deleteToolImageFromFirebase(toolId);
+      console.log("❇️Tool deleted successfully");
+    } catch (e) {
+      throw new LendrBaseError("Failed to delete tool image");
+    }
+  };
 
   return (
-      <ScrollView bg={theme.colors.white} onScroll={() => Keyboard.dismiss()} >
-        <Column alignItems="center" space={4} mx={3} my={4} py={12}>
+      <ScrollView bg={theme.colors.white} onScroll={() => Keyboard.dismiss()} scrollEventThrottle={2} paddingTop={10}>
+        <ToolImagePicker
+            onSelectImage={handleSelectImage}
+            onRemoveImage={handleDeleteImage}
+            existingImageUrl={(imageUrls && imageUrls.length > 0) ? imageUrls[0] : undefined}
+        />
+
+        <Column alignItems="center" space={4} mx={3} my={4} paddingY={12}>
+
+
           {/* Basic Text Input */}
           <FormControl isRequired>
             <FormControl.Label>Tool Name</FormControl.Label>
@@ -283,7 +394,8 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
                   </AlertDialog.Body>
                   <AlertDialog.Footer>
                     <Button.Group space={2}>
-                      <Button variant="unstyled" colorScheme="coolGray" onPress={() => setIsAlertOpen(false)} ref={cancelRef}>
+                      <Button variant="unstyled" colorScheme="coolGray" onPress={() => setIsAlertOpen(false)}
+                              ref={cancelRef}>
                         Cancel
                       </Button>
                       <Button colorScheme="danger" onPress={handleDeleteTool}>

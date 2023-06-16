@@ -10,7 +10,7 @@ export function useMyTools(): ITool[] {
   const [list, setList] = React.useState<ITool[]>([]);
   const {authUser} = useAuthentication();
 
-  console.log("🛠️useMyTools()");
+  console.log("🛠useMyTools()");
 
   React.useEffect(() => {
     // This might run before user is initialized - just skip if that's the case
