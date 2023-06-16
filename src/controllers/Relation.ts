@@ -23,6 +23,9 @@ import {IChatMessage, IChatViewListItem, ILoan, IRelation} from "../models/Relat
 import {getUserFromAuth, getUserFromUid} from "./auth";
 import {ILendrUser} from "../models/ILendrUser";
 
+// Constants
+const MESSAGE_LOAD_LIMIT = 20;
+
 
 // TODO: This is all very stateful. Let's make it into a class.
 
@@ -240,17 +243,17 @@ export function getLiveMessages(setMessages: ((messages: any) => any),
 
   const messagesQuery = query(
       collection(db, "relations", relation.id, "messages"),
-      orderBy("createdAt", "asc"),
-      limit(20),
+      orderBy("createdAt", "desc"),
+      limit(MESSAGE_LOAD_LIMIT),
   );
   const unsub = onSnapshot(messagesQuery, (snapshot: QuerySnapshot<DocumentData>) => {
     let messages: IChatMessage[] = [];
     snapshot.forEach(messageSnap => {
       messages.push({
         id: messageSnap.id,
-        ...messageSnap.data()
+        ...messageSnap.data(),
       } as IChatMessage);
     });
-    setMessages(messages);
+    setMessages(messages.reverse());
   });
 }
