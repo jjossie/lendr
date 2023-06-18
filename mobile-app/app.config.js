@@ -4,7 +4,7 @@ config();
 export default {
   "expo": {
     "name": "Lendr",
-    "slug": "Lendr",
+    "slug": "lendr",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -40,6 +40,9 @@ export default {
       firebaseMessagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
       firebaseAppId: process.env.FIREBASE_APP_ID,
       firebaseMeasurementId: process.env.FIREBASE_MEASUREMENT_ID,
+      "eas": {
+        "projectId": "84d39ce3-20d9-4fb5-9735-870749bc53ac"
+      }
     },
   }
 }

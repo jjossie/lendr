@@ -12,6 +12,7 @@ import MainTabNavigator from "./src/components/navigation/MainTabNavigator";
 
 import "./src/config/algolia";
 
+
 // For now will disable on-screen warning with:
 LogBox.ignoreLogs([
   "We can not support a function callback. See Github Issues for details https://github.com/adobe/react-spectrum/issues/2320",
@@ -23,6 +24,7 @@ LogBox.ignoreLogs([
 export default function App() {
   // "Initializing" state var might be necessary later, but doesn't seem essential rn
   const [initializing, setInitializing] = useState(false);
+
 
   useEffect(() => {
     if (!app) {
