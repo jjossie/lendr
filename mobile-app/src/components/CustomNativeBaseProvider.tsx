@@ -1,20 +1,16 @@
-import {extendTheme} from "native-base";
-
-import React, {useCallback} from "react";
-import {NativeBaseProvider, ColorMode} from "native-base";
 import type {StorageManager} from "native-base";
+import {ColorMode, extendTheme, NativeBaseProvider} from "native-base";
+
+import React from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
-  useFonts,
   Epilogue_100Thin,
   Epilogue_300Light,
   Epilogue_500Medium,
   Epilogue_700Bold,
   Epilogue_900Black,
-}
-  from "@expo-google-fonts/epilogue";
-import * as SplashScreen from 'expo-splash-screen';
-import {View} from "react-native";
+  useFonts,
+} from "@expo-google-fonts/epilogue";
 
 // SplashScreen.preventAutoHideAsync();
 
