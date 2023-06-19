@@ -1,15 +1,9 @@
 import {ILocation} from "./Location";
-// import {DocumentReference} from "firebase/firestore";
 import {ILendrUser} from "./ILendrUser";
 import {Geopoint} from "geofire-common";
-import {DocumentReference, Timestamp} from "firebase/firestore";
+import {Timestamp} from "firebase/firestore";
 
 export interface ITool {
-  // Only for backward compatibility
-  // TODO remove after data migration
-  lenderRef?: DocumentReference<ILendrUser>;
-  holderRef?: DocumentReference<ILendrUser>;
-
 
   id?: string; // Added after retrieving from firestore
   name: string;

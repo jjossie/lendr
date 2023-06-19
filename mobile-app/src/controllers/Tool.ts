@@ -18,7 +18,7 @@ import {
 import {db} from "../config/firebase";
 import {ITool, IToolForm} from "../models/Tool";
 import {getAuth} from "firebase/auth";
-import {AuthError, NotFoundError, ObjectValidationError} from "common/utils/errors";
+import {AuthError, NotFoundError, ObjectValidationError} from "lendr-common/utils/errors";
 
 import {Geopoint} from "geofire-common";
 import {distanceBetweenMi, getCityNameFromGeopoint, getGeohashedLocation, metersFromMiles} from "../models/Location";
@@ -153,9 +153,7 @@ export async function getToolById(toolId: string, userGeopoint?: Geopoint): Prom
 
   const toolData = toolDocSnap.data() as ITool;
 
-  const lenderSnap = (toolData.lenderUid) // TODO: remove after data migration
-      ? await getDoc(doc(db, "users", toolData.lenderUid))
-      : await getDoc(toolData.lenderRef!);
+  const lenderSnap = await getDoc(doc(db, "users", toolData.lenderUid));
 
   if (!lenderSnap.exists())
     throw new NotFoundError(`Lender with id ${toolData.lenderUid} not found ⁉️`);
