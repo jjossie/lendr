@@ -11,7 +11,9 @@
     "exclude": [
         "node_modules",
         "../node_modules",
-        "./dist/**/*"
+        "./dist/**/*",
+        "**/dist",
+        "**/lib"
     ],
     "target": "es2017",
     "module": "commonjs",
