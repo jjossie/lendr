@@ -1,0 +1,5 @@
+{
+  "name": "lendr-monorepo",
+  "private": true,
+  "workspaces": ["common"]
+}

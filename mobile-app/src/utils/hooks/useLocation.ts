@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {getCurrentPositionAsync, LocationObject, requestForegroundPermissionsAsync} from "expo-location";
 import {getCityNameFromGeopoint} from "../../models/Location";
 import {Geopoint} from "geofire-common";
-import {LendrBaseError} from "../errors";
+import {LendrBaseError} from "common/utils/errors";
 
 export function useLocation() {
   console.log("🛠useLocation()");

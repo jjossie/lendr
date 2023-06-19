@@ -18,7 +18,7 @@ import {
 import {db} from "../config/firebase";
 import {ITool, IToolForm} from "../models/Tool";
 import {getAuth} from "firebase/auth";
-import {AuthError, NotFoundError, ObjectValidationError} from "../utils/errors";
+import {AuthError, NotFoundError, ObjectValidationError} from "common/utils/errors";
 
 import {Geopoint} from "geofire-common";
 import {distanceBetweenMi, getCityNameFromGeopoint, getGeohashedLocation, metersFromMiles} from "../models/Location";

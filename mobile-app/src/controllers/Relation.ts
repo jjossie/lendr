@@ -18,7 +18,7 @@ import {
 } from "firebase/firestore";
 import {app, db} from "../config/firebase";
 import {getAuth, User} from "firebase/auth";
-import {AuthError, LendrBaseError, NotFoundError, ObjectValidationError} from "../utils/errors";
+import {AuthError, LendrBaseError, NotFoundError, ObjectValidationError} from "common/utils/errors";
 import {IChatMessage, IChatViewListItem, ILoan, IRelation} from "../models/Relation";
 import {getUserFromAuth, getUserFromUid} from "./auth";
 import {ILendrUser} from "../models/ILendrUser";

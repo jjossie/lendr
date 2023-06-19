@@ -24,7 +24,7 @@ import {Keyboard} from "react-native";
 import {useLocation} from "../../utils/hooks/useLocation";
 import ToolImagePicker from "../ToolImagePicker";
 import {deleteToolImageFromFirebase, uploadToolImageToFirebase} from "../../controllers/storage";
-import {LendrBaseError, NotFoundError} from "../../utils/errors";
+import {LendrBaseError, NotFoundError} from "common/utils/errors";
 
 const DEFAULT_NAME = "";
 const DEFAULT_DESCRIPTION = "";

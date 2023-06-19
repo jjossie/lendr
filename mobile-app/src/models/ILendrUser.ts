@@ -1,6 +1,6 @@
 import {doc, DocumentReference, Timestamp} from "firebase/firestore";
 import {db} from "../config/firebase";
-import {ObjectValidationError} from "../utils/errors";
+import {ObjectValidationError} from "common/utils/errors";
 
 
 export interface ILendrUser {

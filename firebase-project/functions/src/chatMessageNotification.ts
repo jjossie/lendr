@@ -14,7 +14,9 @@ export const chatMessageNotification = onDocumentCreated(
 
       // Get the recipient of the message.
       const message: IChatMessage  = event.data.data() as IChatMessage;
-      const receiverUid = message.receiverUid;
+      // const receiver = getUserFromAuth(message.receiverUid);
+
+
 
       return {
         success: true,
