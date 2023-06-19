@@ -22,7 +22,7 @@ const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
   const responseListener = useRef<Notifications.Subscription | undefined>();
 
   useEffect(() => {
-    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+    registerForPushNotificationsAsync().then((token) => setExpoPushToken(token));
 
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
       setNotification(notification);
@@ -33,6 +33,7 @@ const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
     });
 
     return () => {
+      console.log("Removing Notification Subscriptions, I think?");
       Notifications.removeNotificationSubscription(notificationListener.current!);
       Notifications.removeNotificationSubscription(responseListener.current!);
     };
@@ -47,7 +48,7 @@ const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
           <Text>City: {city}</Text>
 
           <Button onPress={() => {
-            signOutUser();
+            signOutUser().then(r => console.log("❇️Signed out"));
           }}>Sign Out</Button>
 
 

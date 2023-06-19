@@ -38,7 +38,6 @@ export async function registerForPushNotificationsAsync() {
     });
     console.log("Setting notification channel for Android");
   }
-
   return token;
 }
 

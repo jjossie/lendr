@@ -8,6 +8,7 @@ export interface ILendrUser {
   firstName: string,
   lastName: string,
   relations: string[],
+  expoPushTokens: string[]
   uid: string,
   providerData?: any
 }
