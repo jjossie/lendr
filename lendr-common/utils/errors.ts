@@ -25,3 +25,10 @@ export class ObjectValidationError extends LendrBaseError {
     this.name = "ObjectValidationError";
   }
 }
+
+export class NotImplementedError extends LendrBaseError {
+  constructor(message?: string) {
+    super(message ?? "Function Not Implemented 🤡");
+    this.name = "NotImplementedError";
+  }
+}

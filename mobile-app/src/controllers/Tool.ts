@@ -21,10 +21,14 @@ import {getAuth} from "firebase/auth";
 import {AuthError, NotFoundError, ObjectValidationError} from "lendr-common/utils/errors";
 
 import {Geopoint} from "geofire-common";
-import {distanceBetweenMi, getCityNameFromGeopoint, getGeohashedLocation, metersFromMiles} from "../models/Location";
+import {
+  distanceBetweenMi,
+  getCityNameFromGeopoint,
+  getGeohashedLocation,
+  metersFromMiles,
+} from "lendr-common/models/Location";
 
 const geofire = require("geofire-common");
-
 
 export async function createTool(toolForm: IToolForm) {
 
