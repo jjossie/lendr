@@ -18,15 +18,10 @@ import {
 import {db} from "../config/firebase";
 import {ITool, IToolForm} from "../models/Tool";
 import {getAuth} from "firebase/auth";
-import {AuthError, NotFoundError, ObjectValidationError} from "lendr-common/utils/errors";
+import {AuthError, NotFoundError, ObjectValidationError} from "../utils/errors";
 
 import {Geopoint} from "geofire-common";
-import {
-  distanceBetweenMi,
-  getCityNameFromGeopoint,
-  getGeohashedLocation,
-  metersFromMiles,
-} from "lendr-common/models/Location";
+import {distanceBetweenMi, getCityNameFromGeopoint, getGeohashedLocation, metersFromMiles} from "../models/Location";
 
 const geofire = require("geofire-common");
 

@@ -1,6 +1,5 @@
 import {distanceBetween, geohashForLocation, Geopoint} from "geofire-common";
-
-import Geocoder from "react-native-geocoding";
+import {NotImplementedError} from "../utils/errors";
 
 export const KM_TO_MILE = 0.621371;
 
@@ -23,37 +22,6 @@ export interface ILocation {
   relativeDistance?: number; // Added after retrieving from firestore
 }
 
-// export interface ICoordinates {
-//   latitude: number;
-//   longitude: number;
-// }
-
-// export class Location {
-//   latitude: number;
-//   longitude: number;
-//   geohash: string;
-//   city?: string;
-//
-//   constructor(latitude: number, longitude: number, geohash?: string, city?: string) {
-//     this.latitude = latitude;
-//     this.longitude = longitude;
-//     this.geohash = geohash ?? geofire.geohashForLocation([latitude, longitude]);
-//     this.city = city ?? getCity(latitude, longitude);
-//   }
-//
-//   distanceBetweenMi(coordinates: [number, number] | Location): number {
-//     const distanceKm = geofire.distanceBetween(
-//         [this.latitude, this.longitude],
-//         (coordinates instanceof Location) ? coordinates.coordinates() : coordinates,
-//     );
-//     return distanceKm * KM_TO_MILE;
-//   }
-//
-//   coordinates(): [number, number] {
-//     return [this.latitude, this.longitude];
-//   }
-//
-// }
 
 export function getGeohashedLocation(geopoint: Geopoint): ILocation {
   const geohash = geohashForLocation(geopoint);
@@ -75,21 +43,6 @@ export function metersFromMiles(miles: number): number {
 
 let requestCount = 0;
 
-export async function getCityNameFromGeopoint(geopoint: Geopoint): Promise<string> {
-  requestCount++;
-  console.log(`📍Sending a Geocoder Request - ${requestCount} requests so far`);
-  // TODO: Cache this kind of thing. Might be a good way to reduce requests
-  // Given a latitude and longitude, find the nearest city name
-  const response = await Geocoder.from(geopoint[0], geopoint[1]);
-  const result = response.results[0];
-  const city = result.address_components.find(component => {
-    return component.types.includes("locality");
-  })?.long_name;
-  const stateCode = result.address_components.find(component => {
-    return component.types.includes("administrative_area_level_1");
-  })?.short_name;
-  return (city && stateCode) ? `${city}, ${stateCode}` : "Unknown";
-}
 
 export function getRandomCityGeopoint() {
   // Get a random location from the IDAHO_LOCATIONS array
@@ -97,10 +50,120 @@ export function getRandomCityGeopoint() {
   return IDAHO_LOCATIONS[randomCityIndex];
 }
 
-export async function getGeopointFromCityName(cityName: string): Promise<Geopoint> {
+interface ILocationApi {
+  street?: string,
+  city?: string,
+  county?: string,
+  state?: string,
+  country?: string,
+  postalcode?: string,
+}
+
+async function reverseGeocode(lat: number, lon: number): Promise<{
+  "address": {
+    "country": string,
+    "country_code": string,
+    "county": string,
+    "postcode": string,
+    "road": string,
+    "state": string,
+    "town": string,
+  },
+  "boundingbox": [string, string, string, string],
+  "display_name": string,
+  "lat": string,
+  "licence": string,
+  "lon": string,
+  "osm_id": number,
+  "osm_type": string,
+  "place_id": number,
+  "powered_by": string,
+}
+> {
+  requestCount++;
+  console.log(`📍Sending a Free Geocoder Request - ${requestCount} requests so far`);
+  const url = `https://geocode.maps.co/reverse?lat=${lat}&lon=${lon}`;
+  const response = await fetch(url);
+  return response.json();
+}
+
+
+async function geocode(location: ILocationApi)  {
+  let url = "https://geocode.maps.co/search?";
+  if (location.street)     url += `street=${location.street}&`;
+  if (location.city)       url += `city=${location.city}&`;
+  if (location.county)     url += `county=${location.county}&`;
+  if (location.state)      url += `state=${location.state}&`;
+  if (location.country)    url += `country=${location.country}&`;
+  if (location.postalcode) url += `postalcode=${location.postalcode}&`;
+
+  requestCount++;
+  console.log(`📍Sending a Free Geocoder Request - ${requestCount} requests so far`);
+  const response = await fetch(url);
+  return response.json();
+}
+
+/**
+ * Given a city name, find the geopoint. Include the state preferably
+ * @param {string} city
+ * @param {string | undefined} state
+ * @returns {Promise<Geopoint>}
+ */
+export async function getGeopointFromCityName(city: string, state?: string): Promise<Geopoint> {
   // Given a city name, find the geopoint
-  const response = await Geocoder.from(cityName);
-  const result = response.results[0];
-  const geopoint = result.geometry.location;
-  return [geopoint.lat, geopoint.lng];
+  let options: any = {city: city};
+  if (state)
+    options.state = state;
+  const response = await geocode(options);
+  console.log("geocoding response: ", response);
+  return [response.lat, response.lon];
+}
+
+/**
+ * Given a latitude and longitude, find the nearest city name
+ * @param {Geopoint} geopoint
+ * @returns {Promise<string>}
+ */
+export async function getCityNameFromGeopoint(geopoint: Geopoint): Promise<string> {
+  // TODO: Cache this kind of thing. Might be a good way to reduce requests
+  const response = await reverseGeocode(geopoint[0], geopoint[1]);
+  console.log("reverse geocoding response: ", response);
+  const {town, state} = response.address;
+  return (town && state) ? `${town}, ${state}` : town || state || "Unknown";
+}
+
+/**
+ * @deprecated this uses reactNativeGeocoding
+ * @param {Geopoint} geopoint
+ * @returns {Promise<string>}
+ */
+export async function getCityNameFromGeopointRNG(geopoint: Geopoint): Promise<string> {
+  // requestCount++;
+  // console.log(`📍Sending a Geocoder Request - ${requestCount} requests so far`);
+  // // TODO: Cache this kind of thing. Might be a good way to reduce requests
+  // // Given a latitude and longitude, find the nearest city name
+  // const response = await Geocoder.from(geopoint[0], geopoint[1]);
+  // const result = response.results[0];
+  // const city = result.address_components.find(component => {
+  //   return component.types.includes("locality");
+  // })?.long_name;
+  // const stateCode = result.address_components.find(component => {
+  //   return component.types.includes("administrative_area_level_1");
+  // })?.short_name;
+  // return (city && stateCode) ? `${city}, ${stateCode}` : "Unknown";
+  throw new NotImplementedError();
+}
+
+/**
+ * @deprecated this uses reactNativeGeocoding
+ * @param {string} cityName
+ * @returns {Promise<Geopoint>}
+ */
+export async function getGeopointFromCityNameRNG(cityName: string): Promise<Geopoint> {
+  // // Given a city name, find the geopoint
+  // const response = await Geocoder.from(cityName);
+  // const result = response.results[0];
+  // const geopoint = result.geometry.location;
+  // return [geopoint.lat, geopoint.lng];
+  throw new NotImplementedError();
 }

@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {getAuth, onAuthStateChanged, signOut, User} from 'firebase/auth';
-import {AuthError} from "lendr-common/utils/errors";
+import {AuthError} from "../../utils/errors";
 import {getUserFromAuth} from "../../controllers/auth";
 import {ILendrUser} from "../../models/ILendrUser";
 

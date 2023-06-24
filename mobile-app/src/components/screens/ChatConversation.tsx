@@ -5,7 +5,7 @@ import {useChatMessages} from "../../utils/hooks/useChatMessages";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
 import ChatMessage from "../ChatMessage";
 import {getOtherUserInRelation, sendChatMessage} from "../../controllers/Relation";
-import {LendrBaseError} from "lendr-common/utils/errors";
+import {LendrBaseError} from "../../utils/errors";
 import {Platform, ScrollView} from "react-native";
 
 

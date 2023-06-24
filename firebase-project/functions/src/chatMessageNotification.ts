@@ -1,18 +1,15 @@
 // The Cloud Functions for Firebase SDK to create Cloud Functions and triggers.
 import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import * as logger from "firebase-functions/logger";
-import {IChatMessage} from "lendr-common/models/Relation";
-import {setFirestore} from "lendr-common/config/firebase";
-import {getUserFromUid} from "lendr-common/controllers/User";
-import {getFirestore} from "firebase-admin/firestore";
+import {IChatMessage} from "./models/Relation";
+import {getUserFromUid} from "./controllers/users";
 import Expo from "expo-server-sdk";
 
 
 export const chatMessageNotification = onDocumentCreated(
     "/relations/{relationId}/messages/{messageId}",
     async (event) => {
-      // Init Firestore
-      setFirestore(getFirestore());
+
 
       // When a new message is added to a relation, send a notification to the recipient.
       logger.info(event);

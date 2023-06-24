@@ -18,8 +18,7 @@
   "dependencies": {
     "expo-server-sdk": "^3.7.0",
     "firebase-admin": "^11.8.0",
-    "firebase-functions": "^4.3.1",
-    "lendr-common": "*"
+    "firebase-functions": "^4.3.1"
   },
   "devDependencies": {
     "firebase-functions-test": "^3.1.0",

@@ -1,8 +1,6 @@
 import {distanceBetween, geohashForLocation, Geopoint} from "geofire-common";
 import {NotImplementedError} from "../utils/errors";
 
-// import Geocoder from "react-native-geocoding";
-
 export const KM_TO_MILE = 0.621371;
 
 export const REXBURG: Geopoint = [43.823791, -111.777649];
