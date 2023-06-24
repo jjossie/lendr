@@ -32,3 +32,10 @@ export class NotImplementedError extends LendrBaseError {
     this.name = "NotImplementedError";
   }
 }
+
+export class FirestoreNotInitializedError extends LendrBaseError {
+  constructor(message?: string) {
+    super(message ?? "Firebase Firestore Not Initialized 🔥");
+    this.name = "FirestoreNotInitializedError";
+  }
+}

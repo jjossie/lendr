@@ -2,5 +2,5 @@
   "name": "lendr-monorepo",
   "version": "1.0.0",
   "private": true,
-  "workspaces": ["lendr-common", "mobile-app"]
+  "workspaces": ["lendr-common", "mobile-app", "firebase-project/functions"]
 }
