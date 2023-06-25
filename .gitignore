@@ -1,5 +1,16 @@
+# MonoRepo Top-Level GitIgnore
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Environment
+.env
+*.env
+**/.env
+
+# General JS/Node Stuff
 node_modules/
-.expo/
 dist/
 npm-debug.*
 *.jks
@@ -8,12 +19,3 @@ npm-debug.*
 *.key
 *.mobileprovision
 *.orig.*
-web-build/
-
-# macOS
-.DS_Store
-**/.DS_Store
-
-.env
-*.env
-**/.env
