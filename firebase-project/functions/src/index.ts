@@ -11,5 +11,4 @@ initializeApp();
 
 // Export functions from this module
 export {chatMessageNotification} from "./chatMessageNotification";
-export * from "./demo";
 
