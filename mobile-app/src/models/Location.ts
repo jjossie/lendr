@@ -115,7 +115,7 @@ export async function getGeopointFromCityName(city: string, state?: string): Pro
   if (state)
     options.state = state;
   const response = await geocode(options);
-  console.log("geocoding response: ", response);
+  console.log("📍geocoding response: ", response);
   return [response.lat, response.lon];
 }
 
@@ -127,7 +127,7 @@ export async function getGeopointFromCityName(city: string, state?: string): Pro
 export async function getCityNameFromGeopoint(geopoint: Geopoint): Promise<string> {
   // TODO: Cache this kind of thing. Might be a good way to reduce requests
   const response = await reverseGeocode(geopoint[0], geopoint[1]);
-  console.log("reverse geocoding response: ", response);
+  console.log("📍reverse geocoding response: ", response);
   const {town, state} = response.address;
   return (town && state) ? `${town}, ${state}` : town || state || "Unknown";
 }

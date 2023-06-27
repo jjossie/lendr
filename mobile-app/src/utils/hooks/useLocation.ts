@@ -5,7 +5,6 @@ import {Geopoint} from "geofire-common";
 import {LendrBaseError} from "../errors";
 
 export function useLocation() {
-  console.log("🛠useLocation()");
 
   const [location, setLocation] = useState<LocationObject>();
   const [geopoint, setGeopoint] = useState<Geopoint>();
@@ -26,6 +25,9 @@ export function useLocation() {
       }
     })();
   }, []);
+
+  // if (geopoint && city)
+  //   console.log("🛠️useLocation() - Found Location: ", city);
 
   return {
     geopoint,

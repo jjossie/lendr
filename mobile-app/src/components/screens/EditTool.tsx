@@ -18,13 +18,14 @@ import {
   theme,
 } from "native-base";
 import {ExchangePreferences, IToolForm, TimeUnit} from "../../models/Tool";
-import {createTool, deleteTool, editTool, getToolById} from "../../controllers/Tool";
+import {createTool, deleteTool, editTool, getNextToolId, getToolById} from "../../controllers/Tool";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {Keyboard} from "react-native";
 import {useLocation} from "../../utils/hooks/useLocation";
 import ToolImagePicker from "../ToolImagePicker";
 import {deleteToolImageFromFirebase, uploadToolImageToFirebase} from "../../controllers/storage";
-import {LendrBaseError, NotFoundError} from "../../utils/errors";
+import {AuthError, LendrBaseError, NotFoundError} from "../../utils/errors";
+import {useAuthentication} from "../../utils/hooks/useAuthentication";
 
 const DEFAULT_NAME = "";
 const DEFAULT_DESCRIPTION = "";
@@ -47,8 +48,14 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
+  // Nonsense
+  const [unsubBeforeRemove, setUnsubBeforeRemove] = useState<(() => void) | undefined>();
+  const [unsubOnBlur, setUnsubOnBlur] = useState<(() => void) | undefined>();
+
   // Form state
   const [toolId, setToolId] = useState(route.params?.toolId ?? "");
+  const [toolExists, setToolExists] = useState(false);
+
   const [name, setName] = useState(DEFAULT_NAME);
   const [brand, setBrand] = useState(DEFAULT_BRAND);
   const [description, setDescription] = useState(DEFAULT_DESCRIPTION);
@@ -56,7 +63,12 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   const [timeUnit, setTimeUnit] = useState<TimeUnit>(DEFAULT_TIME_UNIT);
   const [preferences, setPreferences] = useState<ExchangePreferences>(DEFAULT_PREFERENCES);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const {geopoint} = useLocation();
+  const {geopoint, errorMsg} = useLocation();
+  if (errorMsg) {
+    console.log("❇️UseLocation ErrorMsg:", errorMsg);
+  }
+
+  const {authUser} = useAuthentication();
 
   // Derived Component UI state
   const [isEditing, setIsEditing] = useState((toolId)); // Defines whether the EditTool window was opened on an
@@ -69,7 +81,6 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   // Side Effects
   useEffect(() => {
     (async () => {
-      // setRetryCount(0);
 
       // Get data for this tool if editing one, or leave blank if not editing a tool
       if (toolId) {
@@ -94,7 +105,6 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
 
       } else {
         // First-time Page Open on Creating a new tool
-        // await handleSaveTool();
         setRetryCount(1);
       }
     })();
@@ -107,28 +117,45 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     (async () => {
       if (retryCount < 1) return;
       try {
-        // Try saving the tool, most likely as a draft
+        // Try saving the tool as a draft
         setIsLoading(true);
-        await handleSaveTool();
+        await createInitialDraftTool();
         setIsLoading(false);
         setIsError(false);
-      } catch (error) {
-        console.log(`❇️HandleSaveTool Failed on attempt ${retryCount}:`, error);
+      } catch (error: any) {
+        console.log(`❇️Create Initial Draft Tool Failed on attempt ${retryCount}:`, error?.message);
         // Retry the callback with a delay if an error occurs
-        if (retryCount < 3) {
-          setTimeout(() => setRetryCount(retryCount + 1), 3000); // Retry after 3 seconds
+        if (retryCount < 5) {
+          setTimeout(() => setRetryCount(retryCount + 1), 2000); // Retry after 2 seconds
         } else {
-          setErrorMessage("Failed to create tool");
+          setErrorMessage("Failed to create draft tool");
           setIsError(true);
         }
       }
     })();
-  }, [retryCount, geopoint]); // Retry whenever retryCount changes
+  }, [retryCount, geopoint, toolId]); // Retry whenever retryCount changes
 
-  const unsubscribe = navigation.addListener("beforeRemove", (e) => {
-    console.log("❇️BeforeRemove");
+  useEffect(() => {
+    console.log("❇️useEffect:toolId:", toolId);
+    if (unsubOnBlur) unsubOnBlur();
+    if (unsubBeforeRemove) unsubBeforeRemove();
+    const unsubB = navigation.addListener("blur", (e) => {
+      console.log("❇️Blur", e.type);
+      deleteDraftIfUnedited();
+    });
+    setUnsubOnBlur(unsubB);
+    const unsubBR = navigation.addListener("beforeRemove", (e) => {
+      console.log("❇️BeforeRemove", e.type);
+      deleteDraftIfUnedited();
+    });
+    setUnsubBeforeRemove(unsubBR);
+  }, [toolId]);
 
+
+  // Callbacks
+  const deleteDraftIfUnedited = () => {
     // Delete the tool if the draft tool is unchanged
+    console.log("❇️Attempting to delete draft");
     if (
         !isEditing &&
         name == DEFAULT_NAME &&
@@ -145,11 +172,9 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
         console.log("❇️Deleted draft tool");
       });
     }
+  };
 
-  });
-
-  // Callbacks
-  const handleSaveTool = useCallback(async () => {
+  const handleSaveTool = useCallback(async (publish: boolean = false) => {
     setIsLoading(true);
     setIsError(false);
 
@@ -166,35 +191,65 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       visibility: "draft",
     };
     if (brand) toolForm.brand = brand;
-    if (!toolId) {
-      try {
-        // Create new tool. This will be done immediately when "Add New Tool" is clicked.
-        const newTool = await createTool(toolForm);
-        setIsLoading(false);
-        setToolId(newTool.id);
-      } catch (e) {
-        console.log("❇️Failed to create tool");
-        console.log(e);
-        setIsLoading(false);
-        throw e;
-      }
-    } else {
-      try {
-        // Save existing tool
-        toolForm.visibility = "published";
-        await editTool(toolId, toolForm);
-        console.log("❇️Tool Saved!");
-        setIsLoading(false);
-        navigation.goBack();
-      } catch (e) {
-        console.log("❇️Failed to edit tool 📛");
-        console.log(e);
-        setErrorMessage("Failed to save tool");
-        setIsError(true);
-        setIsLoading(false);
-      }
+    if (!toolId) throw new LendrBaseError("RAAAAAHHHH");
+    try {
+      // Save existing tool
+      if (publish) toolForm.visibility = "published";
+      await editTool(toolId, toolForm);
+      console.log("❇️Tool Saved!");
+      setIsLoading(false);
+      navigation.goBack();
+    } catch (e) {
+      console.log("❇️Failed to edit tool 📛");
+      console.error(e);
+      setErrorMessage("Failed to save tool");
+      setIsError(true);
+      setIsLoading(false);
     }
+
   }, [name, imageUrls, description, price, timeUnit, preferences, geopoint, brand, toolId, navigation]);
+
+  const createInitialDraftTool = useCallback(async () => {
+    // setIsLoading(true);
+    setIsError(false);
+
+    let toolForm: IToolForm = {
+      name,
+      imageUrls,
+      description,
+      rate: {
+        price: price,
+        timeUnit: timeUnit,
+      },
+      preferences,
+      geopoint,
+      visibility: "draft",
+    };
+    if (brand) toolForm.brand = brand;
+    if (toolExists) {
+      console.log("❇️Tool already exists");
+      return;
+    }
+    if (!toolId) {
+      const nextToolId = getNextToolId();
+      console.log("❇️Next Tool ID: " + nextToolId);
+      setToolId(nextToolId);
+      return;
+    }
+    try {
+      // Create new tool. This will be done immediately when "Add New Tool" is clicked.
+      console.log("❇️Attempting to create draft tool");
+      await createTool(toolForm, toolId);
+      setToolExists(true);
+      setIsLoading(false);
+    } catch (e) {
+      console.log("❇️Failed to create tool");
+      console.log(e);
+      setIsLoading(false);
+      throw e;
+    }
+
+  }, [name, imageUrls, description, price, timeUnit, preferences, geopoint, brand, toolId, toolExists]);
 
   const handleDeleteTool = useCallback(async () => {
     setIsLoading(true);
@@ -215,12 +270,13 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
 
   const handleSelectImage = async (uri: string) => {
     console.log("❇️handleSelectImage()");
-    if (!toolId)
-      throw new LendrBaseError("Cannot upload image without a tool ID");
+    if (!authUser)
+      throw new AuthError("Cannot upload image a user associated");
 
     const imageUrl = await uploadToolImageToFirebase(uri, toolId);
     if (!imageUrl)
       throw new LendrBaseError(`Image url was blank: ${imageUrl}`);
+    console.log("❇️ImageUrl: " + imageUrl);
 
     setImageUrls([imageUrl]);
     console.log("❇️Downloadable Image URL: " + imageUrl);
@@ -230,7 +286,6 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     console.log("❇️handleDeleteImage()");
     if (!toolId)
       throw new LendrBaseError("Cannot delete image without a tool ID");
-
     try {
       await deleteToolImageFromFirebase(toolId);
       console.log("❇️Tool deleted successfully");
@@ -372,7 +427,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
                   isLoading={isLoading}
                   isLoadingText=""
                   spinnerPlacement="start"
-                  onPress={handleSaveTool}>{isEditing ? "Save Edits" : "Publish Tool"}</Button>
+                  onPress={() => {handleSaveTool(true)}}>{isEditing ? "Save Edits" : "Publish Tool"}</Button>
 
           {isEditing &&
             <>

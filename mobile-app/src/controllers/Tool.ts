@@ -1,5 +1,4 @@
 import {
-  addDoc,
   collection,
   doc,
   DocumentData,
@@ -25,9 +24,20 @@ import {distanceBetweenMi, getCityNameFromGeopoint, getGeohashedLocation, meters
 
 const geofire = require("geofire-common");
 
-export async function createTool(toolForm: IToolForm) {
+export function getNextToolId() {
+  console.log("🪛making tool id");
+  const docRef = doc(collection(db, "tools"));
+  console.log("🪛made tool id", docRef);
+  return docRef.id;
+}
 
+export async function createTool(toolForm: IToolForm, toolId: string) {
+  if (!toolId)
+    throw new ObjectValidationError("ToolId is required for creation");
 
+  const toolDocRef = doc(db, "tools", toolId)
+
+  console.log("🪛Attempting to add new tool with id: ", toolDocRef.id);
   // Pretty sure this validation is now unnecessary because tools will always be created as drafts.
   const hasAllFields = (
       toolForm.description &&
@@ -68,11 +78,16 @@ export async function createTool(toolForm: IToolForm) {
     imageUrls: toolForm.imageUrls,
     visibility: toolForm.visibility,
   };
-  return addDoc(collection(db, "tools"), toolData);
+  const existingDoc = await getDoc(toolDocRef);
+  if (existingDoc.exists())
+    throw new ObjectValidationError("🪛Tool already exists", toolForm);
+
+  await setDoc(toolDocRef, toolData);
+  console.log("🪛Added New Tool: ", toolDocRef.id);
 }
 
 export async function editTool(toolId: string, toolForm: IToolForm) {
-  console.log(`Editing tool ${toolId}`);
+  console.log(`🪛Editing tool ${toolId}`);
   // Validate Fields
   if (!(
       toolForm.description &&
@@ -96,6 +111,7 @@ export async function editTool(toolId: string, toolForm: IToolForm) {
     rate: toolForm.rate,
     preferences: toolForm.preferences,
     imageUrls: toolForm.imageUrls,
+    visibility: toolForm.visibility,
   };
 
   if (toolForm.brand)
@@ -104,7 +120,7 @@ export async function editTool(toolId: string, toolForm: IToolForm) {
 }
 
 export async function deleteTool(toolId: string) {
-  console.log(`Deleting tool ${toolId}`);
+  console.log(`🪛Deleting tool ${toolId}`);
 
   // Confirm user is logged in
   const auth = getAuth();
@@ -178,7 +194,7 @@ export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
   if (!radiusMi || !center)
     return;
 
-  console.log(`Getting tools within ${radiusMi} miles of ${center[0]}, ${center[1]}`);
+  console.log(`🪛Getting tools within ${radiusMi} miles of ${center[0]}, ${center[1]}`);
   const radiusM = metersFromMiles(radiusMi);
 
   const bounds = geofire.geohashQueryBounds(center, radiusM);
@@ -228,13 +244,13 @@ export function validateTools() {
         tools.forEach((tool: ITool) => {
 
           if (tool.deletedAt) {
-            console.log(`Skipping deleted tool ${tool.id}`);
+            console.log(`🪛Skipping deleted tool ${tool.id}`);
             return;
           }
 
           if (!tool.visibility) {
             tool.visibility = "published";
-            console.log("Publishing tool: " + tool.name);
+            console.log("🪛Publishing tool: " + tool.name);
             const id: string = tool.id!;
             delete tool.id;
             setDoc(doc(db, "tools", id), tool, {merge: false})
@@ -242,7 +258,7 @@ export function validateTools() {
                   console.log("🔥Tool updated: " + tool.name);
                 });
           } else {
-            console.log(`Skipping ${tool.visibility} tool: `, tool.name);
+            console.log(`🪛Skipping ${tool.visibility} tool: `, tool.name);
           }
         });
       });
