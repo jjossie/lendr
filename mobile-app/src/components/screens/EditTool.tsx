@@ -26,7 +26,6 @@ import ToolImagePicker from "../ToolImagePicker";
 import {deleteToolImageFromFirebase, uploadToolImageToFirebase} from "../../controllers/storage";
 import {AuthError, LendrBaseError, NotFoundError} from "../../utils/errors";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
-import {EventArg, EventListenerCallback} from "@react-navigation/native";
 
 const DEFAULT_NAME = "";
 const DEFAULT_DESCRIPTION = "";
@@ -127,29 +126,38 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       } catch (error: any) {
         console.log(`❇️Create Initial Draft Tool Failed on attempt ${retryCount}:`, error?.message);
         // Retry the callback with a delay if an error occurs
-        if (retryCount < 3) {
-          setTimeout(() => setRetryCount(retryCount + 1), 3000); // Retry after 3 seconds
+        if (retryCount < 5) {
+          setTimeout(() => setRetryCount(retryCount + 1), 2000); // Retry after 2 seconds
         } else {
-          setErrorMessage("Failed to create tool");
+          setErrorMessage("Failed to create draft tool");
           setIsError(true);
         }
       }
     })();
-  }, [retryCount, geopoint]); // Retry whenever retryCount changes
+  }, [retryCount, geopoint, toolId]); // Retry whenever retryCount changes
 
   useEffect(() => {
+    console.log("❇️useEffect:toolId:", toolId);
     if (unsubOnBlur) unsubOnBlur();
     if (unsubBeforeRemove) unsubBeforeRemove();
-    setUnsubOnBlur(navigation.addListener("blur", deleteDraftIfUnedited));
-    setUnsubBeforeRemove(navigation.addListener("beforeRemove", deleteDraftIfUnedited));
-  }, [isEditing]);
+    const unsubB = navigation.addListener("blur", (e) => {
+      console.log("❇️Blur", e.type);
+      deleteDraftIfUnedited();
+    });
+    setUnsubOnBlur(unsubB);
+    const unsubBR = navigation.addListener("beforeRemove", (e) => {
+      console.log("❇️BeforeRemove", e.type);
+      deleteDraftIfUnedited();
+    });
+    setUnsubBeforeRemove(unsubBR);
+  }, [toolId]);
   // }, [isEditing, name, description, price, timeUnit, preferences, imageUrls, brand])
 
 
   // Callbacks
-  const deleteDraftIfUnedited: EventListenerCallback<any, any> = (e: EventArg<any, any, any>) => {
-    console.log("❇️Attempting to delete draft", e.type);
+  const deleteDraftIfUnedited = () => {
     // Delete the tool if the draft tool is unchanged
+    console.log("❇️Attempting to delete draft");
     if (
         !isEditing &&
         name == DEFAULT_NAME &&
