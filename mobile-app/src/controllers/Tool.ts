@@ -111,6 +111,7 @@ export async function editTool(toolId: string, toolForm: IToolForm) {
     rate: toolForm.rate,
     preferences: toolForm.preferences,
     imageUrls: toolForm.imageUrls,
+    visibility: toolForm.visibility,
   };
 
   if (toolForm.brand)

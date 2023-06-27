@@ -81,7 +81,6 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   // Side Effects
   useEffect(() => {
     (async () => {
-      // setRetryCount(0);
 
       // Get data for this tool if editing one, or leave blank if not editing a tool
       if (toolId) {
@@ -151,7 +150,6 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     });
     setUnsubBeforeRemove(unsubBR);
   }, [toolId]);
-  // }, [isEditing, name, description, price, timeUnit, preferences, imageUrls, brand])
 
 
   // Callbacks
@@ -176,7 +174,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     }
   };
 
-  const handleSaveTool = useCallback(async () => {
+  const handleSaveTool = useCallback(async (publish: boolean = false) => {
     setIsLoading(true);
     setIsError(false);
 
@@ -196,7 +194,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     if (!toolId) throw new LendrBaseError("RAAAAAHHHH");
     try {
       // Save existing tool
-      toolForm.visibility = "published";
+      if (publish) toolForm.visibility = "published";
       await editTool(toolId, toolForm);
       console.log("❇️Tool Saved!");
       setIsLoading(false);
@@ -429,7 +427,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
                   isLoading={isLoading}
                   isLoadingText=""
                   spinnerPlacement="start"
-                  onPress={handleSaveTool}>{isEditing ? "Save Edits" : "Publish Tool"}</Button>
+                  onPress={() => {handleSaveTool(true)}}>{isEditing ? "Save Edits" : "Publish Tool"}</Button>
 
           {isEditing &&
             <>
