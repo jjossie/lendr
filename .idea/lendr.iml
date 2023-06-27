@@ -9,6 +9,7 @@
       <excludeFolder url="file://$MODULE_DIR$/Lendr/firebase-project/functions/node_modules" />
       <excludeFolder url="file://$MODULE_DIR$/Lendr/mobile-app/node_modules" />
       <excludeFolder url="file://$MODULE_DIR$/firebase-project/functions/lib" />
+      <excludePattern pattern="*.log" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
