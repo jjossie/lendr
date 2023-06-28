@@ -34,11 +34,12 @@ export function Hit({hit}: HitProps) {
       <Card
           px={0} py={0}
           onPress={() => {
-            console.log("❇️onPress => ", tool.objectID);
+            console.log("❇️onPress => navigating to ToolDetail ", tool.objectID);
             (navigation.getParent());
-            // navigation.navigate("ToolDetail", {
-            //   toolId: tool.id,
-            // });
+            // @ts-ignore
+            navigation.navigate("ToolDetail", {
+              toolId: tool.objectID,
+            });
           }}>
         <Column w="100%" h={64}>
           <Image source={{uri: imageUrl}} alt={tool.name ?? "tool"} style={style.image}/>
