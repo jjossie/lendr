@@ -1,13 +1,10 @@
 //
-// Code courtesy of: https://github.com/algolia/doc-code-samples/tree/master/react-instantsearch-hooks-native/getting-started/src
-//
-// P.S. I'm scared
+// Code courtesy of:
+// https://github.com/algolia/doc-code-samples/tree/master/react-instantsearch-hooks-native/getting-started/src  P.S.
+// I'm scared
 
 import {Hit as AlgoliaHit} from '@algolia/client-search';
-import {ILendrUser} from "../../models/ILendrUser";
-import {TimeUnit, ToolVisibility} from "../../models/Tool";
-import {Timestamp} from "firebase/firestore";
-import {ILocation} from "../../models/Location";
+import {TimeUnit} from "../../models/Tool";
 
 // export type ProductHit = AlgoliaHit<{
 //   brand: string;
@@ -37,27 +34,18 @@ import {ILocation} from "../../models/Location";
 // }>;
 
 export type ProductHit = AlgoliaHit<{
-  id?: string; // Added after retrieving from firestore
+  objectID: string; // Added after retrieving from firestore
+  path: string;
   name: string;
-  brand?: string;
   description: string;
-  imageUrls: string[];
-  lenderUid: string;
-  holderUid: string;
-  lender?: ILendrUser, // Hydrated after retrieving from firestore
-  holder?: ILendrUser, // Must be hydrated... after retrieving from firestore?
-  createdAt: Timestamp;
-  deletedAt?: any; // Only for firestore use
-  modifiedAt: Timestamp;
-  rate: {
-    price: number;
-    timeUnit: TimeUnit
-  },
-  preferences: {
-    delivery: boolean;
-    localPickup: boolean;
-    useOnSite: boolean;
-  }
-  location: ILocation;
-  visibility: ToolVisibility;
+  brand?: string;
+  imageUrl?: string;
+  lenderName?: string;
+  price: number;
+  timeUnit: TimeUnit
+  delivery: boolean;
+  localPickup: boolean;
+  useOnSite: boolean;
+  relativeDistance?: number;
+  city?: string;
 }>;

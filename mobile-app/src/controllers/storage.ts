@@ -12,7 +12,6 @@ export const uploadToolImageToFirebase = async (localImageUri: string, toolId: s
     const response = await fetch(localImageUri);
     console.log("🗃️Device file: ", JSON.stringify(response.url));
     const blob = await response.blob();
-    console.log("🗃Blob?: ", (blob));
 
     // Get Image Reference
     const imageRef = ref(storage, getStorageUrlForToolImage(toolId));

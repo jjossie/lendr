@@ -1,12 +1,12 @@
 import React, {useRef, useState} from "react";
 import {FlatList, SafeAreaView, StyleSheet} from "react-native";
 import {Filters} from "../utilities/algolia/Filters";
-import {searchClient} from "../../config/algolia";
+import {ALGOLIA_INDEX_NAME, searchClient} from "../../config/algolia";
 import {InstantSearch} from "react-instantsearch-hooks-web";
 import {View} from "native-base";
 import {SearchBox} from "../utilities/algolia/SearchBox";
 import {InfiniteHits} from "../utilities/algolia/InfiniteHits";
-import {Hit} from "./Hit";
+import {Hit} from "../utilities/algolia/Hit";
 
 export default function AlgoliaSearch() {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -20,7 +20,7 @@ export default function AlgoliaSearch() {
   return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.container}>
-          <InstantSearch searchClient={searchClient} indexName="dev_lendr_tools">
+          <InstantSearch searchClient={searchClient} indexName={ALGOLIA_INDEX_NAME}>
             <SearchBox onChange={scrollToTop}/>
             <Filters
                 isModalOpen={isModalOpen}

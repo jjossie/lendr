@@ -1,9 +1,8 @@
 import React from "react";
-import {ProductHit} from "../../utils/types/ProductHit";
+import {ProductHit} from "../../../utils/types/ProductHit";
 import {Column, Image, Row, Text} from "native-base";
 import {StyleSheet} from "react-native";
-import Card from "../Card";
-import {ITool} from "../../models/Tool";
+import Card from "../../Card";
 import {useNavigation} from "@react-navigation/native";
 
 type HitProps = {
@@ -17,7 +16,7 @@ export function Hit({hit}: HitProps) {
   //     </Text>
   // );
 
-  const tool: ITool = hit;
+  const tool = hit;
   if (!tool.name)
     return (<Card onPress={() => {
       console.log("nuthin");
@@ -27,16 +26,15 @@ export function Hit({hit}: HitProps) {
 
   const keywordString = tool.name?.split(" ").join(",");
 
-  const imageUrl = tool?.imageUrls && tool.imageUrls?.length > 0
-      ? tool.imageUrls[0]
-      : keywordString ? `https://source.unsplash.com/random/?${keywordString},tool`
-                      : `https://source.unsplash.com/random/?tool,hammer,wrench,screwdriver,drill`;
+  const imageUrl = tool?.imageUrl ??
+  keywordString ? `https://source.unsplash.com/random/?${keywordString},tool`
+      : `https://source.unsplash.com/random/?tool,hammer,wrench,screwdriver,drill`;
 
   return (
       <Card
           px={0} py={0}
           onPress={() => {
-            console.log("❇️onPress => ", tool?.id);
+            console.log("❇️onPress => ", tool.objectID);
             (navigation.getParent());
             // navigation.navigate("ToolDetail", {
             //   toolId: tool.id,
@@ -47,10 +45,10 @@ export function Hit({hit}: HitProps) {
           <Column w="100%" h="50%" p={2}>
             <Text fontSize="md">{tool.name}</Text>
             <Row alignItems="center">
-              <Text fontSize="xl" bold>${tool.rate?.price}</Text><Text
-                fontSize="md">/{tool.rate?.timeUnit}</Text>
+              <Text fontSize="xl" bold>${tool.price}</Text><Text
+                fontSize="md">/{tool.timeUnit}</Text>
             </Row>
-            <Text fontSize="sm">{tool.location?.relativeDistance} mi away</Text>
+            {/*<Text fontSize="sm">{tool.relativeDistance} mi away</Text>*/}
           </Column>
         </Column>
       </Card>
