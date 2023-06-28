@@ -19,7 +19,7 @@ export function useAuthentication() {
   const [authUser, setAuthUser] = useState<User>();
 
   useEffect(() => {
-    const unsubscribeFromAuthStatusChanged = onAuthStateChanged(auth, (foundUser) => {
+    return onAuthStateChanged(auth, (foundUser) => {
       if (foundUser) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/firebase.User
@@ -34,11 +34,11 @@ export function useAuthentication() {
         // User is signed out
         signOut(auth)
             .then(() => setAuthUser(undefined))
-            .catch(() => {throw new AuthError("Somehow we failed to sign out 🤨")});
+            .catch(() => {
+              throw new AuthError("Somehow we failed to sign out 🤨")
+            });
       }
     });
-
-    return unsubscribeFromAuthStatusChanged;
   }, []);
 
   return {

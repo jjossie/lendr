@@ -20,7 +20,7 @@ export function useMyTools(): ITool[] {
         where("lenderUid", "==", authUser.uid),
         where("lenderRef", "==", getRefFromUid(authUser.uid))
     ));
-    const unsub = onSnapshot(q, (snapshot) => {
+    return onSnapshot(q, (snapshot) => {
       const docDataList: ITool[] = [];
       snapshot.forEach(document => {
         docDataList.push({id: document.id, ...document.data()} as ITool);
