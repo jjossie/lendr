@@ -10,7 +10,7 @@
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
-    "peepee": "node src/scripts/peepeepoopoo.js"
+    "seed": "tsc && node lib/scripts/seedFirestore.js"
   },
   "engines": {
     "node": "18"

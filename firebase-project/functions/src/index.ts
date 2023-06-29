@@ -12,4 +12,3 @@ initializeApp();
 // Export functions from this module
 export {chatMessageNotification} from "./chatMessageNotification";
 export {algoliaTransformOnIndex} from "./algoliaTransformOnIndex";
-

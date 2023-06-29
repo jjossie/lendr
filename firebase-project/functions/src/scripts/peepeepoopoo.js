@@ -1,6 +1,9 @@
 const expo = require("expo-server-sdk");
 
-
+/**
+ * @deprecated no mo peepeepoopoo
+ * @returns {Promise<void>}
+ */
 async function peepeepoopoo(){
   const expoPushTokens = [
     "ExponentPushToken[WvdjfaBd4iG90RLEW8AqgI]",

@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   doc,
   DocumentData,
   endAt,
@@ -138,10 +139,7 @@ export async function deleteTool(toolId: string) {
   if (tool.lenderUid != auth.currentUser.uid)
     throw new AuthError("You are not authorized to delete this tool 🤨");
 
-  // "Delete" the tool
-  return setDoc(toolRef, {
-    deletedAt: serverTimestamp(),
-  }, {merge: false});
+  return deleteDoc(toolRef);
 }
 
 /**
@@ -192,7 +190,7 @@ export async function getToolById(toolId: string, userGeopoint?: Geopoint): Prom
 export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
 
   if (!radiusMi || !center)
-    return;
+    return undefined;
 
   console.log(`🪛Getting tools within ${radiusMi} miles of ${center[0]}, ${center[1]}`);
   const radiusM = metersFromMiles(radiusMi);
