@@ -26,7 +26,7 @@ export const InfiniteHits = forwardRef(
               numColumns={2}
               data={hits as unknown as THit[]}
               keyExtractor={(item) => item.objectID}
-              ItemSeparatorComponent={() => <View style={styles.separator}/>}
+              // ItemSeparatorComponent={() => <View style={styles.separator}/>}
               onEndReached={() => {
                 if (!isLastPage) {
                   showMore();
@@ -43,10 +43,10 @@ export const InfiniteHits = forwardRef(
 );
 
 const styles = StyleSheet.create({
-  separator: {
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
-  },
+  // separator: {
+  //   borderBottomWidth: 1,
+  //   borderColor: '#ddd',
+  // },
   item: {
     padding: 5,
   },

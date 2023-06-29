@@ -3,7 +3,7 @@ import {FlatList, SafeAreaView, StyleSheet} from "react-native";
 import {Filters} from "../utilities/algolia/Filters";
 import {ALGOLIA_INDEX_NAME, searchClient} from "../../config/algolia";
 import {InstantSearch} from "react-instantsearch-hooks-web";
-import {View} from "native-base";
+import {theme, View} from "native-base";
 import {SearchBox} from "../utilities/algolia/SearchBox";
 import {InfiniteHits} from "../utilities/algolia/InfiniteHits";
 import {Hit} from "../utilities/algolia/Hit";
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.colors.light[100],
     flexDirection: 'column',
   },
 });
