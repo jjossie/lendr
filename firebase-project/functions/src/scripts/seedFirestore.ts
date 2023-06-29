@@ -23,7 +23,7 @@ const toolsToCreate = [
     lenderUid: 'VQQngHQBeEP8h56uZ0zge9Eb4Ik1',
     location: {
       latitude: 43.8237743,
-      geohash: '9xb923y5bx',
+      // geohash: '9xb923y5bx',
       longitude: -111.7776217,
     },
     holderUid: 'VQQngHQBeEP8h56uZ0zge9Eb4Ik1',
@@ -34,7 +34,7 @@ const toolsToCreate = [
     lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
     location: {
       latitude: 43.82382353401531,
-      geohash: '9xb923vur0',
+      // geohash: '9xb923vur0',
       longitude: -111.7776913516126,
     },
     holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
@@ -58,7 +58,7 @@ const toolsToCreate = [
     description: 'This will cut your tiles. Guaranteed. How does it work, you ask? (I’m) Ben(jamin) Dover and I’ll show ya. ',
     location: {
       latitude: 43.82377584821227,
-      geohash: '9xb923vgzr',
+      // geohash: '9xb923vgzr',
       longitude: -111.7776767681288,
     },
     holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
@@ -77,7 +77,7 @@ const toolsToCreate = [
     description: 'It’s a giant ladder. What more do you want from me ⁉️',
     location: {
       latitude: 43.82377357682729,
-      geohash: '9xb923vgzx',
+      // geohash: '9xb923vgzx',
       longitude: -111.77766027065609,
     },
     brand: 'Giant',
@@ -95,7 +95,7 @@ const toolsToCreate = [
     name: 'Floor Jack',
     description: 'Where did this come from? Harbor Freight?',
     location: {
-      geohash: '9xb923vuj6',
+      // geohash: '9xb923vuj6',
       latitude: 43.82379138525453,
       longitude: -111.77775648932368,
     },
@@ -106,7 +106,7 @@ const toolsToCreate = [
     lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
     location: {
       latitude: 43.81475092650235,
-      geohash: '9xb9221pkj',
+      // geohash: '9xb9221pkj',
       longitude: -111.78434231199525,
     },
     holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
@@ -140,7 +140,7 @@ const toolsToCreate = [
     description: 'Corded, not cordless. Stole this from my dad don’t tell him 🤫',
     location: {
       latitude: 43.82378460514541,
-      geohash: '9xb923vup3',
+      // geohash: '9xb923vup3',
       longitude: -111.7776727777617,
     },
     holderUid: '1AWMpyyzTfXnDMGOu4R360qdmSL2',
@@ -156,7 +156,7 @@ const toolsToCreate = [
     description: 'Get drilled son',
     location: {
       latitude: 43.823790362029165,
-      geohash: '9xb923vup6',
+      // geohash: '9xb923vup6',
       longitude: -111.77767364367863,
     },
     holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
@@ -174,7 +174,7 @@ const toolsToCreate = [
     name: 'Router',
     description: 'Not the networking kind! I have a bunch of bits too just bring them back not broken pls thx 🙏 ',
     location: {
-      geohash: '9xb923vgze',
+      // geohash: '9xb923vgze',
       latitude: 43.82375337287918,
       longitude: -111.77766401200654,
     },
@@ -189,7 +189,7 @@ const toolsToCreate = [
     description: 'This thing is like 120 years old. No idea who made it or where it came from but it works great. They just don’t make ‘em like they used to 😮‍💨',
     location: {
       latitude: 43.82375337287918,
-      geohash: '9xb923vgze',
+      // geohash: '9xb923vgze',
       longitude: -111.77766401200654,
     },
     holderUid: '1AWMpyyzTfXnDMGOu4R360qdmSL2',
@@ -208,7 +208,7 @@ const toolsToCreate = [
     name: 'Hedge trimmer',
     description: 'I was in electrical the whole time I swear',
     location: {
-      geohash: '9xb923vung',
+      // geohash: '9xb923vung',
       latitude: 43.82379471208456,
       longitude: -111.77769799205268,
     },
@@ -221,7 +221,7 @@ const toolsToCreate = [
     lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
     location: {
       latitude: 43.81462785574658,
-      geohash: '9xb9220y8n',
+      // geohash: '9xb9220y8n',
       longitude: -111.78485293060422,
     },
     holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
@@ -243,7 +243,7 @@ const toolsToCreate = [
     description: 'Can pull the Miata right off the motor ',
     location: {
       latitude: 43.82379413136575,
-      geohash: '9xb923vune',
+      // geohash: '9xb923vune',
       longitude: -111.77771176662223,
     },
     holderUid: 'B2ulJyjmsPUaCOTdcIMxJxUUKoi2',

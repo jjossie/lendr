@@ -15,7 +15,7 @@ export interface ITool {
   lender?: ILendrUser, // Hydrated after retrieving from firestore
   holder?: ILendrUser, // Must be hydrated... after retrieving from firestore?
   createdAt: Timestamp;
-  deletedAt?: any; // Only for firestore use
+  deletedAt?: any; // Only for firestore use, deprecated
   modifiedAt: Timestamp;
   rate: {
     price: number;
