@@ -1,11 +1,14 @@
 // Initialize Firebase Admin App
+import {IToolAdminForm, IToolForm} from "../models/Tool";
+import {getRandomCityGeopoint} from "../models/Location";
+
 let admin = require("firebase-admin");
 let serviceAccount = require("../../../../../lendr-3e47b-firebase-adminsdk-ixt8q-5e56898fa2.json");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const usersToCreate = [
+const dummyUsersToCreate = [
   {displayName: "Joe Momma", email: "joemomma@gmail.com", password: "amogus"},
   {displayName: "Hugh Jasper", email: "hughjasper@gmail.com", password: "amogus"},
   {displayName: "Candice Richards", email: "joemomma@gmail.com", password: "amogus"},
@@ -14,29 +17,10 @@ const usersToCreate = [
   {displayName: "Michael Hawk", email: "joemomma@gmail.com", password: "amogus"},
 ];
 
-const toolsToCreate = [
-  {
-    preferences: {localPickup: false, delivery: false, useOnSite: false},
-    visibility: 'draft',
-    rate: {price: 25, timeUnit: 'day'},
-    imageUrls: [],
-    lenderUid: 'VQQngHQBeEP8h56uZ0zge9Eb4Ik1',
-    location: {
-      latitude: 43.8237743,
-      // geohash: '9xb923y5bx',
-      longitude: -111.7776217,
-    },
-    holderUid: 'VQQngHQBeEP8h56uZ0zge9Eb4Ik1',
-    name: 'Ayo',
-    description: 'Duh uh',
-  },
+const dummyToolsToCreate: IToolAdminForm[] = [
   {
     lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
-    location: {
-      latitude: 43.82382353401531,
-      // geohash: '9xb923vur0',
-      longitude: -111.7776913516126,
-    },
+    geopoint: [43.82382353401531, -111.7776913516126],
     holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
     preferences: {localPickup: false, delivery: false, useOnSite: true},
     imageUrls: [
@@ -56,11 +40,7 @@ const toolsToCreate = [
     name: 'Tile Cutter',
     lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
     description: 'This will cut your tiles. Guaranteed. How does it work, you ask? (I’m) Ben(jamin) Dover and I’ll show ya. ',
-    location: {
-      latitude: 43.82377584821227,
-      // geohash: '9xb923vgzr',
-      longitude: -111.7776767681288,
-    },
+    geopoint: [43.82377584821227, -111.7776767681288],
     holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
     brand: 'DeWalt',
     preferences: {localPickup: true, useOnSite: false, delivery: true},
@@ -75,11 +55,7 @@ const toolsToCreate = [
     lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
     name: 'Ladder',
     description: 'It’s a giant ladder. What more do you want from me ⁉️',
-    location: {
-      latitude: 43.82377357682729,
-      // geohash: '9xb923vgzx',
-      longitude: -111.77766027065609,
-    },
+    geopoint: [43.82377357682729, -111.77766027065609],
     brand: 'Giant',
     holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
     rate: {timeUnit: 'week', price: 29},
@@ -94,21 +70,13 @@ const toolsToCreate = [
     lenderUid: 'B2ulJyjmsPUaCOTdcIMxJxUUKoi2',
     name: 'Floor Jack',
     description: 'Where did this come from? Harbor Freight?',
-    location: {
-      // geohash: '9xb923vuj6',
-      latitude: 43.82379138525453,
-      longitude: -111.77775648932368,
-    },
+    geopoint: [43.82379138525453, -111.77775648932368],
     holderUid: 'B2ulJyjmsPUaCOTdcIMxJxUUKoi2',
     brand: 'Pittsburgh',
   },
   {
     lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
-    location: {
-      latitude: 43.81475092650235,
-      // geohash: '9xb9221pkj',
-      longitude: -111.78434231199525,
-    },
+    geopoint: [43.81475092650235, -111.78434231199525],
     holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
     preferences: {useOnSite: false, localPickup: true, delivery: true},
     visibility: 'published',
@@ -127,6 +95,9 @@ const toolsToCreate = [
     name: 'Compound Miter Saw',
     description: 'This right here is the best miter saw ya ever done seen. It’ll take your fingers right off. OSHA’s worst nightmare. ',
     brand: 'Ryobi ',
+    imageUrls: [
+      'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FPAxTxRtAwmXbhEx2eM4h%2Fimg_0?alt=media&token=76ea2150-123a-432b-8bca-632425327b1a',
+    ],
   },
   {
     preferences: {localPickup: true, delivery: true, useOnSite: false},
@@ -138,11 +109,7 @@ const toolsToCreate = [
     lenderUid: '1AWMpyyzTfXnDMGOu4R360qdmSL2',
     name: 'Circular Saw',
     description: 'Corded, not cordless. Stole this from my dad don’t tell him 🤫',
-    location: {
-      latitude: 43.82378460514541,
-      // geohash: '9xb923vup3',
-      longitude: -111.7776727777617,
-    },
+    geopoint: [43.82378460514541, -111.7776727777617],
     holderUid: '1AWMpyyzTfXnDMGOu4R360qdmSL2',
   },
   {
@@ -154,11 +121,7 @@ const toolsToCreate = [
     lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
     name: 'Drill',
     description: 'Get drilled son',
-    location: {
-      latitude: 43.823790362029165,
-      // geohash: '9xb923vup6',
-      longitude: -111.77767364367863,
-    },
+    geopoint: [43.823790362029165, -111.77767364367863],
     holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
     brand: 'Ridgid',
     preferences: {delivery: true, useOnSite: false, localPickup: true},
@@ -173,11 +136,7 @@ const toolsToCreate = [
     lenderUid: '1AWMpyyzTfXnDMGOu4R360qdmSL2',
     name: 'Router',
     description: 'Not the networking kind! I have a bunch of bits too just bring them back not broken pls thx 🙏 ',
-    location: {
-      // geohash: '9xb923vgze',
-      latitude: 43.82375337287918,
-      longitude: -111.77766401200654,
-    },
+    geopoint: [43.82375337287918, -111.77766401200654],
     holderUid: '1AWMpyyzTfXnDMGOu4R360qdmSL2',
   },
   {
@@ -187,11 +146,7 @@ const toolsToCreate = [
     lenderUid: '1AWMpyyzTfXnDMGOu4R360qdmSL2',
     name: 'Lathe',
     description: 'This thing is like 120 years old. No idea who made it or where it came from but it works great. They just don’t make ‘em like they used to 😮‍💨',
-    location: {
-      latitude: 43.82375337287918,
-      // geohash: '9xb923vgze',
-      longitude: -111.77766401200654,
-    },
+    geopoint: [43.82375337287918, -111.77766401200654],
     holderUid: '1AWMpyyzTfXnDMGOu4R360qdmSL2',
     imageUrls: [
       'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FbyZLfyg35nV7tq151iY0%2Fimg_0?alt=media&token=23a10dff-7eb0-42d9-8459-b560e3592893',
@@ -207,11 +162,7 @@ const toolsToCreate = [
     lenderUid: '8vmY84LGS9hyfT3zZAqFZwakvQg1',
     name: 'Hedge trimmer',
     description: 'I was in electrical the whole time I swear',
-    location: {
-      // geohash: '9xb923vung',
-      latitude: 43.82379471208456,
-      longitude: -111.77769799205268,
-    },
+    geopoint: [43.82379471208456, -111.77769799205268],
     holderUid: '8vmY84LGS9hyfT3zZAqFZwakvQg1',
   },
   {
@@ -219,11 +170,7 @@ const toolsToCreate = [
       'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FvbHWSA5HJe9jjWezn6OS%2Fimg_0?alt=media&token=a3f6f5ab-4b4f-4018-8bb6-6df8f8a22d07',
     ],
     lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
-    location: {
-      latitude: 43.81462785574658,
-      // geohash: '9xb9220y8n',
-      longitude: -111.78485293060422,
-    },
+    geopoint: [43.81462785574658, -111.78485293060422],
     holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
     preferences: {localPickup: false, delivery: false, useOnSite: true},
     visibility: 'published',
@@ -241,11 +188,25 @@ const toolsToCreate = [
     lenderUid: 'B2ulJyjmsPUaCOTdcIMxJxUUKoi2',
     name: 'Engine lift',
     description: 'Can pull the Miata right off the motor ',
-    location: {
-      latitude: 43.82379413136575,
-      // geohash: '9xb923vune',
-      longitude: -111.77771176662223,
-    },
+    geopoint: [43.82379413136575, -111.77771176662223],
+    holderUid: 'B2ulJyjmsPUaCOTdcIMxJxUUKoi2',
+  },
+];
+
+
+const dummyToolsToCreate2: IToolAdminForm[] = [
+
+  {
+    preferences: {localPickup: true, delivery: false, useOnSite: false},
+    visibility: 'published',
+    rate: {price: 41, timeUnit: 'week'},
+    imageUrls: [
+      'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2Fw5qAzNQa54ngwVZcK9eh%2Fimg_0?alt=media&token=803ba6c0-0277-4bb8-8b27-d988e5edb8f2',
+    ],
+    lenderUid: 'B2ulJyjmsPUaCOTdcIMxJxUUKoi2',
+    name: 'Engine lift but for boxers',
+    description: 'Can pull the WRX right off the motor ',
+    geopoint: [43.82379413136575, -111.77771176662223],
     holderUid: 'B2ulJyjmsPUaCOTdcIMxJxUUKoi2',
   },
 ];
@@ -254,6 +215,24 @@ const toolsToCreate = [
 const generateAuthUsers = () => {
 
 };
+
+const generateTools = async (toolsToCreate: IToolForm[]) => {
+  const db = admin.firestore();
+
+  for (let tool of toolsToCreate) {
+    console.log("🔨Adding tool ", tool.name);
+    tool.geopoint = getRandomCityGeopoint();
+    await db.collection("test_tools").add(tool);
+  }
+};
+
+// Main
+
+generateTools(dummyToolsToCreate)
+    .then(r => console.log("Generated Tools Successfully"))
+    .catch((e) => {
+      console.error("Failed to generate tools💀", e);
+    });
 
 // export async function getAllTools(): Promise<ITool[]> {
 //   const querySnapshot = await admin.firestore().collection("tools").get();

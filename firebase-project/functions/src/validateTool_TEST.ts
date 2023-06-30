@@ -6,7 +6,7 @@ import {Geopoint} from "geofire-common";
 import {ITool, IToolAdminForm} from "./models/Tool";
 
 
-export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) => {
+export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async (event) => {
   logger.info("Validating new tool: ", event.data.id);
   const db = getFirestore();
   /**
@@ -43,7 +43,7 @@ export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) =
    * Hydration
    */
 
-      // Check lenderUid and hydrate lender object accordingly
+  // Check lenderUid and hydrate lender object accordingly
   const lenderSnap = await db.collection("users").doc(rawDoc.lenderUid).get();
   const lender = lenderSnap.data();
   const lenderDisplayName = `${lender.firstName} ${lender.lastName}`;

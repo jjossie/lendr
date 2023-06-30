@@ -7,12 +7,15 @@ export const REXBURG: Geopoint = [43.823791, -111.777649];
 export const IDAHOFALLS: Geopoint = [43.492661, -112.040756];
 export const POCATELLO: Geopoint = [42.866550, -112.443530];
 export const DRIGGS: Geopoint = [43.724491, -111.111038];
+export const RIGBY: Geopoint = [43.916667, -111.966667];
+export const SAN_FRANCISCO: Geopoint = [37.774929, -122.419418];
+export const OAKLAND: Geopoint = [37.804167, -122.271667];
 export const SANJOSE: Geopoint = [37.338208, -121.886329];
 export const SANTA_CLARA: Geopoint = [37.354167, -121.955278];
 export const SANTA_ANA: Geopoint = [34.020833, -118.479167];
 
-export const IDAHO_LOCATIONS = [REXBURG, IDAHOFALLS, POCATELLO, DRIGGS];
-export const CALIFORNIA_LOCATIONS = [SANJOSE, SANTA_CLARA, SANTA_ANA];
+export const IDAHO_LOCATIONS = [REXBURG, IDAHOFALLS, POCATELLO, DRIGGS, RIGBY];
+export const CALIFORNIA_LOCATIONS = [SANJOSE, SANTA_CLARA, SANTA_ANA, SAN_FRANCISCO, OAKLAND];
 
 export interface ILocation {
   latitude: number;
@@ -47,7 +50,7 @@ let requestCount = 0;
 export function getRandomCityGeopoint() {
   // Get a random location from the IDAHO_LOCATIONS array
   const randomCityIndex = Math.floor(Math.random() * IDAHO_LOCATIONS.length);
-  return IDAHO_LOCATIONS[randomCityIndex];
+  return Math.random() < 0.5 ? IDAHO_LOCATIONS[randomCityIndex] : CALIFORNIA_LOCATIONS[randomCityIndex];
 }
 
 interface ILocationApi {
