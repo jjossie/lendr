@@ -11,11 +11,6 @@ type HitProps = {
 };
 
 export function Hit({hit}: HitProps) {
-  // return (
-  //     <Text>
-  //       <Highlight hit={hit} attribute="name"/>
-  //     </Text>
-  // );
 
   const tool = hit;
   if (!tool.name)

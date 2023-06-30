@@ -25,15 +25,19 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
       const data = chats.map((chat) => {
         // Convert data from useMyTools() to display info for each ChatListItem
         if (!chat.otherUser) return null;
-        const fullName = chat.otherUser.firstName + ' ' + chat.otherUser.lastName;
+        const displayName = (chat.otherUser.firstName && chat.otherUser.lastName)
+            ? chat.otherUser.firstName + ' ' + chat.otherUser.lastName
+            : chat.otherUser.displayName;
         const timeStampSeconds = chat.lastMessage ? chat.lastMessage.createdAt.seconds : chat.createdAt.seconds;
         const timeStamp = new Date(timeStampSeconds * 1000).toLocaleTimeString();
         return {
           key: chat.id,
-          fullName,
+          fullName: displayName,
           timeStamp,
           recentText: chat.lastMessage?.text,
-          onPressCallback: () => {navigation.navigate("ChatConversation", {relationId: chat.id})}
+          onPressCallback: () => {
+            navigation.navigate("ChatConversation", {relationId: chat.id});
+          },
         };
       });
       setListData(data);

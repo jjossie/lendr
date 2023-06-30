@@ -99,19 +99,19 @@ const dummyToolsToCreate: IToolAdminForm[] = [
       'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FPAxTxRtAwmXbhEx2eM4h%2Fimg_0?alt=media&token=76ea2150-123a-432b-8bca-632425327b1a',
     ],
   },
-  {
-    preferences: {localPickup: true, delivery: true, useOnSite: false},
-    visibility: 'published',
-    rate: {price: 12, timeUnit: 'day'},
-    imageUrls: [
-      'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FPAxTxRtAwmXbhEx2eM4h%2Fimg_0?alt=media&token=76ea2150-123a-432b-8bca-632425327b1a',
-    ],
-    lenderUid: '1AWMpyyzTfXnDMGOu4R360qdmSL2',
-    name: 'Circular Saw',
-    description: 'Corded, not cordless. Stole this from my dad don’t tell him 🤫',
-    geopoint: [43.82378460514541, -111.7776727777617],
-    holderUid: '1AWMpyyzTfXnDMGOu4R360qdmSL2',
-  },
+  // {
+  //   preferences: {localPickup: true, delivery: true, useOnSite: false},
+  //   visibility: 'published',
+  //   rate: {price: 12, timeUnit: 'day'},
+  //   imageUrls: [
+  //     'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FPAxTxRtAwmXbhEx2eM4h%2Fimg_0?alt=media&token=76ea2150-123a-432b-8bca-632425327b1a',
+  //   ],
+  //   lenderUid: '1AWMpyyzTfXnDMGOu4R360qdmSL2',
+  //   name: 'Circular Saw',
+  //   description: 'Corded, not cordless. Stole this from my dad don’t tell him 🤫',
+  //   geopoint: [43.82378460514541, -111.7776727777617],
+  //   holderUid: '1AWMpyyzTfXnDMGOu4R360qdmSL2',
+  // },
   {
     visibility: 'published',
     rate: {price: 10, timeUnit: 'day'},
@@ -193,25 +193,6 @@ const dummyToolsToCreate: IToolAdminForm[] = [
   },
 ];
 
-
-const dummyToolsToCreate2: IToolAdminForm[] = [
-
-  {
-    preferences: {localPickup: true, delivery: false, useOnSite: false},
-    visibility: 'published',
-    rate: {price: 41, timeUnit: 'week'},
-    imageUrls: [
-      'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2Fw5qAzNQa54ngwVZcK9eh%2Fimg_0?alt=media&token=803ba6c0-0277-4bb8-8b27-d988e5edb8f2',
-    ],
-    lenderUid: 'B2ulJyjmsPUaCOTdcIMxJxUUKoi2',
-    name: 'Engine lift but for boxers',
-    description: 'Can pull the WRX right off the motor ',
-    geopoint: [43.82379413136575, -111.77771176662223],
-    holderUid: 'B2ulJyjmsPUaCOTdcIMxJxUUKoi2',
-  },
-];
-
-
 const generateAuthUsers = () => {
 
 };
@@ -248,27 +229,3 @@ generateTools(dummyToolsToCreate)
 //     console.log(tool);
 //   }
 // })
-
-
-const ex = {
-  "path": "tools/D0FhMlXEixax5RlhOlrS",
-  "name": "Circular Saw",
-  "description": "Corded, not cordless. Stole this from my dad don’t tell him 🤫",
-  "price": 12,
-  "timeUnit": "day",
-  "delivery": true,
-  "localPickup": true,
-  "useOnSite": false,
-  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FPAxTxRtAwmXbhEx2eM4h%2Fimg_0?alt=media&token=76ea2150-123a-432b-8bca-632425327b1a",
-  "lastmodified": 1688163528302,
-  "objectID": "D0FhMlXEixax5RlhOlrS",
-  "_highlightResult": {
-    "name": {"value": "Circular Saw", "matchLevel": "none", "matchedWords": []},
-    "description": {
-      "value": "Corded, not cordless. Stole this from my dad don’t tell him 🤫",
-      "matchLevel": "none",
-      "matchedWords": [],
-    },
-  },
-  "__position": 13,
-};
