@@ -12,7 +12,7 @@ import * as Notifications from "expo-notifications";
 
 const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
 
-  const {authUser, user} = useAuthentication();
+  const {authUser, user, unsub} = useAuthentication();
 
   const {city} = useLocation();
 
@@ -33,7 +33,10 @@ const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
     });
 
     return () => {
-      console.log("Removing Notification Subscriptions, I think?");
+      console.log("Removing Notification & Auth Subscriptions, I think?");
+      // if (unsub)
+      //   unsub();
+
       Notifications.removeNotificationSubscription(notificationListener.current!);
       Notifications.removeNotificationSubscription(responseListener.current!);
     };

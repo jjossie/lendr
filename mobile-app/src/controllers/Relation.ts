@@ -71,9 +71,9 @@ export function getRelationId(currentUserId: string, otherUserId: string) {
  * This is always initiated by the borrower at time of chat conversation being initiated.
  * @param {string} otherUserId
  * @param {string} toolId
- * @returns {Promise<void>}
+ * @returns {Promise<string>} the ID of the newly created Relation
  */
-export async function createRelation(otherUserId: string, toolId: string) {
+export async function createRelation(otherUserId: string, toolId: string): Promise<string> {
 
   // Get Auth
   const auth = getAuth(app);
@@ -90,21 +90,28 @@ export async function createRelation(otherUserId: string, toolId: string) {
   // Add the Relation to Firestore
   const relationsCollection = collection(db, "relations");
   const relationId = getRelationId(auth.currentUser.uid, otherUserId);
-  console.log("Creating Relation ID: ", relationId);
+  console.log("🤝Creating Relation ID: ", relationId);
   const relationDocRef = doc(relationsCollection, relationId);
-  await setDoc(relationDocRef, {
-    users: [user, otherUser],
-    createdAt: serverTimestamp() as Timestamp,
-  } as IRelation);
+  const relationDoc = await getDoc(relationDocRef);
+  if (!relationDoc.exists()){
+    await setDoc(relationDocRef, {
+      users: [user, otherUser],
+      createdAt: serverTimestamp() as Timestamp,
+    } as IRelation);
+  } else {
+    console.log("🤝Found existing relation");
+  }
+
 
   // Create the loan record
   const loansCollection = collection(relationDocRef, "loans");
-  await addDoc(loansCollection, {
+  const loan = await addDoc(loansCollection, {
     borrowerUid: auth.currentUser.uid,
     lenderUid: otherUserId,
     toolId,
     inquiryDate: serverTimestamp() as Timestamp,
   } as ILoan);
+  console.log("");
 
   // Add the other uid to each User's relations list
   const usersCollection = collection(db, "users");
@@ -116,6 +123,8 @@ export async function createRelation(otherUserId: string, toolId: string) {
   await updateDoc(otherUserDocRef, {
     relations: arrayUnion(auth.currentUser.uid),
   });
+
+  return relationId;
 }
 
 export async function getRelationById(relationId: string): Promise<IRelation> {
@@ -138,7 +147,7 @@ export async function sendChatMessage(receiverUid: string,
                                       text: string,
                                       replyingToId?: string,
                                       media?: any) {
-  console.log(`sending chat "${text}" to ${receiverUid}`);
+  console.log(`🤝sending chat "${text}" to ${receiverUid}`);
   const auth = getAuth(app);
   if (!auth.currentUser)
     throw new AuthError();
@@ -174,13 +183,16 @@ export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentDat
                                              authUser: User,
                                              setChats: ((chats: any) => any),
                                              setIsLoaded: (isLoaded: boolean) => void): void {
-  console.log("🛠️useMyChats() - onSnapshot() called");
+  console.log("🤝useMyChats() - onSnapshot() called");
 
   if (!authUser) return;
 
   const docDataList: IChatViewListItem[] = [];
   const lastMessagePromises: Promise<any>[] = [];
   snapshot.forEach(async relationDocument => {
+    if (!relationDocument || !relationDocument.exists())
+      throw new NotFoundError(`🤝Relation not found ⁉️`);
+
     // Extract the data from the document
     const relationDocumentData: IRelation = relationDocument.data() as IRelation;
 

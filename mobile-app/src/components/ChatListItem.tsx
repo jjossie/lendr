@@ -5,8 +5,12 @@ export const ChatListItem = ({
                                index,
                              }: any) => {
 
-  const initials = item.fullName.split(" ").map((name: string) => name[0]).join("");
+  if (!item)
+    return null;
 
+  console.log("❇️< ChatListItem >" );
+  console.log("❇️< ChatListItem > Item: ", JSON.stringify(item, null, 2));
+  const initials = item.displayName.split(" ").map((name: string) => name[0]).join("");
   return (
       <Pressable key={index} onPress={item.onPressCallback} _dark={{
         bg: "coolGray.800",
@@ -17,7 +21,7 @@ export const ChatListItem = ({
           <HStack alignItems="center" space={3}>
             {item.avatarUrl
                 ? <Avatar size="48px" source={{
-                  uri: item.avatarUrl,
+                  uri: item.photoURL,
                 }}/>
                 : <Avatar bg={theme.colors.red[500]}>{initials}</Avatar>}
             {/*    <Avatar bg={theme.colors.red[500]}>{initials}</Avatar>*/}
@@ -25,7 +29,7 @@ export const ChatListItem = ({
               <Text color="coolGray.800" _dark={{
                 color: "warmGray.50",
               }} bold>
-                {item.fullName}
+                {item.displayName}
               </Text>
               <Text color="coolGray.600" _dark={{
                 color: "warmGray.200",

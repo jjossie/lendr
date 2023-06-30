@@ -26,7 +26,7 @@ export function Hit({hit}: HitProps) {
       (keywordString ? `https://source.unsplash.com/random/?${keywordString},tool`
       : `https://source.unsplash.com/random/?tool,hammer,wrench,screwdriver,drill`);
 
-  console.log("Hit: ", JSON.stringify(tool));
+  // console.log("Hit: ", JSON.stringify(tool));
 
   return (
       <Card
