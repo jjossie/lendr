@@ -222,7 +222,7 @@ const generateTools = async (toolsToCreate: IToolForm[]) => {
   for (let tool of toolsToCreate) {
     console.log("🔨Adding tool ", tool.name);
     tool.geopoint = getRandomCityGeopoint();
-    await db.collection("test_tools").add(tool);
+    await db.collection("tools").add(tool);
   }
 };
 
@@ -248,3 +248,27 @@ generateTools(dummyToolsToCreate)
 //     console.log(tool);
 //   }
 // })
+
+
+const ex = {
+  "path": "tools/D0FhMlXEixax5RlhOlrS",
+  "name": "Circular Saw",
+  "description": "Corded, not cordless. Stole this from my dad don’t tell him 🤫",
+  "price": 12,
+  "timeUnit": "day",
+  "delivery": true,
+  "localPickup": true,
+  "useOnSite": false,
+  "imageUrl": "https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FPAxTxRtAwmXbhEx2eM4h%2Fimg_0?alt=media&token=76ea2150-123a-432b-8bca-632425327b1a",
+  "lastmodified": 1688163528302,
+  "objectID": "D0FhMlXEixax5RlhOlrS",
+  "_highlightResult": {
+    "name": {"value": "Circular Saw", "matchLevel": "none", "matchedWords": []},
+    "description": {
+      "value": "Corded, not cordless. Stole this from my dad don’t tell him 🤫",
+      "matchLevel": "none",
+      "matchedWords": [],
+    },
+  },
+  "__position": 13,
+};

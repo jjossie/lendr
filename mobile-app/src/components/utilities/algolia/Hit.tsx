@@ -28,10 +28,10 @@ export function Hit({hit}: HitProps) {
   const keywordString = tool.name?.split(" ").join(",");
 
   const imageUrl = tool?.imageUrl ??
-  keywordString ? `https://source.unsplash.com/random/?${keywordString},tool`
-      : `https://source.unsplash.com/random/?tool,hammer,wrench,screwdriver,drill`;
+      (keywordString ? `https://source.unsplash.com/random/?${keywordString},tool`
+      : `https://source.unsplash.com/random/?tool,hammer,wrench,screwdriver,drill`);
 
-  console.log("Hit ImageURL: ", imageUrl);
+  console.log("Hit: ", JSON.stringify(tool));
 
   return (
       <Card
