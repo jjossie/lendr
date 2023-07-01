@@ -99,19 +99,6 @@ const dummyToolsToCreate: IToolAdminForm[] = [
       'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FPAxTxRtAwmXbhEx2eM4h%2Fimg_0?alt=media&token=76ea2150-123a-432b-8bca-632425327b1a',
     ],
   },
-  // {
-  //   preferences: {localPickup: true, delivery: true, useOnSite: false},
-  //   visibility: 'published',
-  //   rate: {price: 12, timeUnit: 'day'},
-  //   imageUrls: [
-  //     'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FPAxTxRtAwmXbhEx2eM4h%2Fimg_0?alt=media&token=76ea2150-123a-432b-8bca-632425327b1a',
-  //   ],
-  //   lenderUid: '1AWMpyyzTfXnDMGOu4R360qdmSL2',
-  //   name: 'Circular Saw',
-  //   description: 'Corded, not cordless. Stole this from my dad don’t tell him 🤫',
-  //   geopoint: [43.82378460514541, -111.7776727777617],
-  //   holderUid: '1AWMpyyzTfXnDMGOu4R360qdmSL2',
-  // },
   {
     visibility: 'published',
     rate: {price: 10, timeUnit: 'day'},
@@ -200,19 +187,24 @@ const generateAuthUsers = () => {
 const generateTools = async (toolsToCreate: IToolForm[]) => {
   const db = admin.firestore();
 
+  let timeout = 0;
   for (let tool of toolsToCreate) {
-    console.log("🔨Adding tool ", tool.name);
-    tool.geopoint = getRandomCityGeopoint();
-    await db.collection("tools").add(tool);
+    await setTimeout(async () => {
+      console.log("🔨Adding tool ", tool.name);
+      tool.geopoint = getRandomCityGeopoint();
+      await db.collection("tools").add(tool);
+    }, timeout);
+    timeout += 1500;
   }
+  return toolsToCreate.length;
 };
 
 // Main
 
 generateTools(dummyToolsToCreate)
-    .then(r => console.log("Generated Tools Successfully"))
+    .then(count => console.log(`Generated ${count} Tools Successfully`))
     .catch((e) => {
-      console.error("Failed to generate tools💀", e);
+      console.error("Failed to generate tools 💀", e);
     });
 
 // export async function getAllTools(): Promise<ITool[]> {

@@ -31,7 +31,7 @@ export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) =
     logger.error("Missing required fields on newly created tool: ", rawDoc);
   }
 
-  logger.info("Hydrating newly created tool: ", rawDoc.name)
+  logger.info("Hydrating newly created tool: ", rawDoc.name);
 
   // Trim strings for whitespace
   hydroDoc.name = rawDoc.name.trim();
@@ -43,14 +43,19 @@ export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) =
    * Hydration
    */
 
-      // Check lenderUid and hydrate lender object accordingly
+
+  // Check lenderUid and hydrate lender object accordingly
   const lenderSnap = await db.collection("users").doc(rawDoc.lenderUid).get();
   const lender = lenderSnap.data();
   const lenderDisplayName = `${lender.firstName} ${lender.lastName}`;
 
-  if (!lender.exists) {
+  if (!lenderSnap.exists) {
     logger.error("Lender does not exist: ", rawDoc.lenderUid);
+    // Delete the document if the lender does not exist
+    await event.data.ref.delete();
+    return;
   }
+
   logger.info("Found Lender: ", lenderDisplayName);
   const hydroLender = {
     uid: rawDoc.lenderUid,
@@ -58,18 +63,27 @@ export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) =
   };
   hydroDoc.lender = hydroLender;
 
+
   // Check holderUid and hydrate holder object accordingly
-  if (rawDoc.holderUid === rawDoc.lenderUid){
+  if (!rawDoc.holderUid) // Just copy the lender if it wasn't included
+    rawDoc.holderUid = rawDoc.lenderUid;
+
+  if (rawDoc.holderUid === rawDoc.lenderUid) {
     hydroDoc.holder = hydroLender;
   }
   const holderSnap = await db.collection("users").doc(rawDoc.holderUid).get();
   const holder = holderSnap.data();
-  const holderDisplayName = `${holder.firstName} ${holder.lastName}`;
 
-  if (!holder.exists) {
+  if (!holderSnap.exists) {
     logger.error("Holder does not exist: ", rawDoc.holderUid);
+    // Delete the document if the holder does not exist
+    await event.data.ref.delete();
+    return;
   }
-  logger.info("Found Holder: ", holderDisplayName);
+
+  logger.info("Found Holder: ", rawDoc.holderUid);
+  const holderDisplayName = `${holder.firstName} ${holder.lastName}`;
+  logger.info("Holder DisplayName: ", holderDisplayName);
   hydroDoc.holder = {
     uid: rawDoc.holderUid,
     displayName: holderDisplayName,
@@ -85,7 +99,7 @@ export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) =
       longitude: rawDoc.geopoint[1],
       geohash,
       city,
-    }
+    };
     logger.info("Hydrated Location: ", city, "Geohash: ", geohash);
   }
 

@@ -1,7 +1,7 @@
 import {CallableRequest, onCall} from 'firebase-functions/v2/https';
 import * as logger from "firebase-functions/logger";
 import {getFirestore} from 'firebase-admin/firestore';
-import {ITool} from "./models/Tool";
+import {ITool, IToolForm} from "./models/Tool";
 
 export const algoliaTransformOnIndex = onCall(async (request: CallableRequest<any>) => {
   logger.info("Algolia ft Joel is Indexing");
@@ -10,7 +10,7 @@ export const algoliaTransformOnIndex = onCall(async (request: CallableRequest<an
   // noinspection TypeScriptValidateJSTypes
   const doc = await getFirestore().doc(request.data?.path).get();
 
-  const tool = doc.data() as ITool;
+  const tool = doc.data() as ITool & IToolForm;
   logger.info("Tool found for indexing: ", tool);
 
   // First of all, just don't send it if it's deleted
@@ -34,6 +34,17 @@ export const algoliaTransformOnIndex = onCall(async (request: CallableRequest<an
     delivery: tool.preferences.delivery,
     localPickup: tool.preferences.localPickup,
     useOnSite: tool.preferences.useOnSite,
+  }
+
+  // Attach Location. This could be either a geopoint or a location, due to a race condition inherent to
+  // having two separate cloud functions trigger on the action (document created under "/tools"). Both
+  // validateTool() and executeIndexOperation() (which calls algoliaTransformOnIndex()) will be triggered.
+  if (tool.location?.latitude && tool.location?.latitude)
+    record._geoloc = {lat: tool.location.latitude, lng: tool.location.longitude}
+  else if (tool.geopoint)
+    record._geoloc = {lat: tool.geopoint[0], lng: tool.geopoint[1]}
+  else{
+    logger.error("Tool has no geopoint or location, index will be created but is not geo-locatable")
   }
 
   // Attach the lender's name if possible
