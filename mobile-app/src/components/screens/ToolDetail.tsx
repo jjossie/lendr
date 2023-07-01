@@ -5,12 +5,14 @@ import {getToolById} from "../../controllers/Tool";
 import {ITool} from "../../models/Tool";
 import LenderProfilePreview from "../LenderProfilePreview";
 import {createRelation} from "../../controllers/Relation";
+import {useAuthentication} from "../../utils/hooks/useAuthentication";
 
 
 const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
   // State
   const [toolData, setToolData] = useState<ITool | undefined>();
   const [isLoading, setIsLoading] = useState(false);
+  const {authUser} = useAuthentication();
   console.log(`❇️ToolDetail rendering with Tool: ${toolData?.name}`);
 
   // Side Effect
@@ -49,6 +51,9 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
   const imageUrl = toolData?.imageUrls && toolData.imageUrls.length > 0
       ? toolData.imageUrls[0]
       : `https://source.unsplash.com/random/?${keywordString},tool`;
+
+  const isOwner = toolData?.lenderUid === authUser?.uid;
+
   return (
       <ScrollView>
         {toolData ?
@@ -68,11 +73,11 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
                 <Heading pt={4} size="sm">Lender</Heading>
                 <LenderProfilePreview user={toolData.lender!}/>
 
-                <Button onPress={handleSendMessage}
-                        mt={4}
-                        isLoading={isLoading}
-                        isLoadingText={"Loading"}
-                        isDisabled={isLoading}>Message Lender</Button>
+                {!isOwner && <Button onPress={handleSendMessage}
+                                     mt={4}
+                                     isLoading={isLoading}
+                                     isLoadingText={"Loading"}
+                                     isDisabled={isLoading}>Message Lender</Button>}
 
                 <Heading pt={4} size="sm">Details</Heading>
                 <Text>

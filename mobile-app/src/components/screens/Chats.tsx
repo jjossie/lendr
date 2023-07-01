@@ -11,7 +11,7 @@ export interface ChatsProps {
 }
 
 const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
-  console.log("🛠️< Chats > Component Rendering");
+  console.log("❇️️< Chats > Component Rendering");
 
   // Custom Hooks
   const {user} = useAuthentication();

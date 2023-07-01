@@ -17,7 +17,7 @@ export function Filters({
                           onToggleModal,
                           onChange,
                         }: FiltersProps) {
-  const { items, refine } = useRefinementList({ attribute: 'brand' });
+  const { items, refine } = useRefinementList({ attribute: 'brand'});
   const { canRefine: canClear, refine: clear } = useClearRefinements();
   const { items: currentRefinements } = useCurrentRefinements();
   const totalRefinements = currentRefinements.reduce(

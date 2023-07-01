@@ -11,7 +11,7 @@ interface Props {}
 
 const MainTabNavigator: React.FC<Props> = () => {
   return (
-      <Tab.Navigator>
+      <Tab.Navigator backBehavior={"history"}>
         <Tab.Screen name="Borrow" component={SearchStack} options={{ headerShown: false }}/>
         {/*<Tab.Screen name="Borrow" component={BorrowStack} options={{ headerShown: false }}/>*/}
         <Tab.Screen name="Lend" component={LendStack} options={{ headerShown: false }}/>
