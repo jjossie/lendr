@@ -5,6 +5,8 @@ import {StyleSheet} from "react-native";
 import Card from "../../Card";
 import {useNavigation} from "@react-navigation/native";
 import {Highlight} from "./Highlight";
+import {useLocation} from "../../../utils/hooks/useLocation";
+import {distanceBetweenMi} from "../../../models/Location";
 
 type HitProps = {
   hit: ProductHit;
@@ -19,6 +21,7 @@ export function Hit({hit}: HitProps) {
     }}>empty tool</Card>);
 
   const navigation = useNavigation();
+  const {geopoint} = useLocation();
 
   const keywordString = tool.name?.split(" ").join(",");
 
@@ -27,6 +30,11 @@ export function Hit({hit}: HitProps) {
       : `https://source.unsplash.com/random/?tool,hammer,wrench,screwdriver,drill`);
 
   // console.log("Hit: ", JSON.stringify(tool));
+
+  let relativeDistance = null;
+
+  if (geopoint && tool._geoloc)
+    relativeDistance = distanceBetweenMi([tool._geoloc.lat, tool._geoloc.lng], geopoint)
 
   return (
       <Card
@@ -47,7 +55,7 @@ export function Hit({hit}: HitProps) {
               <Text fontSize="xl" bold>${tool.price}</Text><Text
                 fontSize="md">/{tool.timeUnit}</Text>
             </Row>
-            {/*<Text fontSize="sm">{tool.relativeDistance} mi away</Text>*/}
+            <Text fontSize="sm">{relativeDistance} mi away</Text>
           </Column>
         </Column>
       </Card>

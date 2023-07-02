@@ -194,7 +194,7 @@ export async function getGeopointFromCityName(city: string, state?: string): Pro
   if (state)
     options.state = state;
   const response = await geocode(options);
-  console.log("📍geocoding response: ", JSON.stringify(response));
+  // console.log("📍geocoding response: ", JSON.stringify(response));
   return [response.lat, response.lon];
 }
 
@@ -206,27 +206,28 @@ export async function getGeopointFromCityName(city: string, state?: string): Pro
 export async function getCityNameFromGeopoint(geopoint: Geopoint): Promise<string> {
   // TODO: Cache this kind of thing. Might be a good way to reduce requests
   const response = await reverseGeocode(geopoint[0], geopoint[1]);
-  console.log("📍reverse geocoding response: ", JSON.stringify(response, null, 2));
-  const {neighbourhood, city, town, state} = response.address;
+  // console.log("📍reverse geocoding response: ", JSON.stringify(response, null, 2));
+  const {neighbourhood, city, town, county, state, country} = response.address;
 
-  if (neighbourhood && city && state)
-    return `${neighbourhood}, ${city}, ${state}`;
+  const specificity = [neighbourhood, town, city, getStateAbbreviation(state), county, country]
+      .filter(element => element)
+      .slice(0, 2);
 
-  if (city && state)
-    return `${city}, ${state}`;
+  let cityString = "";
+  for (let specificityElement of specificity) {
+    if (specificityElement) {
+      cityString += specificityElement;
+      cityString += ", ";
+    }
+  }
 
-  if (town && state)
-    return `${town},  ${state}`;
+  if (cityString)
+    return cityString.slice(0, -2);
 
-  if (state)
-    return `${state}`;
-
-  // TODO improve this logic to support countries and whatnot
-
-  return  town || "Unknown";
+  return "Unknown";
 }
 
-export function getStateAbbreviationFromStateName(state: string) {
+export function getStateAbbreviation(state: string) {
   return stateAbbreviations[state] || state;
 }
 

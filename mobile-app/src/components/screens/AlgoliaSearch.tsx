@@ -11,13 +11,20 @@ import {SearchClient} from "algoliasearch/dist/algoliasearch";
 import {useLocation} from "../../utils/hooks/useLocation";
 import {metersFromMiles} from "../../models/Location";
 
+
+let geoSearchClient: SearchClient = {
+  ...searchClient as SearchClient,
+};
+
 export default function AlgoliaSearch() {
   // React Stuff
   const [isModalOpen, setModalOpen] = useState(false);
   const listRef = useRef<FlatList>(null);
 
   // Logical State
-  const [radiusMeters, setRadiusMeters] = useState(metersFromMiles(5));
+
+  const [radiusMeters, setRadiusMeters] = useState(Math.floor(metersFromMiles(50))); // convert to int
+
   const {geopoint} = useLocation();
 
   if (!geopoint)
@@ -27,20 +34,39 @@ export default function AlgoliaSearch() {
     listRef.current?.scrollToOffset({animated: false, offset: 0});
   }
 
-  const geoSearchClient: SearchClient = {
-    ...searchClient as SearchClient,
+  console.log("❇️Algolia Search Client being made");
+
+  geoSearchClient = {
+    ...geoSearchClient as SearchClient,
     search(requests) {
-      return searchClient.search(requests, {
-        aroundLatLng: `${geopoint[0]}, ${geopoint[1]}`,
-        aroundRadius: radiusMeters
+      const requestOptions = {
+        aroundLatLng: `${geopoint[0]},${geopoint[1]}`,
+        aroundRadius: radiusMeters,
+      };
+      console.log("❇️Algolia Search() called");
+      console.log(`❇️Searching for tools ${radiusMeters} meters from ${geopoint[0]}, ${geopoint[1]}`);
+      if (requests.length <= 0)
+        return searchClient.search(requests);
+
+      const newRequests = [...requests].map(request => {
+        if (!request.params)
+          return;
+        // @ts-ignore
+        request.params.aroundLatLng = requestOptions.aroundLatLng;
+        // @ts-ignore
+        request.params.aroundRadius = requestOptions.aroundRadius;
+        return request;
       });
-    }
-  }
+
+      // console.log("❇️Requests: ", JSON.stringify(newRequests, null, 2));
+      return searchClient.search(newRequests as any);
+    },
+  };
 
   return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.container}>
-          <InstantSearch searchClient={searchClient} indexName={ALGOLIA_INDEX_NAME}>
+          <InstantSearch searchClient={geoSearchClient} indexName={ALGOLIA_INDEX_NAME}>
             <SearchBox onChange={scrollToTop}/>
             {/*<GeoSearch/>*/}
             <Filters
@@ -54,7 +80,6 @@ export default function AlgoliaSearch() {
       </SafeAreaView>
   );
 }
-
 
 
 const styles = StyleSheet.create({

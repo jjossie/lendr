@@ -46,6 +46,10 @@ export type ProductHit = AlgoliaHit<{
   delivery: boolean;
   localPickup: boolean;
   useOnSite: boolean;
-  relativeDistance?: number;
+  // relativeDistance?: number;
   city?: string;
+  _geoloc?: {
+    lat: number;
+    lng: number;
+  }
 }>;
