@@ -11,10 +11,14 @@ type SearchBoxProps = UseSearchBoxProps & {
   onChange: (newValue: string) => void;
 };
 
+
 export function SearchBox({ onChange, ...props }: SearchBoxProps) {
   const { query, refine } = useSearchBox(props);
   const [inputValue, setInputValue] = useState(query);
   const inputRef = useRef<TextInput>(null);
+
+  // Might have to do geo search stuff here
+
 
   function setQuery(newQuery: string) {
     setInputValue(newQuery);

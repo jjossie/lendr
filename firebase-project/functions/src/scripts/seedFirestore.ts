@@ -9,7 +9,7 @@ admin.initializeApp({
 });
 
 const dummyUsersToCreate = [
-  {displayName: "Joe Momma", email: "joemomma@gmail.com", password: "amogus"},
+  {displayName: "Joseph Mother", email: "joemomma@gmail.com", password: "amogus"},
   {displayName: "Hugh Jasper", email: "hughjasper@gmail.com", password: "amogus"},
   {displayName: "Candice Richards", email: "joemomma@gmail.com", password: "amogus"},
   {displayName: "Benjamin Dover", email: "joemomma@gmail.com", password: "amogus"},
