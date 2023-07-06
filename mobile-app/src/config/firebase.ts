@@ -1,8 +1,10 @@
 import {initializeApp} from 'firebase/app';
+import {getAuth, initializeAuth} from 'firebase/auth';
 import {getFirestore} from 'firebase/firestore';
-import {getAuth} from "firebase/auth";
 import Constants from "expo-constants";
-import Geocoder from 'react-native-geocoding';
+// import Geocoder from 'react-native-geocoding';
+import {getReactNativePersistence} from "firebase/auth/react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 const firebaseConfig = {
@@ -16,8 +18,10 @@ const firebaseConfig = {
 };
 
 export const app = initializeApp(firebaseConfig);
-
+initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage)
+});
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
-Geocoder.init(Constants.manifest?.extra?.firebaseApiKey);
+// Geocoder.init(Constants.manifest?.extra?.firebaseApiKey);

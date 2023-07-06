@@ -7,12 +7,12 @@ export default {
     "slug": "lendr",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/lendr-logo-v2-1.png",
+    "icon": "./assets/lendr-logo-square-v2-2.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/lendr-splash-v2-2.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#2e5339"
     },
     "jsEngine": "hermes",
     "updates": {

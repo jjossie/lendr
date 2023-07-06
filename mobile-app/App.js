@@ -12,7 +12,6 @@ import MainTabNavigator from "./src/components/navigation/MainTabNavigator";
 
 import "./src/config/algolia";
 
-
 // For now will disable on-screen warning with:
 LogBox.ignoreLogs([
   "We can not support a function callback. See Github Issues for details https://github.com/adobe/react-spectrum/issues/2320",

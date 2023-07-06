@@ -20,6 +20,17 @@ const newColorTheme = {
     800: "#7c83db",
     700: "#b3bef6",
   },
+  primary: {
+    500: "#2e5339",
+    300: "#5c7953"
+  },
+  secondary: {
+    500: "#db504a",
+    300: "#ff6f59",
+  },
+  lendrLight: {
+    100: "#f5fbef",
+  }
 };
 const newFontTheme = {
   Epilogue: {
