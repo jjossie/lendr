@@ -24,6 +24,48 @@ const dummyToolsToCreate: IToolAdminForm[] = [
     holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
     preferences: {localPickup: false, delivery: false, useOnSite: true},
     imageUrls: [
+      'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2F4qpTwWwf7iTZ6uXbkAC7%2Fimg_0?alt=media&token=76e37c18-15f3-4dc9-b14d-dfce4bed35fc',
+    ],
+    rate: {timeUnit: 'hour', price: 5},
+    name: 'Goofy Gadget',
+    description: "Honestly not sure what on earth this thing is, but if you know how to use it you're welcome to",
+    visibility: 'published',
+    brand: 'DeWalt',
+  },
+  {
+    lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
+    geopoint: [43.82382353401531, -111.7776913516126],
+    holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
+    preferences: {localPickup: false, delivery: false, useOnSite: true},
+    imageUrls: [
+      'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2F9b7iS66TpoGnTjARtuKL%2Fimg_0?alt=media&token=05420754-8b86-44e0-85b0-ca656bcd6a65',
+    ],
+    rate: {timeUnit: 'week', price: 69},
+    name: 'Sander',
+    description: "I hate sand\nit's so sandy",
+    visibility: 'published',
+    brand: 'DeWalt',
+  },
+  {
+    lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
+    geopoint: [43.82382353401531, -111.7776913516126],
+    holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
+    preferences: {localPickup: false, delivery: false, useOnSite: true},
+    imageUrls: [
+      'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FSTR2q2NpWARwtQUXeD6Q%2Fimg_0?alt=media&token=9f523cdc-d6e3-4fbe-b589-610633af73dd',
+    ],
+    rate: {timeUnit: 'day', price: 9},
+    name: 'Impact Drill',
+    description: 'Get impacted son',
+    visibility: 'published',
+    brand: 'DeWalt',
+  },
+  {
+    lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
+    geopoint: [43.82382353401531, -111.7776913516126],
+    holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
+    preferences: {localPickup: false, delivery: false, useOnSite: true},
+    imageUrls: [
       'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FEkT03fIic85l2Hgx9rZP%2Fimg_0?alt=media&token=0e9e1c5a-b2e1-415c-8a61-5e0e04976e6c',
     ],
     rate: {timeUnit: 'hour', price: 69},
@@ -32,6 +74,8 @@ const dummyToolsToCreate: IToolAdminForm[] = [
     visibility: 'published',
     brand: 'Tyson',
   },
+
+
   {
     visibility: 'published',
     imageUrls: [
@@ -52,12 +96,12 @@ const dummyToolsToCreate: IToolAdminForm[] = [
     imageUrls: [
       'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FJ47SwFBmrgaBBPd8dwQH%2Fimg_0?alt=media&token=a0044845-9eb7-4e50-8752-f34af7aabbd7',
     ],
-    lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
+    lenderUid: '8vmY84LGS9hyfT3zZAqFZwakvQg1',
     name: 'Ladder',
     description: 'It’s a giant ladder. What more do you want from me ⁉️',
     geopoint: [43.82377357682729, -111.77766027065609],
     brand: 'Giant',
-    holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
+    holderUid: '8vmY84LGS9hyfT3zZAqFZwakvQg1',
     rate: {timeUnit: 'week', price: 29},
   },
   {
@@ -105,11 +149,11 @@ const dummyToolsToCreate: IToolAdminForm[] = [
     imageUrls: [
       'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FYQ8wVSHRmKd5C2fkL0p0%2Fimg_0?alt=media&token=ebf9ad6f-d43f-47e8-9aed-ff2b49cf75c7',
     ],
-    lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
+    lenderUid: '8vmY84LGS9hyfT3zZAqFZwakvQg1',
     name: 'Drill',
     description: 'Get drilled son',
     geopoint: [43.823790362029165, -111.77767364367863],
-    holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
+    holderUid: '8vmY84LGS9hyfT3zZAqFZwakvQg1',
     brand: 'Ridgid',
     preferences: {delivery: true, useOnSite: false, localPickup: true},
   },
@@ -156,9 +200,9 @@ const dummyToolsToCreate: IToolAdminForm[] = [
     imageUrls: [
       'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FvbHWSA5HJe9jjWezn6OS%2Fimg_0?alt=media&token=a3f6f5ab-4b4f-4018-8bb6-6df8f8a22d07',
     ],
-    lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
+    lenderUid: 'B2ulJyjmsPUaCOTdcIMxJxUUKoi2',
     geopoint: [43.81462785574658, -111.78485293060422],
-    holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
+    holderUid: 'B2ulJyjmsPUaCOTdcIMxJxUUKoi2',
     preferences: {localPickup: false, delivery: false, useOnSite: true},
     visibility: 'published',
     rate: {price: 25, timeUnit: 'hour'},
