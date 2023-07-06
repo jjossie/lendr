@@ -37,7 +37,7 @@ const ToolImagePicker: React.FC<ImagePickerProps> = ({onSelectImage, onRemoveIma
 
   const imagePickerOptions: ImagePickerOptions = {
     allowsEditing: false,
-    allowsMultipleSelection: true,
+    allowsMultipleSelection: false,
     quality: 0.9,
     selectionLimit: 5,
     mediaTypes: ImagePicker.MediaTypeOptions.Images,

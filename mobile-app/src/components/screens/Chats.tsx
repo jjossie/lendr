@@ -11,7 +11,7 @@ export interface ChatsProps {
 }
 
 const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
-  console.log("🛠️< Chats > Component Rendering");
+  console.log("❇️️< Chats > Component Rendering");
 
   // Custom Hooks
   const {user} = useAuthentication();
@@ -22,20 +22,32 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
 
   useEffect(() => {
     if (user && chats && chats.length !== 0) {
-      const data = chats.map((chat) => {
-        // Convert data from useMyTools() to display info for each ChatListItem
-        if (!chat.otherUser) return null;
-        const fullName = chat.otherUser.firstName + ' ' + chat.otherUser.lastName;
-        const timeStampSeconds = chat.lastMessage ? chat.lastMessage.createdAt.seconds : chat.createdAt.seconds;
-        const timeStamp = new Date(timeStampSeconds * 1000).toLocaleTimeString();
-        return {
-          key: chat.id,
-          fullName,
-          timeStamp,
-          recentText: chat.lastMessage?.text,
-          onPressCallback: () => {navigation.navigate("ChatConversation", {relationId: chat.id})}
-        };
-      });
+      const data = chats
+          // .sort((a, b) => {
+          //   return (a.lastMessage?.createdAt.seconds && b.lastMessage?.createdAt.seconds)
+          //       ? a.lastMessage?.createdAt.seconds - b.lastMessage?.createdAt.seconds
+          //       : -1;
+          // }) // Don't try sorting here because it breaks the recent messages
+          .map((chat) => {
+            // Convert data from useMyTools() to display info for each ChatListItem
+            if (!chat.otherUser) return null;
+            const displayName = (chat.otherUser.firstName && chat.otherUser.lastName)
+                ? chat.otherUser.firstName + ' ' + chat.otherUser.lastName
+                : chat.otherUser.displayName;
+            const timeStampSeconds = chat.lastMessage ? chat.lastMessage.createdAt.seconds : chat.createdAt.seconds;
+            const timeStamp = new Date(timeStampSeconds * 1000).toLocaleTimeString();
+            return {
+              key: chat.id,
+              displayName: displayName,
+              timeStamp,
+              recentText: chat.lastMessage?.text,
+              onPressCallback: () => {
+                navigation.navigate("ChatConversation", {relationId: chat.id});
+              },
+            };
+          })
+          .filter((item) => (item)); // Filter nulls
+
       setListData(data);
     }
   }, [chats, isLoaded]);

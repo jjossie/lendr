@@ -11,4 +11,6 @@ initializeApp();
 
 // Export functions from this module
 export {chatMessageNotification} from "./chatMessageNotification";
-
+export {algoliaTransformOnIndex} from "./algoliaTransformOnIndex";
+export {validateTool} from "./validateTool";
+export {validateTool_TEST} from "./validateTool_TEST";

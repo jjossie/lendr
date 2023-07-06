@@ -17,6 +17,7 @@ const auth = getAuth();
 export function useAuthentication() {
   const [user, setUser] = useState<ILendrUser | undefined>(undefined);
   const [authUser, setAuthUser] = useState<User>();
+  const [unsub, setUnsub] = useState<(() => void) | undefined >(undefined);
 
   useEffect(() => {
     const unsubscribeFromAuthStatusChanged = onAuthStateChanged(auth, (foundUser) => {
@@ -37,12 +38,13 @@ export function useAuthentication() {
             .catch(() => {throw new AuthError("Somehow we failed to sign out 🤨")});
       }
     });
-
+    // setUnsub(unsubscribeFromAuthStatusChanged); // Apparently this prevents being able to log in at all 🫢
     return unsubscribeFromAuthStatusChanged;
   }, []);
 
   return {
     authUser,
-    user
+    user,
+    // unsub
   };
 }

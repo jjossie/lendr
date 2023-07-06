@@ -1,6 +1,6 @@
 import React from 'react';
 import {Avatar, theme} from 'native-base';
-import {ILendrUser} from "../models/ILendrUser";
+import {ILendrUserPreview} from "../models/ILendrUser";
 import {ColorType, ResponsiveValue} from "native-base/lib/typescript/components/types";
 
 
@@ -13,7 +13,7 @@ function numberFromText(text: string): number {
 
 
 export interface AvatarImageProps {
-  user: ILendrUser;
+  user: ILendrUserPreview;
 }
 
 const AvatarImage: React.FC<AvatarImageProps> = ({user}) => {
@@ -34,9 +34,15 @@ const AvatarImage: React.FC<AvatarImageProps> = ({user}) => {
     theme.colors.red[300],
   ];
 
-  const image = {uri: user.providerData?.imageUrl};
-  const initials = (user.firstName && user.lastName) ? `${user.firstName[0]}${user.lastName[0]}` : "AB";
-  const number = numberFromText(`${user.firstName} ${user.lastName}`);
+  const image = {uri: user?.photoURL};
+  const firstName = (user.displayName)
+      ? user.displayName.split(' ')[0]
+      : user.firstName;
+  const lastName = (user.displayName)
+      ? user.displayName.split(' ')[1]
+      : user.lastName;
+  const initials = (firstName && lastName) ? `${firstName[0]}${lastName[0]}` : "AB";
+  const number = numberFromText(`${firstName} ${lastName}`);
   const color = colors[number % colors.length];
 
   return (

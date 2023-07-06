@@ -5,8 +5,7 @@ import {useAuthentication} from "../../utils/hooks/useAuthentication";
 import {signOutUser} from "../../controllers/auth";
 import LenderProfilePreview from "../LenderProfilePreview";
 import {useLocation} from "../../utils/hooks/useLocation";
-import {View} from "react-native";
-import {registerForPushNotificationsAsync, sendPushNotification} from "../../config/device/notifications";
+import {registerForPushNotificationsAsync} from "../../config/device/notifications";
 import * as Notifications from "expo-notifications";
 
 
@@ -33,7 +32,10 @@ const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
     });
 
     return () => {
-      console.log("Removing Notification Subscriptions, I think?");
+      console.log("Removing Notification & Auth Subscriptions, I think?");
+      // if (unsub)
+      //   unsub();
+
       Notifications.removeNotificationSubscription(notificationListener.current!);
       Notifications.removeNotificationSubscription(responseListener.current!);
     };
@@ -52,23 +54,23 @@ const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
           }}>Sign Out</Button>
 
 
-          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-around' }}>
-            <Text>Your expo push token: {expoPushToken}</Text>
-            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-              <Text>Title: {notification && notification.request.content.title} </Text>
-              <Text>Body: {notification && notification.request.content.body}</Text>
-              <Text>Data: {notification && JSON.stringify(notification.request.content.data)}</Text>
-            </View>
-            <Button
-                onPress={async () => {
-                  if (!expoPushToken) {
-                    console.log("No push token found");
-                    return;
-                  }
-                  await sendPushNotification(expoPushToken);
-                }}
-            >Press to Send Notification</Button>
-          </View>
+          {/*<View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-around' }}>*/}
+          {/*  <Text>Your expo push token: {expoPushToken}</Text>*/}
+          {/*  <View style={{ alignItems: 'center', justifyContent: 'center' }}>*/}
+          {/*    <Text>Title: {notification && notification.request.content.title} </Text>*/}
+          {/*    <Text>Body: {notification && notification.request.content.body}</Text>*/}
+          {/*    <Text>Data: {notification && JSON.stringify(notification.request.content.data)}</Text>*/}
+          {/*  </View>*/}
+          {/*  <Button*/}
+          {/*      onPress={async () => {*/}
+          {/*        if (!expoPushToken) {*/}
+          {/*          console.log("No push token found");*/}
+          {/*          return;*/}
+          {/*        }*/}
+          {/*        await sendPushNotification(expoPushToken);*/}
+          {/*      }}*/}
+          {/*  >Press to Send Notification</Button>*/}
+          {/*</View>*/}
 
         </Column>
       </ScrollView>

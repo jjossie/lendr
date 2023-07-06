@@ -78,6 +78,7 @@ async function createUserInDB(authUser: User, firstName: string = "Joe", lastNam
       },
       firstName,
       lastName,
+      displayName:  `${firstName} ${lastName}`,
       expoPushTokens: [],
       createdAt: Timestamp.now()
     }

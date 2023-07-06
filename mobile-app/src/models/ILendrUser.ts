@@ -5,12 +5,22 @@ import {ObjectValidationError} from "../utils/errors";
 
 export interface ILendrUser {
   createdAt: Timestamp | string,
-  firstName: string,
-  lastName: string,
+  firstName?: string,
+  lastName?: string,
+  displayName: string;
   relations: string[],
   expoPushTokens: string[]
   uid: string,
   providerData?: any
+}
+
+export interface ILendrUserPreview {
+  uid: string,
+  displayName: string,
+  firstName?: string,
+  lastName?: string,
+  photoURL?: string,
+  // providerData?: any
 }
 
 
