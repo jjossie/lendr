@@ -7,6 +7,13 @@ import {getToolsWithinRadius} from "../../controllers/Tool";
 import {useLocation} from "../../utils/hooks/useLocation";
 
 
+/**
+ * @deprecated use BorrowSearch instead, it uses Algolia for instant search, infinite hits, geoqueries, etc.
+ * @param navigation
+ * @param route
+ * @returns {JSX.Element}
+ * @constructor
+ */
 const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
 
   const [toolsList, setToolsList]: [ITool[], any] = useState([]);

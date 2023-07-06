@@ -1,38 +1,50 @@
-import {useEffect, useState} from "react";
 import {getCurrentPositionAsync, LocationObject, requestForegroundPermissionsAsync} from "expo-location";
 import {getCityNameFromGeopoint} from "../../models/Location";
 import {Geopoint} from "geofire-common";
 import {LendrBaseError} from "../errors";
 
-export function useLocation() {
+import {useEffect, useState} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-  const [location, setLocation] = useState<LocationObject>();
-  const [geopoint, setGeopoint] = useState<Geopoint>();
+export function useLocation() {
+  const [location, setLocation] = useState<LocationObject | undefined>();
+  const [geopoint, setGeopoint] = useState<Geopoint | undefined>();
   const [errorMsg, setErrorMsg] = useState<string | undefined>(undefined);
-  const [city, setCity]  = useState<string | undefined>(undefined);
+  const [city, setCity] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    (async () => {
+    const fetchLocation = async () => {
       try {
-        console.log("🛠useLocation() - useEffect");
-        const {location, city} = await getDeviceLocation();
-        setLocation(location);
-        setGeopoint([location?.coords.latitude, location?.coords.longitude]);
-        setCity(city);
+        console.log('🛠useLocation() - useEffect');
+        const cachedLocation = await AsyncStorage.getItem('userLocation');
+
+        if (cachedLocation) {
+          const { location, city } = JSON.parse(cachedLocation);
+          setLocation(location);
+          setGeopoint([location?.coords.latitude, location?.coords.longitude]);
+          setCity(city);
+        } else {
+          const { location, city } = await getDeviceLocation();
+          setLocation(location);
+          setGeopoint([location?.coords.latitude, location?.coords.longitude]);
+          setCity(city);
+
+          const locationData = JSON.stringify({ location, city });
+          await AsyncStorage.setItem('userLocation', locationData);
+        }
       } catch (e: LendrBaseError | any) {
         setErrorMsg(e.message);
-        console.log("🛠useLocation() - Error: getDeviceLocation() probably failed");
+        console.log('🛠useLocation() - Error: getDeviceLocation() probably failed');
       }
-    })();
-  }, []);
+    };
 
-  // if (geopoint && city)
-  //   console.log("🛠️useLocation() - Found Location: ", city);
+    fetchLocation();
+  }, []);
 
   return {
     geopoint,
     city,
-    errorMsg
+    errorMsg,
   };
 }
 

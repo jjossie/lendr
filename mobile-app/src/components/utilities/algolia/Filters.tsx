@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
   },
   filtersButton: {
+    flexGrow: 1,
     paddingVertical: 18,
     flexDirection: 'row',
     justifyContent: 'center',
