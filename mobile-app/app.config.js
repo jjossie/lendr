@@ -22,7 +22,8 @@ export default {
       "**/*"
     ],
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "bundleIdentifier": "com.joeljossie.lendr"
     },
     "android": {
       "adaptiveIcon": {

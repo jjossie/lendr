@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "startTunnel": "expo start --tunnel",
     "start": "expo start",
+    "startDev": "expo start --dev-client",
+    "startTunnel": "expo start --tunnel",
+    "startDevTunnel": "expo start --dev-client --tunnel",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
