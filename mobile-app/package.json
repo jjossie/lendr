@@ -20,12 +20,14 @@
     "algoliasearch": "^4.17.0",
     "dotenv": "^16.0.3",
     "expo": "^48.0.19",
+    "expo-dev-client": "~2.2.1",
     "expo-device": "~5.2.1",
     "expo-image-picker": "~14.1.1",
     "expo-location": "~15.1.1",
     "expo-notifications": "~0.18.1",
     "expo-splash-screen": "~0.18.2",
     "expo-status-bar": "~1.4.4",
+    "expo-updates": "~0.16.4",
     "firebase": "^9.22.2",
     "firebaseui": "^6.0.2",
     "geofire-common": "^6.0.0",
@@ -47,7 +49,6 @@
     "@expo/ngrok": "^4.1.0",
     "@tsconfig/react-native": "^2.0.3",
     "@types/jest": "^29.4.0",
-
     "@types/react-test-renderer": "^18.0.0",
     "typescript": "^4.9.4"
   },
