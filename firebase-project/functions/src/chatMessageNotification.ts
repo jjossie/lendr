@@ -5,11 +5,14 @@ import {IChatMessage} from "./models/Relation";
 import {getUserFromUid} from "./controllers/users";
 import Expo from "expo-server-sdk";
 
-
+/**
+ * Triggered when a new message is added to a relation, which happens on every chat message send.
+ * @type {CloudFunction<FirestoreEvent<QueryDocumentSnapshot | undefined,
+ *     ParamsOf<"/relations/{relationId}/messages/{messageId}">>>}
+ */
 export const chatMessageNotification = onDocumentCreated(
     "/relations/{relationId}/messages/{messageId}",
     async (event) => {
-
 
       // When a new message is added to a relation, send a notification to the recipient.
       logger.info(`ChatMessageNotification running in response to new doc: "relations/${event.params.relationId}/messages/${event.params.messageId}"`);
