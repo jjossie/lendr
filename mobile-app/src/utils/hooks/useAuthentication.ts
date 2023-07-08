@@ -39,7 +39,7 @@ export function useAuthentication() {
       }
     });
     // setUnsub(unsubscribeFromAuthStatusChanged); // Apparently this prevents being able to log in at all 🫢
-    return unsubscribeFromAuthStatusChanged;
+    return () => {unsubscribeFromAuthStatusChanged();};
   }, []);
 
   return {

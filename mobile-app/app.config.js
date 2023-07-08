@@ -27,12 +27,12 @@ export default {
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "./assets/lendr-logo-adaptive-v2-2.png",
+        "backgroundColor": "#2e5339"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/lendr-logo-favicon-v2-2.png"
     },
     "extra": {
       firebaseApiKey: process.env.FIREBASE_API_KEY,

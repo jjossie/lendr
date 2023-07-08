@@ -1,3 +1,5 @@
+import "expo-dev-client";
+
 import {app} from "./src/config/firebase";
 
 import {CustomNativeBaseProvider} from "./src/components/CustomNativeBaseProvider";
