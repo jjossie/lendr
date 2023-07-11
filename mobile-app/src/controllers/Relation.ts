@@ -14,6 +14,7 @@ import {
   serverTimestamp,
   setDoc,
   Timestamp,
+  Unsubscribe,
   updateDoc,
 } from "firebase/firestore";
 import {app, db} from "../config/firebase";
@@ -244,7 +245,7 @@ export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentDat
 export function getLiveMessages(setMessages: ((messages: any) => any),
                                 authUser: User,
                                 user: ILendrUser,
-                                relation: IRelation): void {
+                                relation: IRelation): Unsubscribe | undefined {
 
   // This might run before user is initialized - just skip if that's the case
   if (!authUser || !user) return;
@@ -258,7 +259,7 @@ export function getLiveMessages(setMessages: ((messages: any) => any),
       orderBy("createdAt", "desc"),
       limit(MESSAGE_LOAD_LIMIT),
   );
-  const unsub = onSnapshot(messagesQuery, (snapshot: QuerySnapshot<DocumentData>) => {
+  return onSnapshot(messagesQuery, (snapshot: QuerySnapshot<DocumentData>) => {
     let messages: IChatMessage[] = [];
     snapshot.forEach(messageSnap => {
       messages.push({
@@ -267,5 +268,36 @@ export function getLiveMessages(setMessages: ((messages: any) => any),
       } as IChatMessage);
     });
     setMessages(messages.reverse());
+  });
+}
+
+/**
+ * Gets the loans for a relation and calls the setLoans function with the loans.
+ * Supports the useChatMessages hook. Maybe I should have made it a separate hook lol
+ *
+ * @param {(loans: any) => any} setLoans The React setState function
+ * @param {User} authUser The authenticated user
+ * @param {IRelation} relation The Relation object to get the loans for. Must have an ID.
+ * @returns {Unsubscribe | undefined} The unsubscribe function if it was successful, undefined otherwise.
+ */
+export function getLiveLoans(setLoans: (loans: any) => any,
+                             authUser: User,
+                             relation: IRelation): Unsubscribe | undefined {
+  console.log("🤝getLiveLoans()");
+  if (!authUser || !relation.id) return;
+
+  const loansQuery = query(
+      collection(db, "relations", relation.id, "loans"),
+      orderBy("inquiryDate", "desc"),
+  );
+  return onSnapshot(loansQuery, (snapshot: QuerySnapshot<DocumentData>) => {
+    let loans: ILoan[] = [];
+    snapshot.forEach(loanSnap => {
+      loans.push({
+        id: loanSnap.id,
+        ...loanSnap.data(),
+      } as ILoan);
+    });
+    setLoans(loans.reverse());
   });
 }

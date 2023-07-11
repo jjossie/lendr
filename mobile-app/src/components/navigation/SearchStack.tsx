@@ -9,7 +9,7 @@ const Stack = createNativeStackNavigator();
 const SearchStack: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
   return (
       <Stack.Navigator>
-        <Stack.Screen name="SearchBrowse" component={BorrowSearch} options={{ headerShown: false }}/>
+        <Stack.Screen name="SearchBrowse" component={BorrowSearch} options={{ headerShown: true }}/>
         <Stack.Screen name="SearchToolDetail" component={ToolDetail} />
       </Stack.Navigator>
   );

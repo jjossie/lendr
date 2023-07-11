@@ -9,8 +9,10 @@ export interface LoanContextItemProps {
 }
 
 const LoanContextItem: React.FC<LoanContextItemProps> = ({loan}) => {
-  if (!loan.tool)
+  if (!loan.tool) {
+    console.log("❇️< LoanContextItem > No tool attached");
     return (<></>);
+  }
 
   return (
       <Card onPress={() => {

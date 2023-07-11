@@ -11,6 +11,12 @@ export interface IRelation {
   // Need to figure out how to include subcollection data. Or don't do it at all?
 }
 
+export interface IRelationHydrated extends IRelation {
+  otherUser: ILendrUser;
+  lastMessage: IChatMessage;
+  // loans: ILoan[];
+}
+
 export interface IChatViewListItem {
   id: string // Added after retrieving from firestore
   users?: ILendrUser[];
@@ -24,6 +30,7 @@ export interface IChatViewListItem {
  * probably change that in the future.
  */
 export interface ILoan {
+  id?: string;
   toolId: string;
   tool?: ITool;
   inquiryDate?: Timestamp;
