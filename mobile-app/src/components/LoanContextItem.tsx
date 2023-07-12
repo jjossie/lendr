@@ -5,7 +5,7 @@ import Card from "./Card";
 import {Image} from "react-native";
 
 export interface LoanContextItemProps {
-  loan: ILoan
+  loan: ILoan;
 }
 
 const LoanContextItem: React.FC<LoanContextItemProps> = ({loan}) => {
@@ -28,7 +28,11 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan}) => {
               <Button variant={"subtle"}>Cancel</Button>
             </Row>
           </Column>
-          <Image source={{uri: loan.tool.imageUrls[0]}} style={{width: 100}}/>
+          <Image source={{
+            uri: loan.tool.imageUrls
+                ? loan.tool.imageUrls[0]
+                : "",
+          }} style={{width: 100}}/>
         </Row>
       </Card>
   );

@@ -34,7 +34,7 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
             const displayName = (chat.otherUser.firstName && chat.otherUser.lastName)
                 ? chat.otherUser.firstName + ' ' + chat.otherUser.lastName
                 : chat.otherUser.displayName;
-            const timeStampSeconds = chat.lastMessage ? chat.lastMessage.createdAt.seconds : chat.createdAt.seconds;
+            const timeStampSeconds = chat.lastMessage ? chat.lastMessage.createdAt?.seconds : chat.createdAt?.seconds;
             const timeStamp = new Date(timeStampSeconds * 1000).toLocaleTimeString();
             return {
               key: chat.id,
