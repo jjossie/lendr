@@ -1,11 +1,10 @@
-import {onDocumentCreated} from "firebase-functions/lib/v2/providers/firestore";
+import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import {hydrateTool} from "./controllers/tool";
 import {ObjectValidationError} from "./utils/errors";
 import {logger} from "firebase-functions";
 
 export const validateLoan = onDocumentCreated("/relations/{relationId}/loans/{loanId}", async (event) => {
   logger.info("Validating new tool: ", event.data.id);
-
 
   const rawLoanDoc = event.data.data();
   let hydroLoanDoc = {...rawLoanDoc};

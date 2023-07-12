@@ -176,11 +176,11 @@ export async function getToolById(toolId: string, userGeopoint?: Geopoint): Prom
     id: toolDocSnap.id,
     lender: lenderSnap.data(),
     ...toolData,
-    location: {
-      ...toolData.location,
-      city: await getCityNameFromGeopoint(geopoint),
-    },
   } as ITool;
+
+  if (!result.location.city)
+    result.location.city = await getCityNameFromGeopoint(geopoint);
+
   if (userGeopoint)
     result.location.relativeDistance = distanceBetweenMi(userGeopoint, geopoint);
   return result;

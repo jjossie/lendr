@@ -23,6 +23,7 @@ import {AuthError, LendrBaseError, NotFoundError, ObjectValidationError} from ".
 import {IChatMessage, IChatViewListItem, ILoan, IRelation} from "../models/Relation";
 import {getUserFromAuth, getUserFromUid} from "./auth";
 import {ILendrUser} from "../models/ILendrUser";
+import {getToolById} from "./Tool";
 
 // Constants
 const MESSAGE_LOAD_LIMIT = 20;
@@ -292,10 +293,15 @@ export function getLiveLoans(setLoans: (loans: any) => any,
   );
   return onSnapshot(loansQuery, (snapshot: QuerySnapshot<DocumentData>) => {
     let loans: ILoan[] = [];
-    snapshot.forEach(loanSnap => {
+    snapshot.forEach(async loanSnap => {
+      let loanDoc = loanSnap.data() as ILoan;
+      if (!loanDoc.tool)
+        // Front-end Hydration necessary
+        loanDoc.tool = await getToolById(loanDoc.toolId);
+
       loans.push({
         id: loanSnap.id,
-        ...loanSnap.data(),
+        ...loanDoc,
       } as ILoan);
     });
     setLoans(loans.reverse());
