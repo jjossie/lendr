@@ -17,7 +17,6 @@ export const chatMessageNotification = onDocumentCreated(
       // When a new message is added to a relation, send a notification to the recipient.
       logger.info(`ChatMessageNotification running in response to new doc: "relations/${event.params.relationId}/messages/${event.params.messageId}"`);
       logger.info(event);
-      console.log("Locally??");
 
       // Get the recipient of the message.
       const message: IChatMessage  = event.data.data() as IChatMessage;
@@ -25,6 +24,8 @@ export const chatMessageNotification = onDocumentCreated(
       const sender = await getUserFromUid(message.senderUid);
 
       const notifications = []
+      // Create a notification for each push token. These push tokens are retrieved
+      // from the actual user doc, not the hydrated version stored with the relation.
       for (const pushToken of receiver.expoPushTokens) {
         if (!Expo.isExpoPushToken(pushToken)) {
           logger.error(`Push token ${pushToken} is not a valid Expo push token`);

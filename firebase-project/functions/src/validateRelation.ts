@@ -24,7 +24,7 @@ export const validateRelation = onDocumentCreated("/relations/{relationId}", asy
   const user1 = await getUserFromUid(rawDoc.users[1].uid);
 
   // Hydrate users
-  // TODO implement
+  // TODO implement the hydration better. Consider the implications of including expoPushTokens here.
 
   // Make sure those two users' relations arrays are updated accordingly
   await addRelationToUser(user0.uid, event.params.relationId);
