@@ -42,15 +42,6 @@ export const confirmToolReceived = onCall(async (req) => {
     throw new HttpsError("ok", "Already received");
 
   // Figure out the other user's UID so that we can get the relation
-  // let otherUserId = "";
-  // if (req.auth.uid == tool.lenderUid) {
-  //   // Logged-in user is the Owner/Lender
-  //   otherUserId = tool.holderUid;
-  // } else {
-  //   // Logged-in user is the Borrower
-  //   otherUserId = tool.lenderUid;
-  // }
-
   const currentUserIsLender = (req.auth.uid === tool.lenderUid);
   const otherUserId = (currentUserIsLender) ? tool.holderUid : tool.lenderUid;
   const relationId = getRelationId(req.auth.uid, otherUserId);

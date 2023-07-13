@@ -51,6 +51,9 @@ export interface IToolForm {
   visibility: ToolVisibility;
 }
 
+/**
+ * Should only be used by Firestore seed script
+ */
 export interface IToolAdminForm extends IToolForm {
   lenderUid?: string;
   holderUid?: string;
