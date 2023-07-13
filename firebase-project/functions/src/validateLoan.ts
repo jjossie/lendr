@@ -16,6 +16,9 @@ export const validateLoan = onDocumentCreated("/relations/{relationId}/loans/{lo
 
   // Attach proper inquiry date
 
+  // Set the status
+  hydroLoanDoc.status = "inquired";
+
   // Hydrate the tool
   hydroLoanDoc.tool = await hydrateTool(rawLoanDoc.toolId);
 
