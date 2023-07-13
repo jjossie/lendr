@@ -82,6 +82,7 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation}) => {
                           await action?.callback(loan.toolId);
                         } catch (e) {
                           // Set Error
+                          console.error(`❇️Something went wrong with the ${action?.name} Action: `, e);
                         }
                         setIsLoading(false);
                       }}>{action?.name}</Button>
