@@ -13,10 +13,11 @@ const MainTabNavigator: React.FC<Props> = () => {
   return (
       <Tab.Navigator backBehavior={"history"} screenOptions={{
         headerBackgroundContainerStyle: {
-          borderBottomWidth: 0
+          borderBottomWidth: 0,
+          opacity: 0
         },
-        headerTransparent: true,
-        headerShadowVisible: true,
+        // headerTransparent: true,
+        // headerShadowVisible: true,
       }}>
         <Tab.Screen name="Borrow" component={SearchStack} options={{ headerShown: false }}/>
         {/*<Tab.Screen name="Borrow" component={BorrowStack} options={{ headerShown: false }}/>*/}
