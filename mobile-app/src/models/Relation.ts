@@ -36,7 +36,7 @@ export interface ILoan {
   inquiryDate?: Timestamp;
   loanDate?: Timestamp;
   returnDate?: Timestamp;
-  returnStatus?: boolean;
+  status: "inquired" | "loanRequested" | "loaned" | "returnRequested" | "returned";
   lenderUid: string;
   borrowerUid: string;
 }

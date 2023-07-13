@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Column, Heading, Image, ScrollView, Text} from "native-base";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {getToolById} from "../../controllers/Tool";
+import {getToolById} from "../../controllers/tool";
 import {ITool} from "../../models/Tool";
 import LenderProfilePreview from "../LenderProfilePreview";
-import {createRelation} from "../../controllers/Relation";
+import {createRelation} from "../../controllers/relation";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
 
 

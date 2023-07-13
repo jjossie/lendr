@@ -5,6 +5,7 @@ import Constants from "expo-constants";
 // import Geocoder from 'react-native-geocoding';
 import {getReactNativePersistence} from "firebase/auth/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {getFunctions} from "firebase/functions";
 
 
 const firebaseConfig = {
@@ -23,5 +24,6 @@ initializeAuth(app, {
 });
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+export const functions = getFunctions(app);
 
 // Geocoder.init(Constants.manifest?.extra?.firebaseApiKey);

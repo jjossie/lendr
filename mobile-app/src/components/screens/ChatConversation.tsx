@@ -4,7 +4,7 @@ import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {useChatMessages} from "../../utils/hooks/useChatMessages";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
 import ChatMessage from "../ChatMessage";
-import {getOtherUserInRelation, sendChatMessage} from "../../controllers/Relation";
+import {getOtherUserInRelation, sendChatMessage} from "../../controllers/relation";
 import {LendrBaseError} from "../../utils/errors";
 import {Platform, ScrollView} from "react-native";
 import LoanContext from "../LoanContext";

@@ -17,13 +17,13 @@ import {
   Unsubscribe,
   updateDoc,
 } from "firebase/firestore";
-import {app, db} from "../config/firebase";
-import {getAuth, User} from "firebase/auth";
+import {httpsCallable} from "firebase/functions";
+import {auth, db, functions} from "../config/firebase";
+import {User} from "firebase/auth";
 import {AuthError, LendrBaseError, NotFoundError, ObjectValidationError} from "../utils/errors";
 import {IChatMessage, IChatViewListItem, ILoan, IRelation} from "../models/Relation";
 import {getUserFromAuth, getUserFromUid} from "./auth";
 import {ILendrUser} from "../models/ILendrUser";
-import {getToolById} from "./Tool";
 
 // Constants
 const MESSAGE_LOAD_LIMIT = 20;
@@ -78,7 +78,6 @@ export function getRelationId(currentUserId: string, otherUserId: string) {
 export async function createRelation(otherUserId: string, toolId: string): Promise<string> {
 
   // Get Auth
-  const auth = getAuth(app);
   if (!auth.currentUser)
     throw new AuthError();
 
@@ -150,7 +149,6 @@ export async function sendChatMessage(receiverUid: string,
                                       replyingToId?: string,
                                       media?: any) {
   console.log(`🤝sending chat "${text}" to ${receiverUid}`);
-  const auth = getAuth(app);
   if (!auth.currentUser)
     throw new AuthError();
 
@@ -233,6 +231,21 @@ export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentDat
   setChats(docDataList);
 }
 
+export async function acceptTool(toolId: string) {
+  const functionName = "confirmToolReceived";
+  const confirmToolReceived = httpsCallable(functions, functionName);
+  try {
+    const result = await confirmToolReceived({toolId})
+    console.log("🤝acceptTool result:", JSON.stringify(result.data, null, 2));
+
+  } catch (e: any) {
+    console.error(e.message);
+    console.error(JSON.stringify(e));
+    throw new LendrBaseError(`Something went wrong calling the cloud function ${functionName}`);
+  }
+
+}
+
 
 /**
  * Gets the messages for a relation and calls the setMessages function with the messages.
@@ -295,9 +308,9 @@ export function getLiveLoans(setLoans: (loans: any) => any,
     let loans: ILoan[] = [];
     snapshot.forEach(async loanSnap => {
       let loanDoc = loanSnap.data() as ILoan;
-      if (!loanDoc.tool)
-        // Front-end Hydration necessary
-        loanDoc.tool = await getToolById(loanDoc.toolId);
+      // if (!loanDoc.tool) // Pretty sure it's actually not necessary 'cause they're hydrated on the backend now
+      //   // Front-end Hydration necessary
+      //   loanDoc.tool = await getToolById(loanDoc.toolId) as IToolPreview;
 
       loans.push({
         id: loanSnap.id,

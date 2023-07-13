@@ -16,7 +16,7 @@ export const ChatListItem = ({
       <Pressable key={index} onPress={item.onPressCallback} _dark={{
         bg: "coolGray.800",
       }} _light={{
-        bg: theme.colors.light["50"],
+        bg: theme.colors.light["100"],
       }}>
         <Box pl="4" pr="5" py="2">
           <HStack alignItems="center" space={3}>

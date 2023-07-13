@@ -18,7 +18,7 @@ import {
   theme,
 } from "native-base";
 import {ExchangePreferences, IToolForm, TimeUnit} from "../../models/Tool";
-import {createTool, deleteTool, editTool, getNextToolId, getToolById} from "../../controllers/Tool";
+import {createTool, deleteTool, editTool, getNextToolId, getToolById} from "../../controllers/tool";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {Keyboard} from "react-native";
 import {useLocation} from "../../utils/hooks/useLocation";
