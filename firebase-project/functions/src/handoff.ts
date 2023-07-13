@@ -96,11 +96,13 @@ export const confirmToolReceived = onCall(async (req) => {
   // Update the tool's holder to the current user
   const lendrUser = await getUserFromUid(req.auth.uid);
 
-  const holder: ILendrUserPreview = {
+  let holder: ILendrUserPreview = {
     uid: req.auth.uid,
     displayName: lendrUser.displayName ?? `${lendrUser.firstName} ${lendrUser.lastName}`,
-    photoURL: req.auth.token.picture,
   };
+  if (req.auth.token.picture)
+    holder.photoURL = req.auth.token.picture;
+
   logger.debug("🔥attaching holder: ", JSON.stringify(holder, null, 2))
 
   await toolDocSnap.ref.set({
@@ -110,6 +112,6 @@ export const confirmToolReceived = onCall(async (req) => {
 
   return {
     status: "success",
-    message: `Tool ${tool.name} received by ${req.auth.token.name}`,
+    message: `Tool ${tool.name} received by ${holder.displayName}`,
   };
 });
