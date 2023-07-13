@@ -28,7 +28,10 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan}) => {
               variant={"solid"}
               onPress={async (e) => {
                 setIsLoading(true);
-                await acceptTool(loan.toolId);
+                try {
+                  await acceptTool(loan.toolId);
+                } catch (e) {
+                }
                 setIsLoading(false);
               }}>Accept Tool</Button>
       );

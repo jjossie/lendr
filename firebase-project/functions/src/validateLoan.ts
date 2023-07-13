@@ -4,7 +4,7 @@ import {ObjectValidationError} from "./utils/errors";
 import {logger} from "firebase-functions";
 
 export const validateLoan = onDocumentCreated("/relations/{relationId}/loans/{loanId}", async (event) => {
-  logger.info("Validating new tool: ", event.data.id);
+  logger.debug(`🔥Validating new loan: ${event.params.relationId}/loans/${event.params.loanId}`);
 
   const rawLoanDoc = event.data.data();
   let hydroLoanDoc = {...rawLoanDoc};
@@ -25,11 +25,11 @@ export const validateLoan = onDocumentCreated("/relations/{relationId}/loans/{lo
   // Write the validated, hydrated loan to Firestore
   try {
     await event.data.ref.set(hydroLoanDoc, {merge: false});
-    logger.info("Successfully hydrated & validated loan for tool ", hydroLoanDoc.tool.name,
+    logger.debug("🔥Successfully hydrated & validated loan for tool ", hydroLoanDoc.tool.name,
         "With ID: ", event.params.loanId,
         "From Relation ID: ", event.params.relationId);
   } catch (e) {
-    logger.error("Error Saving tool after hydrating & validating: ",
+    logger.error("🔥Error Saving tool after hydrating & validating: ",
         "With ID: ", event.params.loanId,
         "From Relation ID: ", event.params.relationId);
     throw e;

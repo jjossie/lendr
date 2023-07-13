@@ -1,6 +1,7 @@
 import {ILocation} from "./Location";
 import {Geopoint} from "geofire-common";
 import {Timestamp} from "firebase/firestore";
+import {ILendrUserPreview} from "./ILendrUser";
 
 export interface ITool {
 
@@ -11,21 +12,10 @@ export interface ITool {
   imageUrls: string[];
   lenderUid: string;
   holderUid: string;
-  lender?: {
-    uid: string;
-    displayName: string;
-    firstName?: string;
-    lastName?: string;
-    photoUrl?: string;
-  }, // Hydrated after retrieving from firestore
-  holder?: {
-    uid: string;
-    displayName: string;
-    firstName?: string;
-    lastName?: string;
-    photoUrl?: string;
-  }, // Must be hydrated... after retrieving from firestore?
+  lender?: ILendrUserPreview, // Hydrated by validateTool
+  holder?: ILendrUserPreview, // Hydrated by validateTool
   createdAt: Timestamp;
+  /** @deprecated */
   deletedAt?: any; // Only for firestore use
   modifiedAt: Timestamp;
   rate: {
