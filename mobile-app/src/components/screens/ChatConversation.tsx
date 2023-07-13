@@ -69,7 +69,7 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
             alignContent={'flex-end'}
             style={{flex: 1}}
         >
-          <LoanContext loans={loans}/>
+          <LoanContext relation={relation} loans={loans}/>
           <ScrollView
               ref={(ref) => {
                 scrollViewRef.current = ref;

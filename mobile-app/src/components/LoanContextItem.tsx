@@ -1,15 +1,29 @@
 import React, {useState} from 'react';
 import {Button, Column, Row, Text} from 'native-base';
-import {ILoan} from "../models/Relation";
+import {ILoan, IRelation} from "../models/Relation";
 import Card from "./Card";
 import {Image} from "react-native";
-import {acceptTool} from "../controllers/relation";
+import {acceptTool, requestLoan, requestReturn} from "../controllers/relation";
+import {useAuthentication} from "../utils/hooks/useAuthentication";
+import {useNavigation} from "@react-navigation/native";
 
 export interface LoanContextItemProps {
   loan: ILoan;
+  relation: IRelation;
 }
 
-const LoanContextItem: React.FC<LoanContextItemProps> = ({loan}) => {
+type Action = { name: string, callback: (toolId: string) => Promise<any>, variant: string };
+const actions = {
+  requestLoan: {name: "Loan", callback: requestLoan, variant: "subtle"},
+  acceptLoan: {name: "Accept Loan", callback: acceptTool, variant: "solid"},
+  requestReturn: {name: "Return", callback: requestReturn, variant: "subtle"},
+  acceptReturn: {name: "Accept Return", callback: acceptTool, variant: "solid"},
+};
+
+const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation}) => {
+  const {authUser} = useAuthentication();
+  const navigation = useNavigation();
+
   if (!loan.tool) {
     console.log("❇️< LoanContextItem > No tool attached");
     return (<></>);
@@ -18,49 +32,39 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   console.log("❇️Loan Status:", loan.status);
-  let actionButton = (<></>);
-  switch (loan.status) {
-    case "inquired":
-    case "loanRequested":
-      actionButton = (
-          <Button
-              isLoading={isLoading}
-              variant={"solid"}
-              onPress={async (e) => {
-                setIsLoading(true);
-                try {
-                  await acceptTool(loan.toolId);
-                } catch (e) {
-                }
-                setIsLoading(false);
-              }}>Accept Tool</Button>
-      );
-      break;
-    case "loaned":
-      actionButton = (
-          <Button
-              isLoading={isLoading}
-              variant={"ghost"}
-              onPress={async (e) => {
-              }}>Return Tool</Button>
-      );
-      break;
-    default:
-      actionButton = (
-          <Button
-              isLoading={isLoading}
-              variant={"ghost"}
-              onPress={async (e) => {
-              }}>Who knows</Button>
-      )
+  console.log("❇️Loan:", JSON.stringify(loan, null, 2));
+  console.log("❇️Relation:", JSON.stringify(relation, null, 2));
+
+  const isBorrower: boolean = loan.borrowerUid === authUser?.uid;
+  const isLender = !isBorrower;
+  const canCancel: boolean = loan.status in ["inquired", "loanRequested"];
+
+  let action: Action | undefined;
+
+  if (loan.status === "inquired" && isLender)
+    action = actions.requestLoan;
+  else if (loan.status === "loanRequested" && isBorrower)
+    action = actions.acceptLoan;
+  else if (loan.status === "loaned" && isBorrower)
+    action = actions.requestReturn;
+  else if (loan.status === "returnRequested" && isLender)
+    action = actions.acceptReturn;
+
+  let statusMessage = "";
+  if (loan.status === "loaned" && isLender && loan.loanDate?.seconds) {
+    statusMessage = `Loaned to ${relation.otherUser?.displayName} on ${new Date(loan.loanDate.seconds * 1000).toLocaleDateString()}`;
   }
 
 
   return (
       <Card onPress={() => {
-        // navigation.navigate("ToolDetail", {
-        //   toolId: tool.id,
-        // });
+        if (!loan.tool) return;
+        navigation.getParent()?.navigate("SearchBrowse", { // TODO fix this, it navigates to searchBrowse but not ToolDetail
+          screen: "ToolDetail",
+          params: {
+            toolId: loan.tool.id,
+          },
+        });
       }}>
         <Row w="100%" h={32} justifyContent={"space-between"} flexWrap="nowrap">
           <Column justifyContent={"space-between"} p={4} w="60%" h="100%">
@@ -68,8 +72,22 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan}) => {
                                                          bold={true}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}
             </Text>
             <Row space={2}>
-              {actionButton}
-              <Button variant={"subtle"}>Cancel</Button>
+              {action
+                  ? <Button
+                      isLoading={isLoading}
+                      variant={action?.variant ?? "ghost"}
+                      onPress={async (e) => {
+                        setIsLoading(true);
+                        try {
+                          await action?.callback(loan.toolId);
+                        } catch (e) {
+                          // Set Error
+                        }
+                        setIsLoading(false);
+                      }}>{action?.name}</Button>
+                  : statusMessage ? <Button disabled variant={"ghost"}>{statusMessage}</Button> : null
+              }
+              {(canCancel) && <Button variant={"ghost"}>Cancel</Button>}
             </Row>
           </Column>
           <Image source={{

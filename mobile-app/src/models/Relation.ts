@@ -25,10 +25,7 @@ export interface IChatViewListItem {
   otherUser: ILendrUser;
 }
 
-/**
- * For now, this is using references instead of embedding documents. Should
- * probably change that in the future.
- */
+
 export interface ILoan {
   id?: string;
   toolId: string;
@@ -36,7 +33,7 @@ export interface ILoan {
   inquiryDate?: Timestamp;
   loanDate?: Timestamp;
   returnDate?: Timestamp;
-  status: "inquired" | "loanRequested" | "loaned" | "returnRequested" | "returned";
+  status: "inquired" | "loanRequested" | "loaned" | "returnRequested" | "returned" | "canceled";
   lenderUid: string;
   borrowerUid: string;
 }

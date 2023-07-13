@@ -20,7 +20,7 @@ import {
 import {httpsCallable} from "firebase/functions";
 import {auth, db, functions} from "../config/firebase";
 import {User} from "firebase/auth";
-import {AuthError, LendrBaseError, NotFoundError, ObjectValidationError} from "../utils/errors";
+import {AuthError, LendrBaseError, NotFoundError, NotImplementedError, ObjectValidationError} from "../utils/errors";
 import {IChatMessage, IChatViewListItem, ILoan, IRelation} from "../models/Relation";
 import {getUserFromAuth, getUserFromUid} from "./auth";
 import {ILendrUser} from "../models/ILendrUser";
@@ -243,7 +243,14 @@ export async function acceptTool(toolId: string) {
     console.error(JSON.stringify(e));
     throw new LendrBaseError(`Something went wrong calling the cloud function ${functionName}`);
   }
+}
 
+export async function requestLoan(toolId: string) {
+  throw new NotImplementedError();
+}
+
+export async function requestReturn(toolId: string) {
+  throw new NotImplementedError();
 }
 
 
