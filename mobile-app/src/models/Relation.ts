@@ -1,6 +1,6 @@
 import {Timestamp} from "firebase/firestore";
 import {ILendrUser} from "./ILendrUser";
-import {ITool} from "./Tool";
+import {IToolPreview} from "./Tool";
 
 export interface IRelation {
   id?: string // Added after retrieving from firestore
@@ -32,7 +32,7 @@ export interface IChatViewListItem {
 export interface ILoan {
   id?: string;
   toolId: string;
-  tool?: ITool;
+  tool?: IToolPreview;
   inquiryDate?: Timestamp;
   loanDate?: Timestamp;
   returnDate?: Timestamp;

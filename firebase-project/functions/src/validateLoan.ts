@@ -14,6 +14,8 @@ export const validateLoan = onDocumentCreated("/relations/{relationId}/loans/{lo
     throw new ObjectValidationError("Tool ID is required");
   }
 
+  // Attach proper inquiry date
+
   // Hydrate the tool
   hydroLoanDoc.tool = await hydrateTool(rawLoanDoc.toolId);
 

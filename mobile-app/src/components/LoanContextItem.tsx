@@ -16,23 +16,21 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan}) => {
 
   return (
       <Card onPress={() => {
-        // navigation.navigate("EditTool", {
+        // navigation.navigate("ToolDetail", {
         //   toolId: tool.id,
         // });
       }}>
-        <Row w="100%" h={16}>
-          <Column p={4} w="50%" h="100%">
-            <Text fontSize="lg">{loan.tool.name}</Text>
-            <Row>
+        <Row w="100%" h={32} justifyContent={"space-between"}  flexWrap="nowrap" >
+          <Column justifyContent={"space-between"} p={4} w="60%" h="100%">
+            <Text fontSize="lg">{loan.tool.name} - <Text fontSize={"lg"} bold={true}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}</Text>
+            <Row space={2}>
               <Button variant={"solid"}>Accept Tool</Button>
               <Button variant={"subtle"}>Cancel</Button>
             </Row>
           </Column>
           <Image source={{
-            uri: loan.tool.imageUrls
-                ? loan.tool.imageUrls[0]
-                : "",
-          }} style={{width: 100}}/>
+            uri: loan.tool.imageUrl,
+          }} style={{width: "35%"}}/>
         </Row>
       </Card>
   );
