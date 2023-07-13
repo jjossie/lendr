@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {Box} from 'native-base';
+import {Box, Text} from 'native-base';
 import {ChatListItem} from "../ChatListItem";
 import {SwipeListView} from "react-native-swipe-list-view";
 import {useMyChats} from "../../utils/hooks/useMyChats";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
+import {ILendrUserPreview} from "../../models/ILendrUser";
+
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 
 export interface ChatsProps {
@@ -36,9 +38,15 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
                 : chat.otherUser.displayName;
             const timeStampSeconds = chat.lastMessage ? chat.lastMessage.createdAt?.seconds : chat.createdAt?.seconds;
             const timeStamp = new Date(timeStampSeconds * 1000).toLocaleTimeString();
+            const otherUserPreview: ILendrUserPreview = {
+              displayName,
+              photoURL: chat.otherUser.providerData?.photoURL ?? "", // TODO update when refactoring user
+              uid: chat.otherUser.uid
+            }
             return {
               key: chat.id,
-              displayName: displayName,
+              displayName: displayName, // TODO deprecate
+              userPreview: otherUserPreview,
               timeStamp,
               recentText: chat.lastMessage?.text,
               onPressCallback: () => {
@@ -110,7 +118,9 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
     );
   };
 
-  return <Box bg="white" safeArea flex="1">
+  return <Box p={4} flex="1">
+    <Text p={4} bold fontSize="4xl">Inbox</Text>
+
     <SwipeListView data={listData}
                    renderItem={ChatListItem}
                    renderHiddenItem={renderHiddenItem}
