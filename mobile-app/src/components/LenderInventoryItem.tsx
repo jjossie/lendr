@@ -4,6 +4,7 @@ import {Image, StyleSheet} from 'react-native';
 import {Column, Row, Text} from "native-base";
 import {ITool} from "../models/Tool";
 import Card from "./Card";
+import AvailabilityChip from "./AvailabilityChip";
 
 export type LenderInventoryItemProps = {
   tool: ITool
@@ -17,22 +18,28 @@ const LenderInventoryItem: React.FC<LenderInventoryItemProps> = ({tool, navigati
       ? tool.imageUrls[0]
       : `https://source.unsplash.com/random/640×480/?${keywordString}`;
   return (
-        <Card onPress={() => {
-          navigation.navigate("EditTool", {
-            toolId: tool.id,
-          });
-        }}>
-          <Row w="100%" h={32}>
-            <Column p={4} w="50%" h="100%">
-              <Text fontSize="lg">{tool.name}</Text>
-              <Row alignItems="center">
-                <Text fontSize="4xl" bold>${tool.rate.price}</Text><Text
-                  fontSize="md">/{tool.rate.timeUnit}</Text>
-              </Row>
-            </Column>
-            <Image source={{uri: imageUri}} style={style.image}/>
-          </Row>
-        </Card>
+      <Card onPress={() => {
+        navigation.navigate("EditTool", {
+          toolId: tool.id,
+        });
+      }}>
+        <Row w="100%" h={48}>
+          <Column p={4} w="50%" h="100%">
+            <Text fontSize="lg">{tool.name}</Text>
+            <Row alignItems="center">
+              <Text fontSize="4xl" bold>${tool.rate.price}</Text><Text
+                fontSize="md">/{tool.rate.timeUnit}</Text>
+            </Row>
+            {
+              (tool.lenderUid != tool.holderUid && tool.holder)
+                  ? <AvailabilityChip user={tool.holder}/>
+                  : <AvailabilityChip/>
+            }
+          </Column>
+          <Image source={{uri: imageUri}} style={style.image}/>
+        </Row>
+
+      </Card>
   );
 };
 
