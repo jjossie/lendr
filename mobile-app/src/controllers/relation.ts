@@ -94,7 +94,7 @@ export async function createRelation(otherUserId: string, toolId: string): Promi
   console.log("🤝Creating Relation ID: ", relationId);
   const relationDocRef = doc(relationsCollection, relationId);
   const relationDoc = await getDoc(relationDocRef);
-  if (!relationDoc.exists()){
+  if (!relationDoc.exists()) {
     await setDoc(relationDocRef, {
       users: [user, otherUser],
       createdAt: serverTimestamp() as Timestamp,
@@ -235,7 +235,7 @@ export async function acceptTool(toolId: string) {
   const functionName = "confirmToolReceived";
   const confirmToolReceived = httpsCallable(functions, functionName);
   try {
-    const result = await confirmToolReceived({toolId})
+    const result = await confirmToolReceived({toolId});
     console.log("🤝acceptTool result:", JSON.stringify(result.data, null, 2));
 
   } catch (e: any) {
@@ -302,7 +302,7 @@ export function getLiveLoans(setLoans: (loans: any) => any,
 
   const loansQuery = query(
       collection(db, "relations", relation.id, "loans"),
-      orderBy("inquiryDate", "desc"),
+      orderBy("inquiryDate", "desc"), //TODO fix inquiry date problem: this rejects docs w/o an inquiry date
   );
   return onSnapshot(loansQuery, (snapshot: QuerySnapshot<DocumentData>) => {
     let loans: ILoan[] = [];

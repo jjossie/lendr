@@ -2,6 +2,7 @@ import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import {hydrateTool} from "./controllers/tool";
 import {ObjectValidationError} from "./utils/errors";
 import {logger} from "firebase-functions";
+import {FieldValue} from "firebase-admin/firestore";
 
 export const validateLoan = onDocumentCreated("/relations/{relationId}/loans/{loanId}", async (event) => {
   logger.debug(`🔥Validating new loan: ${event.params.relationId}/loans/${event.params.loanId}`);
@@ -15,6 +16,7 @@ export const validateLoan = onDocumentCreated("/relations/{relationId}/loans/{lo
   }
 
   // Attach proper inquiry date
+  hydroLoanDoc.inquiryDate = FieldValue.serverTimestamp();
 
   // Set the status
   hydroLoanDoc.status = "inquired";
