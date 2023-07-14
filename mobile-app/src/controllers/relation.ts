@@ -231,12 +231,11 @@ export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentDat
   setChats(docDataList);
 }
 
-export async function acceptTool(toolId: string) {
-  const functionName = "confirmToolReceived";
+async function callCloudFunction(functionName: string, toolId: string) {
   const confirmToolReceived = httpsCallable(functions, functionName);
   try {
     const result = await confirmToolReceived({toolId});
-    console.log("🤝acceptTool result:", JSON.stringify(result.data, null, 2));
+    console.log(`🤝${functionName} result:`, JSON.stringify(result.data, null, 2));
 
   } catch (e: any) {
     console.error(e.message);
@@ -245,8 +244,12 @@ export async function acceptTool(toolId: string) {
   }
 }
 
+export async function acceptTool(toolId: string) {
+  await callCloudFunction("confirmToolReceived", toolId);
+}
+
 export async function requestLoan(toolId: string) {
-  throw new NotImplementedError();
+  await callCloudFunction("requestHandoff", toolId);
 }
 
 export async function requestReturn(toolId: string) {

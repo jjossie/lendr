@@ -6,6 +6,7 @@ import {Image} from "react-native";
 import {acceptTool, requestLoan, requestReturn} from "../controllers/relation";
 import {useAuthentication} from "../utils/hooks/useAuthentication";
 import {useNavigation} from "@react-navigation/native";
+import {Timestamp} from "firebase/firestore";
 
 export interface LoanContextItemProps {
   loan: ILoan;
@@ -24,20 +25,21 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation}) => {
   const {authUser} = useAuthentication();
   const navigation = useNavigation();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   if (!loan.tool) {
     console.log("❇️< LoanContextItem > No tool attached");
     return (<></>);
   }
 
-  const [isLoading, setIsLoading] = useState(false);
 
   console.log("❇️Loan Status:", loan.status);
   console.log("❇️Loan:", JSON.stringify(loan, null, 2));
-  console.log("❇️Relation:", JSON.stringify(relation, null, 2));
+  // console.log("❇️Relation:", JSON.stringify(relation, null, 2));
 
   const isBorrower: boolean = loan.borrowerUid === authUser?.uid;
   const isLender = !isBorrower;
-  const canCancel: boolean = loan.status in ["inquired", "loanRequested"];
+  const canCancel: boolean = ["inquired", "loanRequested"].includes(loan.status);
 
   let action: Action | undefined;
 
@@ -50,9 +52,17 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation}) => {
   else if (loan.status === "returnRequested" && isLender)
     action = actions.acceptReturn;
 
+  function dateFromTimestamp(timestamp: Timestamp) {
+    return new Date(timestamp.seconds * 1000).toLocaleDateString();
+  }
+
+  // Non-actionable status messages
   let statusMessage = "";
+  if (loan.status === "inquired" && isLender && loan.inquiryDate?.seconds) {
+    statusMessage = `${relation.otherUser?.displayName} expressed interest on ${dateFromTimestamp(loan.inquiryDate)}`;
+  }
   if (loan.status === "loaned" && isLender && loan.loanDate?.seconds) {
-    statusMessage = `Loaned to ${relation.otherUser?.displayName} on ${new Date(loan.loanDate.seconds * 1000).toLocaleDateString()}`;
+    statusMessage = `Loaned to ${relation.otherUser?.displayName} on ${dateFromTimestamp(loan.loanDate)}`;
   }
 
 
@@ -67,33 +77,35 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation}) => {
         });
       }}>
         <Row w="100%" h={32} justifyContent={"space-between"} flexWrap="nowrap">
-          <Column justifyContent={"space-between"} p={4} w="60%" h="100%">
-            <Text fontSize="lg">{loan.tool.name} - <Text fontSize={"lg"}
-                                                         bold={true}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}
-            </Text>
-            <Row space={2}>
-              {action
-                  ? <Button
-                      isLoading={isLoading}
-                      variant={action?.variant ?? "ghost"}
-                      onPress={async (e) => {
-                        setIsLoading(true);
-                        try {
-                          await action?.callback(loan.toolId);
-                        } catch (e) {
-                          // Set Error
-                          console.error(`❇️Something went wrong with the ${action?.name} Action: `, e);
-                        }
-                        setIsLoading(false);
-                      }}>{action?.name}</Button>
-                  : statusMessage ? <Button disabled variant={"ghost"}>{statusMessage}</Button> : null
-              }
-              {(canCancel) && <Button variant={"ghost"}>Cancel</Button>}
-            </Row>
-          </Column>
-          <Image source={{
-            uri: loan.tool.imageUrl,
-          }} style={{width: "35%"}}/>
+          {loan.tool && <>
+            <Column justifyContent={(statusMessage || action) ? "space-between" : "center"} p={4} w="60%" h="100%">
+              <Text fontSize="lg">{loan.tool.name} - <Text fontSize={"lg"}
+                                                           bold={true}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}
+              </Text>
+              <Row space={2}>
+                {action
+                    ? <Button
+                        isLoading={isLoading}
+                        variant={action?.variant ?? "ghost"}
+                        onPress={async (e) => {
+                          setIsLoading(true);
+                          try {
+                            await action?.callback(loan.toolId);
+                          } catch (e) {
+                            // Set Error
+                            console.error(`❇️Something went wrong with the ${action?.name} Action: `, e);
+                          }
+                          setIsLoading(false);
+                        }}>{action?.name}</Button>
+                    : statusMessage ? <Button disabled variant={"ghost"}>{statusMessage}</Button> : null
+                }
+                {(canCancel) && <Button variant={"ghost"}>Cancel</Button>}
+              </Row>
+            </Column>
+            <Image source={{
+              uri: loan.tool.imageUrl,
+            }} style={{width: "35%"}}/>
+          </>}
         </Row>
       </Card>
   );
