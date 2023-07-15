@@ -3,7 +3,7 @@ import {Button, Column, Row, Text} from 'native-base';
 import {ILoan, IRelation} from "../models/Relation";
 import Card from "./Card";
 import {Image} from "react-native";
-import {acceptTool, requestLoan, requestReturn} from "../controllers/relation";
+import {acceptHandoff, initiateHandoff} from "../controllers/relation";
 import {useAuthentication} from "../utils/hooks/useAuthentication";
 import {useNavigation} from "@react-navigation/native";
 import {Timestamp} from "firebase/firestore";
@@ -15,10 +15,10 @@ export interface LoanContextItemProps {
 
 type Action = { name: string, callback: (relationId: string, loanId: string) => Promise<any>, variant: string };
 const actions = {
-  requestLoan: {name: "Loan", callback: requestLoan, variant: "subtle"},
-  acceptLoan: {name: "Accept Loan", callback: acceptTool, variant: "solid"},
-  requestReturn: {name: "Return", callback: requestReturn, variant: "subtle"},
-  acceptReturn: {name: "Accept Return", callback: acceptTool, variant: "solid"},
+  requestLoan: {name: "Loan", callback: initiateHandoff, variant: "subtle"},
+  acceptLoan: {name: "Accept Loan", callback: acceptHandoff, variant: "solid"},
+  requestReturn: {name: "Return", callback: initiateHandoff, variant: "subtle"},
+  acceptReturn: {name: "Accept Return", callback: acceptHandoff, variant: "solid"},
 };
 
 const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation}) => {
@@ -64,6 +64,9 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation}) => {
   if (loan.status === "loaned" && isLender && loan.loanDate?.seconds) {
     statusMessage = `Loaned to ${relation.otherUser?.displayName} on ${dateFromTimestamp(loan.loanDate)}`;
   }
+  if ((loan.status === "loanRequested" && isBorrower) ||
+      (loan.status === "returnRequested" && isLender))
+    statusMessage = `Initiated handoff to ${relation.otherUser?.displayName}`;
 
 
   return (

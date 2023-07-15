@@ -50,8 +50,8 @@ async function getRelationFromTool(db: FirebaseFirestore.Firestore, uid: string,
  * Called when a user wants to confirm a tool was handed off to them.
  * @type {Function<any, Promise<{}>>}
  */
-export const confirmToolReceived = onCall(async (req) => {
-  logger.debug("🔥confirmToolReceived running");
+export const acceptHandoff = onCall(async (req) => {
+  logger.debug("🔥acceptHandoff running");
 
   // Get the requesting User
   if (!req.auth || !req.auth.uid) {
@@ -133,9 +133,9 @@ export const confirmToolReceived = onCall(async (req) => {
  * Called when a lender is handing off the tool to the borrower.
  * @type {Function<any, Promise<void>>}
  */
-export const requestHandoff = onCall(async (req) => {
+export const initiateHandoff = onCall(async (req) => {
 
-  logger.debug("🔥requestHandoff running");
+  logger.debug("🔥initiateHandoff running");
 
   // Get the requesting User
   if (!req.auth || !req.auth.uid) {
@@ -155,18 +155,25 @@ export const requestHandoff = onCall(async (req) => {
     throw new HttpsError("not-found", e.message);
   }
 
-  // Make sure the Lender made the call
-  if (req.auth.uid !== loan.lenderUid)
-    throw new HttpsError("permission-denied", "You must be the lender to initiate the loan handoff");
+  // Set the loan status based on who initiated the handoff
+  if (req.auth.uid !== loan.lenderUid) {
+    // Borrower made the call
+    // Make sure the loan status is valid
+    if (loan.status !== "loaned")
+      throw new HttpsError("failed-precondition",
+          `🔥Loan status must be 'loaned' for borrower to initiate handoff (actual status: ${loan.status})`);
+    await setLoanStatus(db, relationId, loanId, "returnRequested");
 
-  // Make sure the loan status is valid
-  if (loan?.status === "inquired") {
-    await setLoanStatus(db, relationId, loanId, "loanRequested");
   } else {
-    logger.error(`🔥Error: Skipping loan ${loanId} because status is ${loan.status}`);
+    // Lender made the call
+    // Make sure the loan status is valid
+    if (loan.status !== "inquired")
+      throw new HttpsError("failed-precondition",
+          `🔥Loan status must be 'inquired' for lender to initiate handoff (actual status: ${loan.status})`);
+    await setLoanStatus(db, relationId, loanId, "loanRequested");
   }
 
-  // Notify the borrower they get to use the tool!
+  // Notify the borrower they get to use the tool! // TODO fix, might be other way around
   const borrower = await getUserFromUid(loan.borrowerUid);
   const lender = await getUserFromUid(loan.lenderUid);
   await sendExpoNotifications(

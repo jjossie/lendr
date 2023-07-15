@@ -232,10 +232,10 @@ export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentDat
 }
 
 async function callCloudFunction(functionName: string, requestData: any) {
-  const confirmToolReceived = httpsCallable(functions, functionName);
+  const cloudFunction = httpsCallable(functions, functionName);
   console.log(`🤝Calling Cloud Function ${functionName} with data: ${JSON.stringify(requestData)}`);
   try {
-    const result = await confirmToolReceived(requestData);
+    const result = await cloudFunction(requestData);
     console.log(`🤝${functionName} result:`, JSON.stringify(result.data, null, 2));
 
   } catch (e: any) {
@@ -245,12 +245,12 @@ async function callCloudFunction(functionName: string, requestData: any) {
   }
 }
 
-export async function acceptTool(relationId: string, loanId: string) {
-  await callCloudFunction("confirmToolReceived", {relationId, loanId});
+export async function acceptHandoff(relationId: string, loanId: string) {
+  await callCloudFunction("acceptHandoff", {relationId, loanId});
 }
 
-export async function requestLoan(relationId: string, loanId: string) {
-  await callCloudFunction("requestHandoff", {relationId, loanId});
+export async function initiateHandoff(relationId: string, loanId: string) {
+  await callCloudFunction("initiateHandoff", {relationId, loanId});
 }
 
 export async function requestReturn(relationId: string, loanId: string) {

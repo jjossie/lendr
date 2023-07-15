@@ -16,4 +16,4 @@ export {validateTool} from "./validateTool";
 export {validateRelation} from "./validateRelation";
 export {validateLoan} from "./validateLoan";
 export {validateTool_TEST} from "./validateTool_TEST";
-export {confirmToolReceived, requestHandoff} from "./handoff";
+export {acceptHandoff, initiateHandoff} from "./handoff";
