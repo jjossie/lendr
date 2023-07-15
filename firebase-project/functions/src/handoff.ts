@@ -168,10 +168,11 @@ export const requestHandoff = onCall(async (req) => {
 
   // Notify the borrower they get to use the tool!
   const borrower = await getUserFromUid(loan.borrowerUid);
+  const lender = await getUserFromUid(loan.lenderUid);
   await sendExpoNotifications(
       borrower.expoPushTokens,
       "Tool Available!",
-      `${null} user is giving you ${loan?.tool?.name}`,
+      `${lender.displayName} user is giving you ${loan?.tool?.name}`,
       {}, // TODO put redirect info here
   );
 });
