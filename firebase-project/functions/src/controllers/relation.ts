@@ -1,6 +1,6 @@
-import {firestore} from "firebase-admin";
 import {NotFoundError} from "../utils/errors";
 import {ILoan, LoanStatus} from "../models/Relation";
+import {logger} from "firebase-functions";
 
 
 export function getRelationId(currentUserId: string, otherUserId: string) {
@@ -13,7 +13,8 @@ export async function getLoan(db: FirebaseFirestore.Firestore, relationId: strin
   const loanSnap = await db.collection(`relations/${relationId}/loans/`).doc(loanId).get();
 
   if (!loanSnap.exists) {
-    throw new NotFoundError(`Loan ${relationId}/loans/${loanId} does not exist.`);
+    logger.error("🔥Loan ${relationId}/loans/${loanId} does not exist")
+    throw new NotFoundError(`Loan ${relationId}/loans/${loanId} does not exist`);
   }
   return {...loanSnap.data(), id: loanId} as ILoan;
 }

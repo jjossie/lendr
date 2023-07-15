@@ -37,9 +37,9 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
       console.log("❇️Created new relation: ", relationId);
       // await sendChatMessage(toolData!.lenderUid, "Hey, I'm interested in this tool!");
       setIsLoading(false);
-      navigation.navigate("Chat", {
+      navigation.getParent()!.navigate("Chat", {
         screen: "ChatConversation",
-        params: {relationId},
+        params: {relationId, draftMessage: `Hey, I'm interested in this ${toolData?.name ?? "tool"}!`},
       });
     } catch (e) {
       console.log("❇️Failed to create relation", e);

@@ -232,16 +232,16 @@ export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentDat
 }
 
 async function callCloudFunction(functionName: string, requestData: any) {
-  const cloudFunction = httpsCallable(functions, functionName);
   console.log(`🤝Calling Cloud Function ${functionName} with data: ${JSON.stringify(requestData)}`);
+  const cloudFunction = httpsCallable(functions, functionName);
+  console.log(`🤝Cloud function:`, cloudFunction);
   try {
     const result = await cloudFunction(requestData);
     console.log(`🤝${functionName} result:`, JSON.stringify(result.data, null, 2));
-
   } catch (e: any) {
-    console.error(e.message);
-    console.error(JSON.stringify(e));
-    throw new LendrBaseError(`Something went wrong calling the cloud function ${functionName}`);
+    // console.error(e.message);
+    // console.error(JSON.stringify(e));
+    throw new LendrBaseError(`Something went wrong calling the cloud function ${functionName}: ${JSON.stringify(e, null, 2)}`);
   }
 }
 
@@ -249,8 +249,8 @@ export async function acceptHandoff(relationId: string, loanId: string) {
   await callCloudFunction("acceptHandoff", {relationId, loanId});
 }
 
-export async function initiateHandoff(relationId: string, loanId: string) {
-  await callCloudFunction("initiateHandoff", {relationId, loanId});
+export async function startHandoff(relationId: string, loanId: string) {
+  await callCloudFunction("startHandoff", {relationId, loanId});
 }
 
 export async function requestReturn(relationId: string, loanId: string) {

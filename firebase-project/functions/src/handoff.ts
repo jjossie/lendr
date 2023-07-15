@@ -21,13 +21,13 @@ async function getToolByIdFromCallable(db: Firestore, toolId: string) {
   return {toolDocSnap, tool};
 }
 
-async function getRelevantLoansSnap(db: FirebaseFirestore.Firestore, relationId: string, toolId: string) {
+async function getRelevantLoansSnap(db: Firestore, relationId: string, toolId: string) {
   return await db.collection(`relations/${relationId}/loans`)
       .where("toolId", "==", toolId)
       .get();
 }
 
-async function getRelationFromTool(db: FirebaseFirestore.Firestore, uid: string, tool: ITool) {
+async function getRelationFromTool(db: Firestore, uid: string, tool: ITool) {
   // Figure out the other user's UID so that we can get the relation
   const currentUserIsLender = (uid === tool.lenderUid); // TODO this logic doesn't work. Not universally, at least.
   const otherUserId = [tool.lenderUid, tool.holderUid].filter(id => id !== uid)[0];
@@ -130,12 +130,14 @@ export const acceptHandoff = onCall(async (req) => {
 
 
 /**
- * Called when a lender is handing off the tool to the borrower.
+ * Called when either the lender or borrower is initiating a handoff. The other user must confirm the handoff
+ * for the holder status to actually be changed. This does, however, change the loan status to either 'loanRequested'
+ * or 'returnRequested'.
  * @type {Function<any, Promise<void>>}
  */
-export const initiateHandoff = onCall(async (req) => {
+export const startHandoff = onCall(async (req) => {
 
-  logger.debug("🔥initiateHandoff running");
+  logger.debug("🔥startHandoff running");
 
   // Get the requesting User
   if (!req.auth || !req.auth.uid) {
@@ -152,24 +154,31 @@ export const initiateHandoff = onCall(async (req) => {
   try {
     loan = await getLoan(db, relationId, loanId);
   } catch (e) {
+    logger.error(e);
     throw new HttpsError("not-found", e.message);
   }
 
   // Set the loan status based on who initiated the handoff
   if (req.auth.uid !== loan.lenderUid) {
     // Borrower made the call
+    logger.debug(`🔥Borrower ${loan.borrowerUid} trying to initiate handoff`)
     // Make sure the loan status is valid
-    if (loan.status !== "loaned")
+    if (loan.status !== "loaned"){
+      logger.warn(`🔥Loan status invalid: ${loan.status}`)
       throw new HttpsError("failed-precondition",
           `🔥Loan status must be 'loaned' for borrower to initiate handoff (actual status: ${loan.status})`);
+    }
     await setLoanStatus(db, relationId, loanId, "returnRequested");
 
   } else {
     // Lender made the call
+    logger.debug(`🔥Lender ${loan.lenderUid} trying to initiate handoff`)
     // Make sure the loan status is valid
-    if (loan.status !== "inquired")
+    if (loan.status !== "inquired"){
+      logger.warn(`🔥Loan status invalid: ${loan.status}`)
       throw new HttpsError("failed-precondition",
           `🔥Loan status must be 'inquired' for lender to initiate handoff (actual status: ${loan.status})`);
+    }
     await setLoanStatus(db, relationId, loanId, "loanRequested");
   }
 

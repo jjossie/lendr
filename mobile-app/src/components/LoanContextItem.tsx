@@ -3,7 +3,7 @@ import {Button, Column, Row, Text} from 'native-base';
 import {ILoan, IRelation} from "../models/Relation";
 import Card from "./Card";
 import {Image} from "react-native";
-import {acceptHandoff, initiateHandoff} from "../controllers/relation";
+import {acceptHandoff, startHandoff} from "../controllers/relation";
 import {useAuthentication} from "../utils/hooks/useAuthentication";
 import {useNavigation} from "@react-navigation/native";
 import {Timestamp} from "firebase/firestore";
@@ -15,9 +15,9 @@ export interface LoanContextItemProps {
 
 type Action = { name: string, callback: (relationId: string, loanId: string) => Promise<any>, variant: string };
 const actions = {
-  requestLoan: {name: "Loan", callback: initiateHandoff, variant: "subtle"},
+  requestLoan: {name: "Loan", callback: startHandoff, variant: "subtle"},
   acceptLoan: {name: "Accept Loan", callback: acceptHandoff, variant: "solid"},
-  requestReturn: {name: "Return", callback: initiateHandoff, variant: "subtle"},
+  requestReturn: {name: "Return", callback: startHandoff, variant: "subtle"},
   acceptReturn: {name: "Accept Return", callback: acceptHandoff, variant: "solid"},
 };
 
@@ -43,8 +43,13 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation}) => {
 
   let action: Action | undefined;
 
-  if (loan.status === "inquired" && isLender)
-    action = actions.requestLoan;
+  // Possible Actions
+  if (loan.status === "inquired"){
+    if (isLender)
+      action = actions.requestLoan;
+    else
+      action = actions.acceptLoan; // Maybe we don't want them to see this?
+  }
   else if (loan.status === "loanRequested" && isBorrower)
     action = actions.acceptLoan;
   else if (loan.status === "loaned" && isBorrower)
@@ -96,7 +101,7 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation}) => {
                             await action?.callback(relation.id!, loan.id!);
                           } catch (e) {
                             // Set Error
-                            console.error(`❇️Something went wrong with the ${action?.name} Action: `, e);
+                            console.error(`❇️Something went wrong with the ${action?.name} Action: \n`, e);
                           }
                           setIsLoading(false);
                         }}>{action?.name}</Button>
