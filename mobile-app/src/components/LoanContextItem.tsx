@@ -13,7 +13,7 @@ export interface LoanContextItemProps {
   relation: IRelation;
 }
 
-type Action = { name: string, callback: (toolId: string) => Promise<any>, variant: string };
+type Action = { name: string, callback: (relationId: string, loanId: string) => Promise<any>, variant: string };
 const actions = {
   requestLoan: {name: "Loan", callback: requestLoan, variant: "subtle"},
   acceptLoan: {name: "Accept Loan", callback: acceptTool, variant: "solid"},
@@ -90,7 +90,7 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation}) => {
                         onPress={async (e) => {
                           setIsLoading(true);
                           try {
-                            await action?.callback(loan.toolId);
+                            await action?.callback(relation.id!, loan.id!);
                           } catch (e) {
                             // Set Error
                             console.error(`❇️Something went wrong with the ${action?.name} Action: `, e);

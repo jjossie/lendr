@@ -1,7 +1,7 @@
 import {HttpsError, onCall} from "firebase-functions/v2/https";
 import {FieldValue, getFirestore, Timestamp} from "firebase-admin/firestore";
 import {ITool} from "./models/Tool";
-import {getRelationId} from "./controllers/relation";
+import {getLoan, getRelationId, setLoanStatus} from "./controllers/relation";
 import {ILoan} from "./models/Relation";
 import {logger} from "firebase-functions";
 import {getUserFromUid} from "./controllers/users";
@@ -29,9 +29,14 @@ async function getRelevantLoansSnap(db: FirebaseFirestore.Firestore, relationId:
 
 async function getRelationFromTool(db: FirebaseFirestore.Firestore, uid: string, tool: ITool) {
   // Figure out the other user's UID so that we can get the relation
-  const currentUserIsLender = (uid === tool.lenderUid);
-  const otherUserId = (currentUserIsLender) ? tool.holderUid : tool.lenderUid;
+  const currentUserIsLender = (uid === tool.lenderUid); // TODO this logic doesn't work. Not universally, at least.
+  const otherUserId = [tool.lenderUid, tool.holderUid].filter(id => id !== uid)[0];
+  if (!otherUserId)
+    throw new HttpsError("internal", "No other user ID found");
+
   const relationId = getRelationId(uid, otherUserId);
+  logger.debug("🔥getRelationFromTool(): otherUserId:", otherUserId);
+  logger.debug("🔥getRelationFromTool(): relationID:", relationId);
 
   // Ensure the relation exists
   const relationDocSnap = await db.collection("relations").doc(relationId).get();
@@ -136,11 +141,48 @@ export const requestHandoff = onCall(async (req) => {
   if (!req.auth || !req.auth.uid) {
     throw new HttpsError("unauthenticated", "User not logged in 🫥");
   }
+
+  // Get the relationId & loanId from the query string
+  const relationId = req.data.relationId;
+  const loanId = req.data.loanId;
+
+  // Get the loan from the database
+  const db = getFirestore();
+  let loan: ILoan;
+  try {
+    loan = await getLoan(db, relationId, loanId);
+  } catch (e) {
+    throw new HttpsError("not-found", e.message);
+  }
+
+  // Make sure the Lender made the call
+  if (req.auth.uid !== loan.lenderUid)
+    throw new HttpsError("permission-denied", "You must be the lender to initiate the loan handoff");
+
+  // Make sure the loan status is valid
+  if (loan?.status === "inquired") {
+    await setLoanStatus(db, relationId, loanId, "loanRequested");
+  } else {
+    logger.error(`🔥Error: Skipping loan ${loanId} because status is ${loan.status}`);
+  }
+
+  // Notify the borrower they get to use the tool!
+  const borrower = await getUserFromUid(loan.borrowerUid);
+  await sendExpoNotifications(
+      borrower.expoPushTokens,
+      "Tool Available!",
+      `${null} user is giving you ${loan?.tool?.name}`,
+      {}, // TODO put redirect info here
+  );
+});
+
+/**
+ * Called when a borrower is trying to return the tool.
+ * @type {Function<any, Promise<void>>}
+ */
+export const requestReturn = onCall(async (req) => {
   // Get the tool ID from the query string
   const toolId = req.data.toolId;
-  if (!toolId || typeof toolId !== "string") {
-    throw new HttpsError("invalid-argument", "Tool ID not provided ⭕️");
-  }
 
   // Get the tool from the database
   const db = getFirestore();
@@ -149,34 +191,28 @@ export const requestHandoff = onCall(async (req) => {
   // Get the relationship
   const {currentUserIsLender, otherUserId, relationId} = await getRelationFromTool(db, req.auth.uid, tool);
 
-  // Make sure the Lender made the call
-  if (!currentUserIsLender)
-    throw new HttpsError("permission-denied", "You must be the lender to initiate the loan handoff");
+
+  // Make sure the Borrower made the call
+  if (currentUserIsLender)
+    throw new HttpsError("permission-denied", "You must be the borrower to initiate the return");
+
 
   // Get all relevant loans
   const relevantLoansSnap = await getRelevantLoansSnap(db, relationId, toolId);
 
   if (relevantLoansSnap.empty)
-    throw new HttpsError("failed-precondition", "Loan does not exist! cannot initiate an unsolicited handoff");
+    throw new HttpsError("failed-precondition", "Loan does not exist! cannot initiate an unsolicited return");
 
 
   // Set the loan status to loanRequested
   relevantLoansSnap.docs.forEach(doc => {
     const loan = doc.data() as ILoan;
     // Make sure the loan status is valid
-    if (loan.status === "inquired") {
-      loan.status = "loanRequested";
+    if (loan.status === "loaned") {
+      loan.status = "returned";
     } else {
-      logger.error(`🔥Error: Skipping loan ${doc.id} because status is ${loan.status}`);
+      logger.error(`Error: Skipping loan ${doc.id} because status is ${loan.status}`);
     }
   });
 
-  // Notify the borrower they get to use the tool!
-  const otherUser = await getUserFromUid(otherUserId);
-  await sendExpoNotifications(
-      otherUser.expoPushTokens,
-      "Tool Available!",
-      `${null} user is giving you ${tool.name}`,
-      {}, // TODO put redirect info here
-  );
 });

@@ -231,10 +231,11 @@ export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentDat
   setChats(docDataList);
 }
 
-async function callCloudFunction(functionName: string, toolId: string) {
+async function callCloudFunction(functionName: string, requestData: any) {
   const confirmToolReceived = httpsCallable(functions, functionName);
+  console.log(`🤝Calling Cloud Function ${functionName} with data: ${JSON.stringify(requestData)}`);
   try {
-    const result = await confirmToolReceived({toolId});
+    const result = await confirmToolReceived(requestData);
     console.log(`🤝${functionName} result:`, JSON.stringify(result.data, null, 2));
 
   } catch (e: any) {
@@ -244,15 +245,15 @@ async function callCloudFunction(functionName: string, toolId: string) {
   }
 }
 
-export async function acceptTool(toolId: string) {
-  await callCloudFunction("confirmToolReceived", toolId);
+export async function acceptTool(relationId: string, loanId: string) {
+  await callCloudFunction("confirmToolReceived", {relationId, loanId});
 }
 
-export async function requestLoan(toolId: string) {
-  await callCloudFunction("requestHandoff", toolId);
+export async function requestLoan(relationId: string, loanId: string) {
+  await callCloudFunction("requestHandoff", {relationId, loanId});
 }
 
-export async function requestReturn(toolId: string) {
+export async function requestReturn(relationId: string, loanId: string) {
   throw new NotImplementedError();
 }
 
