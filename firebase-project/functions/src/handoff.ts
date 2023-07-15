@@ -1,5 +1,5 @@
 import {HttpsError, onCall} from "firebase-functions/v2/https";
-import {FieldValue, getFirestore, Timestamp} from "firebase-admin/firestore";
+import {getFirestore} from "firebase-admin/firestore";
 import {ITool} from "./models/Tool";
 import {getLoan, getRelationId, setLoanStatus} from "./controllers/relation";
 import {ILoan} from "./models/Relation";
@@ -61,56 +61,74 @@ export const acceptHandoff = onCall(async (req) => {
   logger.debug("🔥uid: ", req.auth.uid);
   logger.debug("🔥user token: ", JSON.stringify(req.auth.token, null, 2));
 
-  // Get the tool ID from the query string
-  const toolId = req.data.toolId;
-  if (!toolId || typeof toolId !== "string") {
-    throw new HttpsError("invalid-argument", "Tool ID not provided ⭕️");
-  }
+  // const toolId = req.data.toolId;
+
+  // Get the relation and loan IDs from the request
+  const {relationId, loanId} = req.data;
+
+  // Get the loan from the database
   const db = getFirestore();
-  const {toolDocSnap, tool} = await getToolByIdFromCallable(db, toolId);
+  let loan: ILoan;
+  try {
+    loan = await getLoan(db, relationId, loanId);
+  } catch (e) {
+    logger.error(e);
+    throw new HttpsError("not-found", e.message);
+  }
+
+  const currentUserIsLender = (req.auth.uid === loan.lenderUid);
+  const otherUserId = [loan.lenderUid, loan.borrowerUid].filter(id => id !== req.auth.uid)[0];
+  logger.debug(`🔥Current user (${currentUserIsLender ? "lender" : "borrower"}) accepting handoff from [${otherUserId}] (${currentUserIsLender ? "borrower" : "lender"})`)
+  // const currentUser = await getUserFromUid(req.auth.uid);
+  // const otherUser = await getUserFromUid(otherUserId);
+
+  // Get the tool ID
+  const {toolDocSnap, tool} = await getToolByIdFromCallable(db, loan.toolId);
 
   // Check if the tool is already received
-  if (req.auth.uid == tool.holderUid)
-    throw new HttpsError("ok", "Already received");
-
-  const {currentUserIsLender, otherUserId, relationId} = await getRelationFromTool(db, req.auth.uid, tool);
-
-  // Check if the loan exists and create it if it doesn't
-  const relevantLoansSnap = await getRelevantLoansSnap(db, relationId, toolId);
-
-  if (relevantLoansSnap.empty) {
-    logger.debug("🔥No relevant loans found, creating a new one");
-    const newLoan: ILoan = {
-      borrowerUid: currentUserIsLender ? otherUserId : req.auth.uid,
-      lenderUid: currentUserIsLender ? req.auth.uid : otherUserId,
-      status: currentUserIsLender ? "returned" : "loaned", // Indicates status after successful handoff
-      toolId,
-      loanDate: FieldValue.serverTimestamp() as Timestamp,
-    };
-    await db.collection(`relations/${relationId}/loans`).add(newLoan);
-  } else {
-    logger.debug(`🔥Found ${relevantLoansSnap.docs.length} relevant loans, updating statuses`);
-    // Loop through all loans that involve this tool and make sure they're marked appropriately
-    for (const loanDoc of relevantLoansSnap.docs) {
-      let loan = loanDoc.data() as ILoan;
-      if (loan.status === "returned")
-        continue;
-      if (currentUserIsLender)
-        loan.status = "returned";
-      else
-        loan.status = "loaned";
-      await loanDoc.ref.set(loan, {merge: true});
-      break;
-    }
+  if (req.auth.uid == tool.holderUid){
+    logger.error(`🔥Tool ${tool.name} is already in current user ( ${req.auth.uid} )'s possession.\nDouble check loan status.`);
+    throw new HttpsError("ok", "Already received"); // TODO double check loan status here
   }
 
+  // Set the new loan status
+  await setLoanStatus(db, relationId, loanId, currentUserIsLender ? "returned" : "loaned");
+
+  // Check if the loan exists and create it if it doesn't
+  // const relevantLoansSnap = await getRelevantLoansSnap(db, relationId, loan.toolId);
+  //
+  // if (relevantLoansSnap.empty) {
+  //   logger.debug("🔥No relevant loans found, creating a new one");
+  //   const newLoan: ILoan = {
+  //     borrowerUid: currentUserIsLender ? otherUserId : req.auth.uid,
+  //     lenderUid: currentUserIsLender ? req.auth.uid : otherUserId,
+  //     status: currentUserIsLender ? "returned" : "loaned", // Indicates status after successful handoff
+  //     toolId: loan.toolId,
+  //     loanDate: FieldValue.serverTimestamp() as Timestamp,
+  //   };
+  //   await db.collection(`relations/${relationId}/loans`).add(newLoan);
+  // } else {
+  //   logger.debug(`🔥Found ${relevantLoansSnap.docs.length} relevant loans, updating statuses`);
+  //   // Loop through all loans that involve this tool and make sure they're marked appropriately
+  //   for (const loanDoc of relevantLoansSnap.docs) {
+  //     let loan = loanDoc.data() as ILoan;
+  //     if (loan.status === "returned")
+  //       continue;
+  //     if (currentUserIsLender)
+  //       loan.status = "returned";
+  //     else
+  //       loan.status = "loaned";
+  //     await loanDoc.ref.set(loan, {merge: true});
+  //     break;
+  //   }
+  // }
 
   // Update the tool's holder to the current user
-  const lendrUser = await getUserFromUid(req.auth.uid);
+  const currentUser = await getUserFromUid(req.auth.uid);
 
   let holder: ILendrUserPreview = {
     uid: req.auth.uid,
-    displayName: lendrUser.displayName ?? `${lendrUser.firstName} ${lendrUser.lastName}`,
+    displayName: currentUser.displayName ?? `${currentUser.firstName} ${currentUser.lastName}`,
   };
   if (req.auth.token.picture)
     holder.photoURL = req.auth.token.picture;
