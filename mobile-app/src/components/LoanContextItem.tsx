@@ -72,6 +72,9 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation}) => {
   if ((loan.status === "loanRequested" && isBorrower) ||
       (loan.status === "returnRequested" && isLender))
     statusMessage = `Initiated handoff to ${relation.otherUser?.displayName}`;
+  if (loan.status === "returned") {
+    statusMessage = `Returned ${loan.returnDate ? dateFromTimestamp(loan.returnDate) : ""}`
+  }
 
 
   return (

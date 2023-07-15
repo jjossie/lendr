@@ -1,6 +1,7 @@
 import {NotFoundError} from "../utils/errors";
 import {ILoan, LoanStatus} from "../models/Relation";
 import {logger} from "firebase-functions";
+import {FieldValue} from "firebase-admin/firestore";
 
 
 export function getRelationId(currentUserId: string, otherUserId: string) {
@@ -20,8 +21,12 @@ export async function getLoan(db: FirebaseFirestore.Firestore, relationId: strin
 }
 
 export async function setLoanStatus(db: FirebaseFirestore.Firestore, relationId: string, loanId: string, status: LoanStatus ) {
-  await db.collection(`relations/${relationId}/loans/`).doc(loanId).set({
-    status: status
-  }, {merge: true});
+    let loanUpdate: any = {
+      status: status,
+      inquiryDate: (status === "inquired") ? FieldValue.serverTimestamp() : undefined,
+      loanDate: (status === "loaned") ? FieldValue.serverTimestamp() : undefined,
+      returnDate: (status === "returned") ? FieldValue.serverTimestamp() : undefined,
+    };
 
+    await db.collection(`relations/${relationId}/loans/`).doc(loanId).set(loanUpdate, {merge: true});
 }
