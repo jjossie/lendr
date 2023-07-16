@@ -14,7 +14,7 @@ function numberFromText(text: string): number {
 
 export interface AvatarImageProps {
   user: ILendrUserPreview;
-  size: ThemeComponentSizeType<"Avatar">
+  size?: ThemeComponentSizeType<"Avatar">
 }
 
 const AvatarImage: React.FC<AvatarImageProps> = ({user, size}) => {
