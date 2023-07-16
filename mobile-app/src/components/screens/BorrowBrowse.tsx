@@ -3,7 +3,7 @@ import {Column, Row, ScrollView, Select, Spacer} from 'native-base';
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import BorrowBrowseItem from "../BorrowBrowseItem";
 import {ITool} from "../../models/Tool";
-import {getToolsWithinRadius} from "../../controllers/Tool";
+import {getToolsWithinRadius} from "../../controllers/tool";
 import {useLocation} from "../../utils/hooks/useLocation";
 
 

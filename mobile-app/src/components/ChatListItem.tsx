@@ -1,4 +1,5 @@
-import {Avatar, Box, HStack, Pressable, Spacer, Text, theme, VStack} from "native-base";
+import {Box, HStack, Pressable, Spacer, Text, theme, VStack} from "native-base";
+import AvatarImage from "./AvatarImage";
 
 export const ChatListItem = ({
                                item,
@@ -15,16 +16,11 @@ export const ChatListItem = ({
       <Pressable key={index} onPress={item.onPressCallback} _dark={{
         bg: "coolGray.800",
       }} _light={{
-        bg: "white",
+        bg: theme.colors.light["100"],
       }}>
         <Box pl="4" pr="5" py="2">
           <HStack alignItems="center" space={3}>
-            {item.avatarUrl
-                ? <Avatar size="48px" source={{
-                  uri: item.photoURL,
-                }}/>
-                : <Avatar bg={theme.colors.red[500]}>{initials}</Avatar>}
-            {/*    <Avatar bg={theme.colors.red[500]}>{initials}</Avatar>*/}
+            {item.userPreview && <AvatarImage user={item.userPreview}/>}
             <VStack>
               <Text color="coolGray.800" _dark={{
                 color: "warmGray.50",

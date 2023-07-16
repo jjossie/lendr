@@ -14,11 +14,13 @@ import {
   serverTimestamp,
   setDoc,
   Timestamp,
+  Unsubscribe,
   updateDoc,
 } from "firebase/firestore";
-import {app, db} from "../config/firebase";
-import {getAuth, User} from "firebase/auth";
-import {AuthError, LendrBaseError, NotFoundError, ObjectValidationError} from "../utils/errors";
+import {httpsCallable} from "firebase/functions";
+import {auth, db, functions} from "../config/firebase";
+import {User} from "firebase/auth";
+import {AuthError, LendrBaseError, NotFoundError, NotImplementedError, ObjectValidationError} from "../utils/errors";
 import {IChatMessage, IChatViewListItem, ILoan, IRelation} from "../models/Relation";
 import {getUserFromAuth, getUserFromUid} from "./auth";
 import {ILendrUser} from "../models/ILendrUser";
@@ -76,7 +78,6 @@ export function getRelationId(currentUserId: string, otherUserId: string) {
 export async function createRelation(otherUserId: string, toolId: string): Promise<string> {
 
   // Get Auth
-  const auth = getAuth(app);
   if (!auth.currentUser)
     throw new AuthError();
 
@@ -93,7 +94,7 @@ export async function createRelation(otherUserId: string, toolId: string): Promi
   console.log("🤝Creating Relation ID: ", relationId);
   const relationDocRef = doc(relationsCollection, relationId);
   const relationDoc = await getDoc(relationDocRef);
-  if (!relationDoc.exists()){
+  if (!relationDoc.exists()) {
     await setDoc(relationDocRef, {
       users: [user, otherUser],
       createdAt: serverTimestamp() as Timestamp,
@@ -148,7 +149,6 @@ export async function sendChatMessage(receiverUid: string,
                                       replyingToId?: string,
                                       media?: any) {
   console.log(`🤝sending chat "${text}" to ${receiverUid}`);
-  const auth = getAuth(app);
   if (!auth.currentUser)
     throw new AuthError();
 
@@ -231,6 +231,32 @@ export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentDat
   setChats(docDataList);
 }
 
+async function callCloudFunction(functionName: string, requestData: any) {
+  console.log(`🤝Calling Cloud Function ${functionName} with data: ${JSON.stringify(requestData)}`);
+  const cloudFunction = httpsCallable(functions, functionName);
+  console.log(`🤝Cloud function:`, cloudFunction);
+  try {
+    const result = await cloudFunction(requestData);
+    console.log(`🤝${functionName} result:`, JSON.stringify(result.data, null, 2));
+  } catch (e: any) {
+    // console.error(e.message);
+    // console.error(JSON.stringify(e));
+    throw new LendrBaseError(`Something went wrong calling the cloud function ${functionName}: ${JSON.stringify(e, null, 2)}`);
+  }
+}
+
+export async function acceptHandoff(relationId: string, loanId: string) {
+  await callCloudFunction("acceptHandoff", {relationId, loanId});
+}
+
+export async function startHandoff(relationId: string, loanId: string) {
+  await callCloudFunction("startHandoff", {relationId, loanId});
+}
+
+export async function requestReturn(relationId: string, loanId: string) {
+  throw new NotImplementedError();
+}
+
 
 /**
  * Gets the messages for a relation and calls the setMessages function with the messages.
@@ -244,7 +270,7 @@ export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentDat
 export function getLiveMessages(setMessages: ((messages: any) => any),
                                 authUser: User,
                                 user: ILendrUser,
-                                relation: IRelation): void {
+                                relation: IRelation): Unsubscribe | undefined {
 
   // This might run before user is initialized - just skip if that's the case
   if (!authUser || !user) return;
@@ -258,7 +284,7 @@ export function getLiveMessages(setMessages: ((messages: any) => any),
       orderBy("createdAt", "desc"),
       limit(MESSAGE_LOAD_LIMIT),
   );
-  const unsub = onSnapshot(messagesQuery, (snapshot: QuerySnapshot<DocumentData>) => {
+  return onSnapshot(messagesQuery, (snapshot: QuerySnapshot<DocumentData>) => {
     let messages: IChatMessage[] = [];
     snapshot.forEach(messageSnap => {
       messages.push({
@@ -267,5 +293,41 @@ export function getLiveMessages(setMessages: ((messages: any) => any),
       } as IChatMessage);
     });
     setMessages(messages.reverse());
+  });
+}
+
+/**
+ * Gets the loans for a relation and calls the setLoans function with the loans.
+ * Supports the useChatMessages hook. Maybe I should have made it a separate hook lol
+ *
+ * @param {(loans: any) => any} setLoans The React setState function
+ * @param {User} authUser The authenticated user
+ * @param {IRelation} relation The Relation object to get the loans for. Must have an ID.
+ * @returns {Unsubscribe | undefined} The unsubscribe function if it was successful, undefined otherwise.
+ */
+export function getLiveLoans(setLoans: (loans: any) => any,
+                             authUser: User,
+                             relation: IRelation): Unsubscribe | undefined {
+  console.log("🤝getLiveLoans()");
+  if (!authUser || !relation.id) return;
+
+  const loansQuery = query(
+      collection(db, "relations", relation.id, "loans"),
+      orderBy("inquiryDate", "desc"), //TODO fix inquiry date problem: this rejects docs w/o an inquiry date
+  );
+  return onSnapshot(loansQuery, (snapshot: QuerySnapshot<DocumentData>) => {
+    let loans: ILoan[] = [];
+    snapshot.forEach(async loanSnap => {
+      let loanDoc = loanSnap.data() as ILoan;
+      // if (!loanDoc.tool) // Pretty sure it's actually not necessary 'cause they're hydrated on the backend now
+      //   // Front-end Hydration necessary
+      //   loanDoc.tool = await getToolById(loanDoc.toolId) as IToolPreview;
+
+      loans.push({
+        id: loanSnap.id,
+        ...loanDoc,
+      } as ILoan);
+    });
+    setLoans(loans.reverse());
   });
 }

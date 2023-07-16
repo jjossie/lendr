@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Column, Heading, Image, ScrollView, Text} from "native-base";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {getToolById} from "../../controllers/Tool";
+import {getToolById} from "../../controllers/tool";
 import {ITool} from "../../models/Tool";
 import LenderProfilePreview from "../LenderProfilePreview";
-import {createRelation} from "../../controllers/Relation";
+import {createRelation} from "../../controllers/relation";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
 
 
@@ -37,9 +37,9 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
       console.log("❇️Created new relation: ", relationId);
       // await sendChatMessage(toolData!.lenderUid, "Hey, I'm interested in this tool!");
       setIsLoading(false);
-      navigation.navigate("Chat", {
+      navigation.getParent()!.navigate("Chat", {
         screen: "ChatConversation",
-        params: {relationId},
+        params: {relationId, draftMessage: `Hey, I'm interested in this ${toolData?.name ?? "tool"}!`},
       });
     } catch (e) {
       console.log("❇️Failed to create relation", e);

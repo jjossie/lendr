@@ -7,12 +7,12 @@ export default {
     "slug": "lendr",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/lendr-logo-v2-1.png",
+    "icon": "./assets/lendr-logo-square-v2-2.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/lendr-splash-v2-2.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#2e5339"
     },
     "jsEngine": "hermes",
     "updates": {
@@ -22,16 +22,17 @@ export default {
       "**/*"
     ],
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "bundleIdentifier": "com.joeljossie.lendr"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "./assets/lendr-logo-adaptive-v2-2.png",
+        "backgroundColor": "#2e5339"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/lendr-logo-favicon-v2-2.png"
     },
     "extra": {
       firebaseApiKey: process.env.FIREBASE_API_KEY,

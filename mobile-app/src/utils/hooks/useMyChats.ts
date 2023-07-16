@@ -2,7 +2,7 @@ import {collection, DocumentData, documentId, onSnapshot, query, QuerySnapshot, 
 import {db} from "../../config/firebase";
 import {useAuthentication} from "./useAuthentication";
 import {useEffect, useState} from "react";
-import {getRelationId, handleRelationsQuerySnapshot} from "../../controllers/Relation";
+import {getRelationId, handleRelationsQuerySnapshot} from "../../controllers/relation";
 import {IChatViewListItem} from "../../models/Relation";
 
 export function useMyChats(): { chats: IChatViewListItem[] | undefined, isLoaded: boolean } {

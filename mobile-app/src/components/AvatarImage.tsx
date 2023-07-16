@@ -1,7 +1,7 @@
 import React from 'react';
 import {Avatar, theme} from 'native-base';
 import {ILendrUserPreview} from "../models/ILendrUser";
-import {ColorType, ResponsiveValue} from "native-base/lib/typescript/components/types";
+import {ColorType, ResponsiveValue, ThemeComponentSizeType} from "native-base/lib/typescript/components/types";
 
 
 function numberFromText(text: string): number {
@@ -14,9 +14,10 @@ function numberFromText(text: string): number {
 
 export interface AvatarImageProps {
   user: ILendrUserPreview;
+  size?: ThemeComponentSizeType<"Avatar">
 }
 
-const AvatarImage: React.FC<AvatarImageProps> = ({user}) => {
+const AvatarImage: React.FC<AvatarImageProps> = ({user, size}) => {
 
   const colors: ResponsiveValue<ColorType>[] = [
     theme.colors.lightBlue[400],
@@ -47,7 +48,7 @@ const AvatarImage: React.FC<AvatarImageProps> = ({user}) => {
 
   return (
       <>
-        {image.uri ? <Avatar source={image}/> : <Avatar bgColor={color}>{initials}</Avatar>}
+        {image.uri ? <Avatar size={size} source={image}/> : <Avatar size={size} bgColor={color}>{initials}</Avatar>}
       </>
   );
 };

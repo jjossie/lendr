@@ -38,8 +38,9 @@ export const BorrowSearch: React.FC<NativeStackScreenProps<any>> = ({navigation}
   console.log("❇️Algolia Search Client being made");
 
   const overrideSearch = useCallback((requests: readonly MultipleQueriesQuery[]) => {
-    if (!geopoint)
+    if (!geopoint) {
       return searchClient.search([]);
+    }
 
     const requestOptions = {
       aroundLatLng: `${geopoint[0]},${geopoint[1]}`,

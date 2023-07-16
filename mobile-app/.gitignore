@@ -17,3 +17,8 @@ web-build/
 .env
 *.env
 **/.env
+
+# Picture stuff
+*.xcf
+assets/lendr-logo-v1.png
+assets/lendr-logo-v2.png
