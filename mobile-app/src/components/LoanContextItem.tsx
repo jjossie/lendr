@@ -78,13 +78,16 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation, verbos
       (loan.status === "returnRequested" && isLender))
     statusMessage = `Waiting for ${relation.otherUser?.firstName ?? relation.otherUser?.displayName} to accept`;
   if (loan.status === "loaned" && loan.loanDate?.seconds) {
-    statusMessage = `Loaned since ${dateFromTimestamp(loan.loanDate)}`;
+    statusMessage = isLender
+        ? `Loaned to ${relation.otherUser?.displayName} on ${dateFromTimestamp(loan.loanDate)}`
+        : `Borrowing since ${dateFromTimestamp(loan.loanDate)}`;
   }
 
   if (loan.status === "returned") {
     statusMessage = `Returned ${loan.returnDate ? dateFromTimestamp(loan.returnDate) : ""}`;
   }
 
+  console.log(`❇️StatusMessage: ${statusMessage}`);
 
   return (
       <Card onPress={() => {
@@ -96,35 +99,37 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation, verbos
           },
         });
       }}>
-        <Row w="100%" h={verbose ? 40 : 32} justifyContent={"space-between"} flexWrap="nowrap">
+        <Row w="100%"
+             h={verbose ? 48 : 32}
+             justifyContent={"space-between"}
+             flexWrap="wrap">
           {loan.tool && <>
-            <Column justifyContent={(statusMessage || action) ? "space-between" : "space-around"} p={4} w="60%"
-                    h="100%">
+            <Column alignItems={"flex-start"} justifyContent={"space-between"} p={4} w="60%" h="100%">
               <Text fontSize="lg">{loan.tool.name} - <Text fontSize={"lg"}
                                                            bold={true}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}
               </Text>
 
               {verbose && <AvailabilityChip showAvailable={false} user={lender}/>}
 
-              <Row alignItems={"center"} flexWrap={"nowrap"} space={2}>
-                {action && <Button
-                        isLoading={isLoading}
-                        variant={action?.variant ?? "ghost"}
-                        onPress={async (e) => {
-                          setIsLoading(true);
-                          try {
-                            await action?.callback(relation.id!, loan.id!);
-                          } catch (e) {
-                            // Set Error
-                            console.error(`❇️Something went wrong with the ${action?.name} Action: \n`, e);
-                          }
-                          setIsLoading(false);
-                        }}>{action?.name}</Button>
-                }
+              <Row alignItems={"center"} flexWrap={"wrap"}>
                 {
-                  statusMessage && <Text color={theme.colors.text["400"]}>{statusMessage}</Text>
+                    statusMessage && <Text color={theme.colors.text["400"]}>{statusMessage}</Text>
                 }
-                {(canCancel) && <Button variant={"ghost"}>Cancel</Button>}
+                {action && <Button
+                  isLoading={isLoading}
+                  variant={action?.variant ?? "ghost"}
+                  onPress={async (e) => {
+                    setIsLoading(true);
+                    try {
+                      await action?.callback(relation.id!, loan.id!);
+                    } catch (e) {
+                      // Set Error
+                      console.error(`❇️Something went wrong with the ${action?.name} Action: \n`, e);
+                    }
+                    setIsLoading(false);
+                  }}>{action?.name}</Button>
+                }
+                {(canCancel) && <Button p={0} variant={"ghost"}>Cancel</Button>}
               </Row>
             </Column>
             <Image source={{
