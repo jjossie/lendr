@@ -11,8 +11,9 @@ import AuthStack from "./src/components/navigation/AuthStack";
 import {useAuthentication} from "./src/utils/hooks/useAuthentication";
 import {NavigationContainer} from "@react-navigation/native";
 import MainTabNavigator from "./src/components/navigation/MainTabNavigator";
-
 import "./src/config/algolia";
+import "./src/config/googlesignin";
+
 
 // For now will disable on-screen warning with:
 LogBox.ignoreLogs([
