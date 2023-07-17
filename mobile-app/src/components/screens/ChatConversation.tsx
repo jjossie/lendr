@@ -4,16 +4,17 @@ import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {useChatMessages} from "../../utils/hooks/useChatMessages";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
 import ChatMessage from "../ChatMessage";
-import {getOtherUserInRelation, sendChatMessage} from "../../controllers/Relation";
+import {getOtherUserInRelation, sendChatMessage} from "../../controllers/relation";
 import {LendrBaseError} from "../../utils/errors";
 import {Platform, ScrollView} from "react-native";
+import LoanContext from "../LoanContext";
 
 
 const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
 
   // Content State
   const [messageText, setMessageText] = useState<string>("");
-  const {messages, relation} = useChatMessages(route.params?.relationId);
+  const {messages, relation, loans} = useChatMessages(route.params?.relationId);
   const {user} = useAuthentication();
 
   // UI State
@@ -68,7 +69,7 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
             alignContent={'flex-end'}
             style={{flex: 1}}
         >
-
+          <LoanContext relation={relation} loans={loans}/>
           <ScrollView
               ref={(ref) => {
                 scrollViewRef.current = ref;

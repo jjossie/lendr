@@ -1,7 +1,7 @@
 import {ILocation} from "./Location";
-import {ILendrUser} from "./ILendrUser";
 import {Geopoint} from "geofire-common";
 import {Timestamp} from "firebase/firestore";
+import {ILendrUserPreview} from "./ILendrUser";
 
 export interface ITool {
 
@@ -12,9 +12,10 @@ export interface ITool {
   imageUrls: string[];
   lenderUid: string;
   holderUid: string;
-  lender?: ILendrUser, // Hydrated after retrieving from firestore
-  holder?: ILendrUser, // Must be hydrated... after retrieving from firestore?
+  lender?: ILendrUserPreview, // Hydrated by validateTool
+  holder?: ILendrUserPreview, // Hydrated by validateTool
   createdAt: Timestamp;
+  /** @deprecated */
   deletedAt?: any; // Only for firestore use
   modifiedAt: Timestamp;
   rate: {
@@ -48,6 +49,17 @@ export interface IToolForm {
   preferences: ExchangePreferences;
   geopoint?: Geopoint;
   visibility: ToolVisibility;
+}
+
+/**
+ * Should only be used by Firestore seed script
+ */
+export interface IToolAdminForm extends IToolForm {
+  lenderUid?: string;
+  holderUid?: string;
+  createdAt?: Timestamp;
+  modifiedAt?: Timestamp;
+  location?: ILocation;
 }
 
 export type ToolVisibility = "draft" | "published";

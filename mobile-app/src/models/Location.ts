@@ -14,6 +14,84 @@ export const SANTA_ANA: Geopoint = [34.020833, -118.479167];
 export const IDAHO_LOCATIONS = [REXBURG, IDAHOFALLS, POCATELLO, DRIGGS];
 export const CALIFORNIA_LOCATIONS = [SANJOSE, SANTA_CLARA, SANTA_ANA];
 
+const stateAbbreviations: any = {
+  "Alabama": "AL",
+  "Alaska": "AK",
+  "Arizona": "AZ",
+  "Arkansas": "AR",
+  "California": "CA",
+  "Colorado": "CO",
+  "Connecticut": "CT",
+  "Delaware": "DE",
+  "Florida": "FL",
+  "Georgia": "GA",
+  "Hawaii": "HI",
+  "Idaho": "ID",
+  "Illinois": "IL",
+  "Indiana": "IN",
+  "Iowa": "IA",
+  "Kansas": "KS",
+  "Kentucky": "KY",
+  "Louisiana": "LA",
+  "Maine": "ME",
+  "Maryland": "MD",
+  "Massachusetts": "MA",
+  "Michigan": "MI",
+  "Minnesota": "MN",
+  "Mississippi": "MS",
+  "Missouri": "MO",
+  "Montana": "MT",
+  "Nebraska": "NE",
+  "Nevada": "NV",
+  "New Hampshire": "NH",
+  "New Jersey": "NJ",
+  "New Mexico": "NM",
+  "New York": "NY",
+  "North Carolina": "NC",
+  "North Dakota": "ND",
+  "Ohio": "OH",
+  "Oklahoma": "OK",
+  "Oregon": "OR",
+  "Pennsylvania": "PA",
+  "Rhode Island": "RI",
+  "South Carolina": "SC",
+  "South Dakota": "SD",
+  "Tennessee": "TN",
+  "Texas": "TX",
+  "Utah": "UT",
+  "Vermont": "VT",
+  "Virginia": "VA",
+  "Washington": "WA",
+  "West Virginia": "WV",
+  "Wisconsin": "WI",
+  "Wyoming": "WY",
+  "District of Columbia": "DC",
+  "American Samoa": "AS",
+  "Guam": "GU",
+  "Northern Mariana Islands": "MP",
+  "Puerto Rico": "PR",
+  "United States Minor Outlying Islands": "UM",
+  "U.S. Virgin Islands": "VI",
+  "Armed Forces Europe": "AE",
+  "Armed Forces Pacific": "AP",
+  "Armed Forces the Americas": "AA",
+  "Alberta": "AB",
+  "British Columbia": "BC",
+  "Manitoba": "MB",
+  "New Brunswick": "NB",
+  "Newfoundland and Labrador": "NL",
+  "Northwest Territories": "NT",
+  "Nova Scotia": "NS",
+  "Nunavut": "NU",
+  "Ontario": "ON",
+  "Prince Edward Island": "PE",
+  "Quebec": "QC",
+  "Saskatchewan": "SK",
+  "Yukon": "YT",
+  "Newfoundland": "NF",
+}
+
+
 export interface ILocation {
   latitude: number;
   longitude: number;
@@ -67,7 +145,9 @@ async function reverseGeocode(lat: number, lon: number): Promise<{
     "postcode": string,
     "road": string,
     "state": string,
-    "town": string,
+    "town"?: string,
+    "city"?: string,
+    "neighbourhood"?: string,
   },
   "boundingbox": [string, string, string, string],
   "display_name": string,
@@ -86,7 +166,6 @@ async function reverseGeocode(lat: number, lon: number): Promise<{
   const response = await fetch(url);
   return response.json();
 }
-
 
 async function geocode(location: ILocationApi)  {
   let url = "https://geocode.maps.co/search?";
@@ -115,7 +194,7 @@ export async function getGeopointFromCityName(city: string, state?: string): Pro
   if (state)
     options.state = state;
   const response = await geocode(options);
-  console.log("📍geocoding response: ", response);
+  // console.log("📍geocoding response: ", JSON.stringify(response));
   return [response.lat, response.lon];
 }
 
@@ -127,9 +206,29 @@ export async function getGeopointFromCityName(city: string, state?: string): Pro
 export async function getCityNameFromGeopoint(geopoint: Geopoint): Promise<string> {
   // TODO: Cache this kind of thing. Might be a good way to reduce requests
   const response = await reverseGeocode(geopoint[0], geopoint[1]);
-  console.log("📍reverse geocoding response: ", response);
-  const {town, state} = response.address;
-  return (town && state) ? `${town}, ${state}` : town || state || "Unknown";
+  // console.log("📍reverse geocoding response: ", JSON.stringify(response, null, 2));
+  const {neighbourhood, city, town, county, state, country} = response.address;
+
+  const specificity = [neighbourhood, town, city, getStateAbbreviation(state), county, country]
+      .filter(element => element)
+      .slice(0, 2);
+
+  let cityString = "";
+  for (let specificityElement of specificity) {
+    if (specificityElement) {
+      cityString += specificityElement;
+      cityString += ", ";
+    }
+  }
+
+  if (cityString)
+    return cityString.slice(0, -2);
+
+  return "Unknown";
+}
+
+export function getStateAbbreviation(state: string) {
+  return stateAbbreviations[state] || state;
 }
 
 /**

@@ -3,6 +3,11 @@ import {ILendrUser} from "./ILendrUser";
 import {Geopoint} from "geofire-common";
 import {Timestamp} from "firebase/firestore";
 
+type Rate = {
+  price: number;
+  timeUnit: TimeUnit
+};
+
 export interface ITool {
 
   id?: string; // Added after retrieving from firestore
@@ -15,12 +20,9 @@ export interface ITool {
   lender?: ILendrUser, // Hydrated after retrieving from firestore
   holder?: ILendrUser, // Must be hydrated... after retrieving from firestore?
   createdAt: Timestamp;
-  deletedAt?: any; // Only for firestore use
+  deletedAt?: any; // Only for firestore use, deprecated
   modifiedAt: Timestamp;
-  rate: {
-    price: number;
-    timeUnit: TimeUnit
-  },
+  rate: Rate,
   preferences: {
     delivery: boolean;
     localPickup: boolean;
@@ -28,6 +30,13 @@ export interface ITool {
   }
   location: ILocation;
   visibility: ToolVisibility;
+}
+
+export interface IToolPreview {
+  id: string;
+  name: string;
+  imageUrl: string;
+  rate: Rate;
 }
 
 /**
@@ -41,10 +50,7 @@ export interface IToolForm {
   brand?: string;
   description: string;
   imageUrls: string[];
-  rate: {
-    price: number;
-    timeUnit: TimeUnit;
-  },
+  rate: Rate,
   preferences: ExchangePreferences;
   geopoint?: Geopoint;
   visibility: ToolVisibility;

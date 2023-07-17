@@ -1,5 +1,6 @@
-import {Timestamp} from "firebase/firestore";
+import {Timestamp} from "firebase-admin/firestore";
 import {ILendrUser} from "./ILendrUser";
+import {ITool} from "./Tool";
 
 export interface IRelation {
   id?: string // Added after retrieving from firestore
@@ -18,16 +19,20 @@ export interface IChatViewListItem {
   otherUser: ILendrUser;
 }
 
+export type LoanStatus = "inquired" | "loanRequested" | "loaned" | "returnRequested" | "returned" | "canceled";
+
 /**
  * For now, this is using references instead of embedding documents. Should
  * probably change that in the future.
  */
 export interface ILoan {
+  id?: string;
   toolId: string;
+  tool?: ITool;
   inquiryDate?: Timestamp;
   loanDate?: Timestamp;
   returnDate?: Timestamp;
-  returnStatus?: boolean;
+  status: LoanStatus;
   lenderUid: string;
   borrowerUid: string;
 }

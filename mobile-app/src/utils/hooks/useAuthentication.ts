@@ -17,9 +17,10 @@ const auth = getAuth();
 export function useAuthentication() {
   const [user, setUser] = useState<ILendrUser | undefined>(undefined);
   const [authUser, setAuthUser] = useState<User>();
+  const [unsub, setUnsub] = useState<(() => void) | undefined >(undefined);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, (foundUser) => {
+    const unsubscribeFromAuthStatusChanged = onAuthStateChanged(auth, (foundUser) => {
       if (foundUser) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/firebase.User
@@ -34,15 +35,16 @@ export function useAuthentication() {
         // User is signed out
         signOut(auth)
             .then(() => setAuthUser(undefined))
-            .catch(() => {
-              throw new AuthError("Somehow we failed to sign out 🤨")
-            });
+            .catch(() => {throw new AuthError("Somehow we failed to sign out 🤨")});
       }
     });
+    // setUnsub(unsubscribeFromAuthStatusChanged); // Apparently this prevents being able to log in at all 🫢
+    return () => {unsubscribeFromAuthStatusChanged();};
   }, []);
 
   return {
     authUser,
-    user
+    user,
+    // unsub
   };
 }

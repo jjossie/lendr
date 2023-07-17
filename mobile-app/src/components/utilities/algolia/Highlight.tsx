@@ -6,6 +6,7 @@ import React, {Fragment} from 'react';
 import {StyleSheet, Text} from 'react-native';
 import {Hit as AlgoliaHit} from '@algolia/client-search';
 import {getHighlightedParts, getPropertyByPath} from 'instantsearch.js/es/lib/utils';
+import {theme} from "native-base";
 
 type HighlightPartProps = {
   children: React.ReactNode;
@@ -71,8 +72,9 @@ export function Highlight<THit extends AlgoliaHit<Record<string, unknown>>>({
 const styles = StyleSheet.create({
   highlighted: {
     fontWeight: 'bold',
-    backgroundColor: '#f5df4d',
+    backgroundColor: theme.colors.orange[300],
     color: '#6f6106',
+    borderRadius: 2,
   },
   nonHighlighted: {
     fontWeight: 'normal',

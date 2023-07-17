@@ -1,16 +1,19 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Column, Heading, Image, ScrollView, Text} from "native-base";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
-import {getToolById} from "../../controllers/Tool";
+import {getToolById} from "../../controllers/tool";
 import {ITool} from "../../models/Tool";
 import LenderProfilePreview from "../LenderProfilePreview";
-import {createRelation, sendChatMessage} from "../../controllers/Relation";
+import {createRelation} from "../../controllers/relation";
+import {useAuthentication} from "../../utils/hooks/useAuthentication";
 
 
 const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
   // State
   const [toolData, setToolData] = useState<ITool | undefined>();
-  console.debug(`ToolDetail rendering with Tool: ${toolData?.name}`);
+  const [isLoading, setIsLoading] = useState(false);
+  const {authUser} = useAuthentication();
+  console.log(`❇️ToolDetail rendering with Tool: ${toolData?.name}`);
 
   // Side Effect
   useEffect(() => {
@@ -19,7 +22,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
           setToolData(data!);
         })
         .catch((e) => {
-          console.log("Error in retrieving ToolData 👹");
+          console.log("❇️Error in retrieving ToolData 👹");
           console.log(e.message);
           navigation.goBack();
         });
@@ -29,10 +32,17 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
   // Callbacks
   const handleSendMessage = async () => {
     try {
-      await createRelation(toolData!.lenderUid, toolData!.id!);
-      await sendChatMessage(toolData!.lenderUid, "Hey, I'm interested in this tool!");
+      setIsLoading(true);
+      const relationId = await createRelation(toolData!.lenderUid, toolData!.id!);
+      console.log("❇️Created new relation: ", relationId);
+      // await sendChatMessage(toolData!.lenderUid, "Hey, I'm interested in this tool!");
+      setIsLoading(false);
+      navigation.getParent()!.navigate("Chat", {
+        screen: "ChatConversation",
+        params: {relationId, draftMessage: `Hey, I'm interested in this ${toolData?.name ?? "tool"}!`},
+      });
     } catch (e) {
-      console.log("Failed to create relation", e);
+      console.log("❇️Failed to create relation", e);
     }
   };
 
@@ -41,6 +51,9 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
   const imageUrl = toolData?.imageUrls && toolData.imageUrls.length > 0
       ? toolData.imageUrls[0]
       : `https://source.unsplash.com/random/?${keywordString},tool`;
+
+  const isOwner = toolData?.lenderUid === authUser?.uid;
+
   return (
       <ScrollView>
         {toolData ?
@@ -60,7 +73,11 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
                 <Heading pt={4} size="sm">Lender</Heading>
                 <LenderProfilePreview user={toolData.lender!}/>
 
-                <Button onPress={handleSendMessage} mt={4}>Message Lender</Button>
+                {!isOwner && <Button onPress={handleSendMessage}
+                                     mt={4}
+                                     isLoading={isLoading}
+                                     isLoadingText={"Loading"}
+                                     isDisabled={isLoading}>Message Lender</Button>}
 
                 <Heading pt={4} size="sm">Details</Heading>
                 <Text>

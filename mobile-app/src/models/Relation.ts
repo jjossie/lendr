@@ -1,5 +1,6 @@
 import {Timestamp} from "firebase/firestore";
 import {ILendrUser} from "./ILendrUser";
+import {IToolPreview} from "./Tool";
 
 export interface IRelation {
   id?: string // Added after retrieving from firestore
@@ -10,6 +11,12 @@ export interface IRelation {
   // Need to figure out how to include subcollection data. Or don't do it at all?
 }
 
+export interface IRelationHydrated extends IRelation {
+  otherUser: ILendrUser;
+  lastMessage: IChatMessage;
+  // loans: ILoan[];
+}
+
 export interface IChatViewListItem {
   id: string // Added after retrieving from firestore
   users?: ILendrUser[];
@@ -18,16 +25,15 @@ export interface IChatViewListItem {
   otherUser: ILendrUser;
 }
 
-/**
- * For now, this is using references instead of embedding documents. Should
- * probably change that in the future.
- */
+
 export interface ILoan {
+  id?: string;
   toolId: string;
+  tool?: IToolPreview;
   inquiryDate?: Timestamp;
   loanDate?: Timestamp;
   returnDate?: Timestamp;
-  returnStatus?: boolean;
+  status: "inquired" | "loanRequested" | "loaned" | "returnRequested" | "returned" | "canceled";
   lenderUid: string;
   borrowerUid: string;
 }

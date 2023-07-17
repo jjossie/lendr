@@ -17,7 +17,7 @@ export function Filters({
                           onToggleModal,
                           onChange,
                         }: FiltersProps) {
-  const { items, refine } = useRefinementList({ attribute: 'brand' });
+  const { items, refine } = useRefinementList({ attribute: 'brand'});
   const { canRefine: canClear, refine: clear } = useClearRefinements();
   const { items: currentRefinements } = useCurrentRefinements();
   const totalRefinements = currentRefinements.reduce(
@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
   },
   filtersButton: {
+    flexGrow: 1,
     paddingVertical: 18,
     flexDirection: 'row',
     justifyContent: 'center',

@@ -1,4 +1,11 @@
-import {createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut, User} from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+  User,
+} from "firebase/auth";
 import {arrayRemove, arrayUnion, doc, getDoc, setDoc, Timestamp, updateDoc} from "firebase/firestore";
 import {db} from "../config/firebase";
 import {ILendrUser} from "../models/ILendrUser";
@@ -61,6 +68,13 @@ export async function signOutUser() {
   });
 }
 
+/**
+ * Right now this gets called every time we log in.
+ * @param {User} authUser
+ * @param {string} firstName
+ * @param {string} lastName
+ * @returns {Promise<DocumentSnapshot<DocumentData> | void>}
+ */
 async function createUserInDB(authUser: User, firstName: string = "Joe", lastName: string = "Momma") {
 
   // Use the Firebase Auth UID as the document ID in Firestore
@@ -68,6 +82,13 @@ async function createUserInDB(authUser: User, firstName: string = "Joe", lastNam
   const token = await registerForPushNotificationsAsync();
   let userDocSnap = await getDoc(userDocRef);
 
+  // Update the Firebase Auth Profile
+  const displayName = `${firstName} ${lastName}`;
+  await updateProfile(authUser, {
+    displayName
+  });
+
+  // Create the user if it doesn't exist; otherwise, just update the Expo push tokens // TODO simplify that logic
   if (!userDocSnap.exists()) {
     console.log(`Creating user ${authUser.email} with uid ${authUser.uid} in firestore`);
     let lendrUser: ILendrUser = {
@@ -76,16 +97,19 @@ async function createUserInDB(authUser: User, firstName: string = "Joe", lastNam
       providerData: {
         ...authUser.providerData[0],
       },
-      firstName,
+      firstName, // TODO authProfileRefactoring
       lastName,
+      displayName:  displayName,
       expoPushTokens: [],
       createdAt: Timestamp.now()
     }
     if (token)
       lendrUser.expoPushTokens.push(token);
+
     // Add the user to the users collection (this will automatically create the user document in Firestore with the ID from the UID above)
     return setDoc(userDocRef, lendrUser);
   } else {
+
     // Add the token to the user's list of tokens (arrayUnion will do a set-style union, ignoring duplicates)
     console.log(`Found user ${authUser.email} with uid: ${authUser.uid}`);
     if (token)
