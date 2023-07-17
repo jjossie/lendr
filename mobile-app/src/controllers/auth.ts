@@ -1,11 +1,4 @@
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-  signInWithEmailAndPassword,
-  signOut,
-  updateProfile,
-  User,
-} from "firebase/auth";
+import {createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut, User} from "firebase/auth";
 import {arrayRemove, arrayUnion, doc, getDoc, setDoc, Timestamp, updateDoc} from "firebase/firestore";
 import {db} from "../config/firebase";
 import {ILendrUser} from "../models/ILendrUser";
@@ -50,7 +43,6 @@ export function logInUser(email: string, password: string) {
         console.error(error);
       });
 }
-
 export async function signOutUser() {
   const auth = getAuth();
   if (!auth.currentUser)
@@ -60,8 +52,13 @@ export async function signOutUser() {
   // to prevent them from getting notifications while signed out
   const lendrUserDocRef = doc(db, "users", auth.currentUser.uid);
   const token = await registerForPushNotificationsAsync();
-  if (token)
-    await updateDoc(lendrUserDocRef, {expoPushTokens: arrayRemove(token)});
+
+  try {
+    if (token)
+      await updateDoc(lendrUserDocRef, {expoPushTokens: arrayRemove(token)});
+  } catch (e) {
+    console.log("🧍Could not update lendrUser to remove expoPushToken");
+  }
 
   signOut(auth).then(() => {
     console.log("Signed Out 🫡");
@@ -69,24 +66,26 @@ export async function signOutUser() {
 }
 
 /**
- * Right now this gets called every time we log in.
+ * Right now this gets called every time we log in USING EMAIL AND PASSWORD. This doesn't get
+ * called when we use Google Sign In.
  * @param {User} authUser
  * @param {string} firstName
  * @param {string} lastName
  * @returns {Promise<DocumentSnapshot<DocumentData> | void>}
  */
-async function createUserInDB(authUser: User, firstName: string = "Joe", lastName: string = "Momma") {
+async function createUserInDB(authUser: User, firstName?: string, lastName?: string) {
 
   // Use the Firebase Auth UID as the document ID in Firestore
   const userDocRef = doc(db, "users", authUser.uid);
   const token = await registerForPushNotificationsAsync();
   let userDocSnap = await getDoc(userDocRef);
 
+  const displayName = authUser.displayName ?? `${firstName} ${lastName}`;
+
   // Update the Firebase Auth Profile
-  const displayName = `${firstName} ${lastName}`;
-  await updateProfile(authUser, {
-    displayName,
-  });
+  // await updateProfile(authUser, {
+  //   displayName,
+  // });
 
   // Create the user if it doesn't exist; otherwise, just update the Expo push tokens // TODO simplify that logic
   if (!userDocSnap.exists()) {

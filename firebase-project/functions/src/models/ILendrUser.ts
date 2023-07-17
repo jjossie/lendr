@@ -9,7 +9,9 @@ export interface ILendrUser {
   relations: string[],
   expoPushTokens: string[]
   uid: string,
-  providerData?: any
+  providerData?: any,
+  photoURL?: string,
+  email?: string,
 }
 
 export interface ILendrUserPreview {
