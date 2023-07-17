@@ -23,6 +23,7 @@ export async function createUser(userRecord: UserRecord) {
     lastName: userRecord.displayName.split(" ")[1],
     uid: userRecord.uid,
     email: userRecord.email,
+    photoURL: userRecord.photoURL,
     displayName: userRecord.displayName,
     relations: [],
     expoPushTokens: [],
