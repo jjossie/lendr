@@ -23,17 +23,33 @@ export default {
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.joeljossie.lendr"
+      "bundleIdentifier": "com.joeljossie.lendr",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/lendr-logo-adaptive-v2-2.png",
         "backgroundColor": "#2e5339"
-      }
+      },
+      "googleServicesFile": "./GoogleService-Info.plist", // TODO fix,
+      "package": "com.joeljossie.lendr"
     },
     "web": {
       "favicon": "./assets/lendr-logo-favicon-v2-2.png"
     },
+    "plugins": [
+      "@react-native-firebase/app",
+      "@react-native-google-signin/google-signin",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ],
+
     "extra": {
       firebaseApiKey: process.env.FIREBASE_API_KEY,
       firebaseAuthDomain: process.env.FIREBASE_AUTH_DOMAIN,

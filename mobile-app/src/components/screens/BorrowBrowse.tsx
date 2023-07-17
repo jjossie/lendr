@@ -24,9 +24,9 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
 
   // Side Effects
   useEffect(() => {
-    // console.log("BorrowBrowse - useEffect - geopoint: ", geopoint);
+    // console.log("❇️BorrowBrowse - useEffect - geopoint: ", geopoint);
     (async () => {
-      // console.log("BorrowBrowse - useEffect - (async) geopoint: ", geopoint);
+      // console.log("❇️BorrowBrowse - useEffect - (async) geopoint: ", geopoint);
       if (geopoint &&
           geopoint.length === 2 &&
           geopoint[0] !== undefined &&
@@ -35,7 +35,7 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
         const tools = await getToolsWithinRadius(searchRadius, geopoint);
         setToolsList(tools);
       }else{
-        console.log("Cannot fetch tools - Location is uninitialized");
+        console.log("❇️Cannot fetch tools - Location is uninitialized");
         setToolsList([]);
       }
     })();

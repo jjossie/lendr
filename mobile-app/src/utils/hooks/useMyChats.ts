@@ -31,8 +31,7 @@ export function useMyChats(): { chats: IChatViewListItem[] | undefined, isLoaded
     if (!relationIds) return;
     const relationsQuery = query(collection(db, "relations"), where(documentId(), "in", relationIds));
 
-    const unsub = onSnapshot(relationsQuery, onHandleRelationsQuerySnapshot);
-
+    return onSnapshot(relationsQuery, onHandleRelationsQuerySnapshot);
   }, [authUser, user]);
 
   return {chats, isLoaded};

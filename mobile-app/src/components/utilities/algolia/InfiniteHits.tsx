@@ -3,7 +3,7 @@
 // https://github.com/algolia/doc-code-samples/tree/master/react-instantsearch-hooks-native/getting-started/src
 
 import React, {forwardRef} from 'react';
-import {FlatList, StyleSheet, View} from 'react-native';
+import {FlatList, Keyboard, StyleSheet, View} from 'react-native';
 import {Hit as AlgoliaHit} from '@algolia/client-search';
 import {useInfiniteHits, UseInfiniteHitsProps} from 'react-instantsearch-hooks';
 import {Hit} from "./Hit";
@@ -25,6 +25,8 @@ export const InfiniteHits = forwardRef(
               ref={ref}
               numColumns={2}
               data={hits as unknown as THit[]}
+              onScroll={() => Keyboard.dismiss()}
+              scrollEventThrottle={2}
               keyExtractor={(item) => item.objectID}
               // ItemSeparatorComponent={() => <View style={styles.separator}/>}
               onEndReached={() => {

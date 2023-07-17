@@ -47,7 +47,7 @@ const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
           <Column space="lg">
             <Text p={4} bold fontSize="4xl">Account</Text>
 
-            {user && <LenderProfilePreview user={user!}/>}
+            {user && <LenderProfilePreview user={user}/>}
             <Text fontSize="md">{authUser?.email}</Text>
 
             <Text>City: {city}</Text>

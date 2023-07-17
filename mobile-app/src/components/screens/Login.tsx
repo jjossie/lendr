@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Button, Center, Column, FormControl, Input, ScrollView} from 'native-base';
 import {logInUser} from "../../controllers/auth";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
+import {onGoogleButtonPress} from "../../config/googlesignin";
 
 const Login: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
 
@@ -48,6 +49,9 @@ const Login: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
 
             <Button size="lg" onPress={handleLogIn} variant="solid">Sign In</Button>
             <Button size="lg" onPress={handleRegister} variant="outline">Register</Button>
+            <Button
+                onPress={() => onGoogleButtonPress().then(() => console.log('Signed in with Google!'))}
+            >Google Sign-In</Button>
           </Column>
         </Center>
       </ScrollView>
