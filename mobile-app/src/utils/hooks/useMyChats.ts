@@ -28,7 +28,7 @@ export function useMyChats(): { chats: IChatViewListItem[] | undefined, isLoaded
     // but then leave the query here? We got firebase controller logic in react AND react logic in the controller.
     const relationIds = user?.relations?.map(id => getRelationId(authUser.uid, id));
 
-    if (!relationIds) return;
+    if (!relationIds || relationIds.length === 0) return;
     const relationsQuery = query(collection(db, "relations"), where(documentId(), "in", relationIds));
 
     return onSnapshot(relationsQuery, onHandleRelationsQuerySnapshot);
