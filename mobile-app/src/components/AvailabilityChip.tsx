@@ -8,9 +8,10 @@ import {getRelationId} from "../controllers/relation";
 
 export interface AvailabilityChipProps {
   user?: ILendrUserPreview;
+  showAvailable?: boolean;
 }
 
-const AvailabilityChip: React.FC<AvailabilityChipProps> = ({user}) => {
+const AvailabilityChip: React.FC<AvailabilityChipProps> = ({user, showAvailable = true}) => {
   const navigation = useNavigation();
   const {authUser} = useAuthentication();
 
@@ -36,10 +37,10 @@ const AvailabilityChip: React.FC<AvailabilityChipProps> = ({user}) => {
              borderWidth={user ? 0.5 : 0}>
           {user
               ? <AvatarImage size={"xs"} user={user}/>
-              : <Circle size={2} bgColor={theme.colors.success[500]}/>}
+              : showAvailable ? <Circle size={2} bgColor={theme.colors.success[500]}/> : null}
           {user
               ? <Text>{user.displayName}</Text>
-              : <Text>Available</Text>}
+              : showAvailable ? <Text>Available</Text> : null}
         </Row>
       </Pressable>
   );

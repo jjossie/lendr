@@ -22,11 +22,6 @@ export function useMyTools(): { lendingToolsList: ITool[], borrowingLoansList: I
         where("lenderUid", "==", authUser.uid),
     );
 
-    // const borrowingQuery = query(collection(db, "tools"),
-    //     where("lenderUid", "!=", authUser.uid),
-    //     where("holderUid", "==", authUser.uid),
-    // ); // Do we want to add a query for tools we're interested in but not holding just yet?
-
     const lendingUnsubscribe = onSnapshot(lendingQuery, (snapshot) => {
       const docDataList: ITool[] = [];
       snapshot.forEach(document => {
@@ -54,7 +49,7 @@ export function useMyTools(): { lendingToolsList: ITool[], borrowingLoansList: I
         });
         setBorrowingLoansList(docDataList);
       });
-    }
+    } else { console.log("🛠️No relations");}
 
     return () => {
       lendingUnsubscribe();

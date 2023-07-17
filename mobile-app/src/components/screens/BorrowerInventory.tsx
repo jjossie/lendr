@@ -23,7 +23,7 @@ const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
 
   const getRelationFromLoan = async (loan: ILoan) => {
     const relationID = getRelationId(loan.borrowerUid, loan.lenderUid);
-    console.log(`❇️getting relation ${relationID}`);
+    // console.log(`❇️getting relation ${relationID}`);
     const relation = await getRelationById(relationID);
     console.log(`❇️relation ${relationID} : `, JSON.stringify(relation, null, 2));
     return {relation, loan}
@@ -31,13 +31,13 @@ const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
 
 
   useEffect(() => {
-    console.log("❇️BorrowerInventory useEffect()");
+    // console.log("❇️< BorrowerInventory > useEffect()");
     let promises: Promise<{loan: ILoan, relation: IRelation }>[] = [];
 
     borrowingLoansList.forEach(loan => promises.push(getRelationFromLoan(loan)));
 
     Promise.all(promises).then((results) => {
-      console.log("❇️BorrowerInventory loansAndRelations results:", JSON.stringify(results, null, 2));
+      // console.log("❇️< BorrowerInventory > loansAndRelations results:", JSON.stringify(results, null, 2));
       setLoansAndRelations(results);
     });
   }, [borrowingLoansList]);
@@ -51,7 +51,7 @@ const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
           {(loansAndRelations && loansAndRelations.length > 0)
               ?
               loansAndRelations.map( ({loan, relation}) => {
-                return (<LoanContextItem key={loan.id} relation={relation} loan={loan}/>);
+                return (<LoanContextItem verbose key={loan.id} relation={relation} loan={loan}/>);
               })
 
               :
