@@ -8,6 +8,7 @@ export const onUserCreate = functions.auth.user().onCreate(async (user) => {
   // Create a Lendr User if it doesn't already exist
   logger.debug(`🔥Checking for existing Lendr user ${user.uid}`);
   const lendrUser = await getUserFromUid(user.uid);
+  logger.debug("🔥LendrUser object Found: ", lendrUser);
   if (lendrUser) return;
 
   logger.debug(`🔥Creating Lendr User for user ${user.uid}`);

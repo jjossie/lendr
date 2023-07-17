@@ -6,11 +6,11 @@ import UserRecord = auth.UserRecord;
 export async function getUserFromUid(uid: string): Promise<ILendrUser | undefined> {
   const db = getFirestore();
   const docSnap = await db.doc("users/" + uid).get();
+  if (!docSnap.exists) return undefined;
   return {
     uid: docSnap.id,
     ...docSnap.data(),
   } as ILendrUser;
-
 }
 
 export async function createUser(userRecord: UserRecord) {
