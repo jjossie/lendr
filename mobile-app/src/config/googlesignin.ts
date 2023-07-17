@@ -1,5 +1,4 @@
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-// import auth from "@react-native-firebase/auth";
 import {getAuth, GoogleAuthProvider, signInWithCredential} from "firebase/auth";
 
 
@@ -17,7 +16,6 @@ export async function onGoogleButtonPress() {
   const googleCredential = GoogleAuthProvider.credential(idToken);
 
   // Sign-in the user with the credential
-  // return auth().signInWithCredential(googleCredential);
   const auth = getAuth();
 
   return signInWithCredential(auth, googleCredential);

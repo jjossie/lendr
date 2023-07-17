@@ -85,7 +85,7 @@ async function createUserInDB(authUser: User, firstName: string = "Joe", lastNam
   // Update the Firebase Auth Profile
   const displayName = `${firstName} ${lastName}`;
   await updateProfile(authUser, {
-    displayName
+    displayName,
   });
 
   // Create the user if it doesn't exist; otherwise, just update the Expo push tokens // TODO simplify that logic
@@ -99,21 +99,23 @@ async function createUserInDB(authUser: User, firstName: string = "Joe", lastNam
       },
       firstName, // TODO authProfileRefactoring
       lastName,
-      displayName:  displayName,
+      displayName: displayName,
       expoPushTokens: [],
-      createdAt: Timestamp.now()
-    }
+      createdAt: Timestamp.now(),
+      photoURL: authUser?.photoURL ?? undefined,
+    };
     if (token)
       lendrUser.expoPushTokens.push(token);
 
-    // Add the user to the users collection (this will automatically create the user document in Firestore with the ID from the UID above)
+    // Add the user to the users collection (this will automatically create the user document in Firestore with the ID
+    // from the UID above)
     return setDoc(userDocRef, lendrUser);
   } else {
 
     // Add the token to the user's list of tokens (arrayUnion will do a set-style union, ignoring duplicates)
     console.log(`Found user ${authUser.email} with uid: ${authUser.uid}`);
     if (token)
-      await updateDoc(userDocRef, {expoPushTokens: arrayUnion(token)});
+      await updateDoc(userDocRef, {expoPushTokens: arrayUnion(token), photoURL: authUser?.photoURL ?? undefined});
     return userDocSnap;
   }
 }
