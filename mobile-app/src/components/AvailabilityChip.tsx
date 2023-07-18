@@ -20,7 +20,7 @@ const AvailabilityChip: React.FC<AvailabilityChipProps> = ({user, showAvailable 
           onPress={() => {
             if (!authUser?.uid || !user?.uid)
               return;
-            navigation.getParent()?.navigate("Chat", {
+            navigation.getParent()?.navigate("Inbox", {
               screen: "ChatConversation",
               params: {
                 relationId: getRelationId(authUser.uid, user.uid),
