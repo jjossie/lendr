@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Box, Button, Column, ScrollView, Text} from 'native-base';
+import {Box, Button, Column, Heading, ScrollView, Text} from 'native-base';
 import {BottomTabScreenProps} from "@react-navigation/bottom-tabs";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
 import {signOutUser} from "../../controllers/auth";
@@ -45,7 +45,7 @@ const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
       <Box>
         <ScrollView p={4}>
           <Column space="lg">
-            <Text p={4} bold fontSize="4xl">Account</Text>
+            <Heading>Account</Heading>
 
             {user &&
               <Column space="lg" alignItems={"center"} justifyContent={"center"} p={4}>

@@ -9,9 +9,10 @@ export type CarouselProps = {
   items: any[],
   variant?: "stats" | "slides",
   itemsPerInterval?: number,
+  bgColor?: any,
 }
 
-export const Carousel: React.FC<CarouselProps> = ({items, variant = "slides", itemsPerInterval = 1}) => {
+export const Carousel: React.FC<CarouselProps> = ({items, variant = "slides", itemsPerInterval = 1, bgColor}) => {
 
   const [interval, setInterval] = React.useState<number | undefined>(1);
   const [intervals, setIntervals] = React.useState(1);
@@ -54,7 +55,7 @@ export const Carousel: React.FC<CarouselProps> = ({items, variant = "slides", it
   }
 
   return (
-      <Box w={"100%"} bgColor={colors.white}>
+      <Box w={"100%"} bgColor={ bgColor ?? colors.white}>
         <ScrollView
             horizontal={true}
             contentContainerStyle={{...styles.scrollView, width: `${100 * intervals}%`}}

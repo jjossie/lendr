@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Column, ScrollView, Text} from 'native-base';
+import {Button, Column, Heading, ScrollView} from 'native-base';
 import LenderInventoryItem from "../LenderInventoryItem";
 import Spacer from "../utilities/Spacer";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
@@ -15,7 +15,7 @@ const LenderInventory: React.FC<NativeStackScreenProps<any>> = ({navigation}) =>
   return (
       <ScrollView>
         <Column p={4}>
-          <Text p={4} bold fontSize="4xl">Lending</Text>
+          <Heading>Lending</Heading>
           {lendingToolsList.map(tool => {
             return <LenderInventoryItem navigation={navigation}
                                         key={tool.id + tool.name}

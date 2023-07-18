@@ -111,6 +111,25 @@ const theme = extendTheme({
         fontWeight: "bold"
       }
     },
+    Heading: {
+      baseStyle: {
+        fontWeight: "bold",
+        fontSize: "4xl",
+        paddingTop: 0,
+        paddingBottom: 4,
+        paddingHorizontal: 4
+      },
+      defaultProps: {
+        fontSize: "4xl",
+
+      }
+    }
+    // Box: {
+    //   baseStyle: {
+    //     // bgColor: "light.100",
+    //   }
+    // }
+
   }
 });
 

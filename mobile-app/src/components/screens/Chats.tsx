@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Text} from 'native-base';
+import {Box, Heading} from 'native-base';
 import {ChatListItem} from "../ChatListItem";
 import {SwipeListView} from "react-native-swipe-list-view";
 import {useMyChats} from "../../utils/hooks/useMyChats";
@@ -143,7 +143,7 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
   };
 
   return <Box p={4} flex="1">
-    <Text p={4} bold fontSize="4xl">Inbox</Text>
+    <Heading>Inbox</Heading>
 
     <SwipeListView data={listData}
                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}

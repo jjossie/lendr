@@ -52,6 +52,11 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
     scrollToBottom();
   }, [scrollViewRef]);
 
+  useEffect(() => {
+    if (relation && user)
+      navigation.setOptions({title: getOtherUserInRelation(relation, user).displayName})
+  }, [relation])
+
   // State Guards
   if (!user || !relation) return null;
 

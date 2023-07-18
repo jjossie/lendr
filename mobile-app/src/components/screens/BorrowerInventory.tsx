@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Column, ScrollView, Text} from 'native-base';
+import {Button, Column, Heading, ScrollView, Text} from 'native-base';
 import Spacer from "../utilities/Spacer";
 import {useNavigation} from "@react-navigation/native";
 import {useMyTools} from "../../utils/hooks/useMyTools";
@@ -55,7 +55,7 @@ const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
   return (
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <Column p={4} flex={1} h={"100%"}>
-          <Text p={4} bold fontSize="4xl">Borrowing</Text>
+          <Heading>Borrowing</Heading>
           {(loansAndRelations && loansAndRelations.length > 0)
               ?
               loansAndRelations

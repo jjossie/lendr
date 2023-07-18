@@ -1,5 +1,5 @@
 import React from 'react';
-import {Box} from 'native-base';
+import {Box, useTheme} from 'native-base';
 import {ILoan, IRelation} from "../models/Relation";
 import LoanContextItem from "./LoanContextItem";
 import Carousel from "./utilities/Carousel";
@@ -11,10 +11,13 @@ export interface LoanContextProps {
 
 const LoanContext: React.FC<LoanContextProps> = ({loans, relation}) => {
   console.log("❇️< LoanContext >", JSON.stringify(loans, null, 2));
+
+  const {colors} = useTheme();
+
   if (!loans) return (<></>);
   return (
       <Box>
-        <Carousel items={loans.map(loan => (
+        <Carousel bgColor={colors.light[100]} items={loans.map(loan => (
             <LoanContextItem key={loan.id} loan={loan} relation={relation} />
         ))}/>
       </Box>
