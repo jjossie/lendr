@@ -32,7 +32,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     flexDirection: 'row',
     paddingHorizontal: 10,
-    paddingTop: 5,
+    // paddingTop: 5,
   },
   bullet: {
     paddingHorizontal: 5,

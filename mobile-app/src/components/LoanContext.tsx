@@ -2,6 +2,7 @@ import React from 'react';
 import {Box} from 'native-base';
 import {ILoan, IRelation} from "../models/Relation";
 import LoanContextItem from "./LoanContextItem";
+import Carousel from "./utilities/Carousel";
 
 export interface LoanContextProps {
   loans: ILoan[];
@@ -13,9 +14,9 @@ const LoanContext: React.FC<LoanContextProps> = ({loans, relation}) => {
   if (!loans) return (<></>);
   return (
       <Box>
-        {loans.map(loan => (
+        <Carousel items={loans.map(loan => (
             <LoanContextItem key={loan.id} loan={loan} relation={relation} />
-        ))}
+        ))}/>
       </Box>
   );
 };

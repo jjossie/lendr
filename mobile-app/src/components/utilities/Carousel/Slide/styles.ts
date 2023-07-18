@@ -2,9 +2,8 @@ import {StyleSheet} from 'react-native';
 
 export const styles = StyleSheet.create({
   slide: {
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-    paddingTop: 30,
+    paddingTop: 10,
+    paddingHorizontal: 10,
     flexBasis: '100%',
     flex: 1,
     maxWidth: '100%',
