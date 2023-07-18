@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Column, ScrollView, Text} from 'native-base';
 import Spacer from "../utilities/Spacer";
 import {useNavigation} from "@react-navigation/native";
@@ -6,6 +6,7 @@ import {useMyTools} from "../../utils/hooks/useMyTools";
 import LoanContextItem from "../LoanContextItem";
 import {getRelationById, getRelationId} from "../../controllers/relation";
 import {ILoan, IRelation} from "../../models/Relation";
+import {RefreshControl} from 'react-native';
 
 export interface BorrowerInventoryProps {
 
@@ -13,23 +14,15 @@ export interface BorrowerInventoryProps {
 
 const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
 
+  // State
   const navigation = useNavigation();
   const {borrowingLoansList, setReload} = useMyTools();
-
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const [loansAndRelations, setLoansAndRelations] = React.useState<{loan: ILoan, relation: IRelation }[]>([]);
 
   // console.log("❇️BorrowingLoansList:", JSON.stringify(borrowingLoansList, null, 2));
 
-
-  const getRelationFromLoan = async (loan: ILoan) => {
-    const relationID = getRelationId(loan.borrowerUid, loan.lenderUid);
-    // console.log(`❇️getting relation ${relationID}`);
-    const relation = await getRelationById(relationID);
-    console.log(`❇️relation ${relationID} : `, JSON.stringify(relation, null, 2));
-    return {relation, loan}
-  };
-
-
+  // Side Effects
   useEffect(() => {
     // console.log("❇️< BorrowerInventory > useEffect()");
     let promises: Promise<{loan: ILoan, relation: IRelation }>[] = [];
@@ -42,10 +35,25 @@ const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
     });
   }, [borrowingLoansList]);
 
+  // Callbacks
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setReload(b => !b);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000)
+  };
 
+  const getRelationFromLoan = async (loan: ILoan) => {
+    const relationID = getRelationId(loan.borrowerUid, loan.lenderUid);
+    // console.log(`❇️getting relation ${relationID}`);
+    const relation = await getRelationById(relationID);
+    console.log(`❇️relation ${relationID} : `, JSON.stringify(relation, null, 2));
+    return {relation, loan}
+  };
 
   return (
-      <ScrollView>
+      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <Column p={4} flex={1} h={"100%"}>
           <Text p={4} bold fontSize="4xl">Borrowing</Text>
           {(loansAndRelations && loansAndRelations.length > 0)

@@ -1,11 +1,11 @@
 import {collection, DocumentData, documentId, onSnapshot, query, QuerySnapshot, where} from "firebase/firestore";
 import {db} from "../../config/firebase";
 import {useAuthentication} from "./useAuthentication";
-import {useEffect, useState} from "react";
+import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {getRelationId, handleRelationsQuerySnapshot} from "../../controllers/relation";
 import {IChatViewListItem} from "../../models/Relation";
 
-export function useMyChats(): { chats: IChatViewListItem[] | undefined, isLoaded: boolean } {
+export function useMyChats(): { chats: IChatViewListItem[] | undefined, isLoaded: boolean, setIsLoaded: Dispatch<SetStateAction<boolean>>} {
   console.log("🛠️useMyChats() - Hook Called");
 
   // State
@@ -16,6 +16,7 @@ export function useMyChats(): { chats: IChatViewListItem[] | undefined, isLoaded
   // Callbacks
 
   const onHandleRelationsQuerySnapshot = (snapshot: QuerySnapshot<DocumentData>) => {
+    console.log("🛠️useMyChats() - handling relationsQuerySnapshot");
     handleRelationsQuerySnapshot(snapshot, authUser!, setChats, setIsLoaded);
   }
 
@@ -34,5 +35,5 @@ export function useMyChats(): { chats: IChatViewListItem[] | undefined, isLoaded
     return onSnapshot(relationsQuery, onHandleRelationsQuerySnapshot);
   }, [authUser, user]);
 
-  return {chats, isLoaded};
+  return {chats, isLoaded, setIsLoaded};
 }

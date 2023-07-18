@@ -24,6 +24,7 @@ import {AuthError, LendrBaseError, NotFoundError, NotImplementedError, ObjectVal
 import {IChatMessage, IChatViewListItem, ILoan, IRelation} from "../models/Relation";
 import {getUserFromAuth, getUserFromUid} from "./auth";
 import {ILendrUser} from "../models/ILendrUser";
+import {Dispatch, SetStateAction} from "react";
 
 // Constants
 const MESSAGE_LOAD_LIMIT = 20;
@@ -182,7 +183,7 @@ export async function sendChatMessage(receiverUid: string,
 export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentData>,
                                              authUser: User,
                                              setChats: ((chats: any) => any),
-                                             setIsLoaded: (isLoaded: boolean) => void): void {
+                                             setIsLoaded: Dispatch<SetStateAction<boolean>>): void {
   console.log("🤝useMyChats() - onSnapshot() called");
 
   if (!authUser) return;
@@ -222,7 +223,7 @@ export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentDat
     setChats((_oldList: any) => {
       return docDataList;
     });
-    setIsLoaded(true);
+    setIsLoaded(b => !b);
   });
 
   // Don't use this yet because it will screw up the loop in the Promise.all() call.

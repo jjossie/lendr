@@ -7,6 +7,7 @@ import {useAuthentication} from "../../utils/hooks/useAuthentication";
 import {ILendrUserPreview} from "../../models/ILendrUser";
 
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
+import {RefreshControl} from "react-native";
 
 export interface ChatsProps {
 
@@ -25,11 +26,13 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
 
   // Custom Hooks
   const {user} = useAuthentication();
-  const {chats, isLoaded} = useMyChats();
+  const {chats, isLoaded, setIsLoaded} = useMyChats();
 
   // State
   const [listData, setListData] = useState<any[] | undefined>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
+  // Side Effects
   useEffect(() => {
     if (user && chats && chats.length !== 0) {
       const data = chats
@@ -48,7 +51,7 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
             const timeStamp = new Date(timeStampSeconds * 1000).toLocaleTimeString();
             const otherUserPreview: ILendrUserPreview = {
               displayName,
-              photoURL: chat.otherUser.providerData?.photoURL ?? "", // TODO update when refactoring user
+              photoURL: chat.otherUser?.photoURL ?? "",
               uid: chat.otherUser.uid
             }
             return {
@@ -68,6 +71,15 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
     }
   }, [chats, isLoaded]);
 
+  // Callbacks
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setIsLoaded(b => !b);
+    // await useMyChats();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000)
+  };
   const closeRow = (rowMap: any[], rowKey: any) => {
     // if (rowMap[rowKey]) {
     //   rowMap[rowKey].closeRow();
@@ -130,6 +142,7 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
     <Text p={4} bold fontSize="4xl">Inbox</Text>
 
     <SwipeListView data={listData}
+                   refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
                    renderItem={ChatListItem}
                    renderHiddenItem={renderHiddenItem}
                    rightOpenValue={-130}
