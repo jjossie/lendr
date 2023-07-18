@@ -68,18 +68,21 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation, verbos
   let statusMessage = "";
   if (loan.status === "inquired" && loan.inquiryDate?.seconds) {
     statusMessage = isLender
-        ? `${relation.otherUser?.displayName} expressed interest on ${dateFromTimestamp(loan.inquiryDate)}`
+        ? `${relation.otherUser?.firstName ?? relation.otherUser?.displayName} expressed interest on ${dateFromTimestamp(loan.inquiryDate)}`
         : `Inquired ${dateFromTimestamp(loan.inquiryDate)}`;
   }
   if (loan.status === "loaned" && isLender && loan.loanDate?.seconds) {
-    statusMessage = `Loaned to ${relation.otherUser?.displayName} on ${dateFromTimestamp(loan.loanDate)}`;
+    statusMessage = `Loaned to ${relation.otherUser?.firstName ?? relation.otherUser?.displayName} on ${dateFromTimestamp(loan.loanDate)}`;
   }
-  if ((loan.status === "loanRequested" && isBorrower) ||
-      (loan.status === "returnRequested" && isLender))
+  if ((loan.status === "loanRequested" && isLender) ||
+      (loan.status === "returnRequested" && isBorrower)){
+
     statusMessage = `Waiting for ${relation.otherUser?.firstName ?? relation.otherUser?.displayName} to accept`;
+    statusMessage += loan.status === "returnRequested" ? " return" : " loan";
+  }
   if (loan.status === "loaned" && loan.loanDate?.seconds) {
     statusMessage = isLender
-        ? `Loaned to ${relation.otherUser?.displayName} on ${dateFromTimestamp(loan.loanDate)}`
+        ? `Loaned to ${relation.otherUser?.firstName ?? relation.otherUser?.displayName} on ${dateFromTimestamp(loan.loanDate)}`
         : `Borrowing since ${dateFromTimestamp(loan.loanDate)}`;
   }
 
