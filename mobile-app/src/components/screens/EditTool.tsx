@@ -278,7 +278,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       throw new LendrBaseError(`Image url was blank: ${imageUrl}`);
     console.log("❇️ImageUrl: " + imageUrl);
 
-    setImageUrls([imageUrl]);
+    setImageUrls(list => [...list, imageUrl]);
     console.log("❇️Downloadable Image URL: " + imageUrl);
   };
 
@@ -294,12 +294,14 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     }
   };
 
+
   return (
       <ScrollView bg={theme.colors.white} onScroll={() => Keyboard.dismiss()} scrollEventThrottle={2} paddingTop={10}>
         <ToolImagePicker
             onSelectImage={handleSelectImage}
             onRemoveImage={handleDeleteImage}
-            existingImageUrl={(imageUrls && imageUrls.length > 0) ? imageUrls[0] : undefined}
+            // existingImageUrl={(imageUrls && imageUrls.length > 0) ? imageUrls[0] : undefined}
+            existingImageUrls={imageUrls}
         />
 
         <Column alignItems="center" space={4} mx={3} my={4} paddingY={12}>

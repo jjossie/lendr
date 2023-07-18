@@ -70,7 +70,6 @@ const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
                 <Button variant={"solid"} size={"lg"} onPress={() => {
                   navigation.getParent()!.navigate("SearchBrowse");
                 }}>Browse Tools</Button>
-                <Button variant={"outline"} size={"lg"} onPress={() => { setReload((r) => !r); }}>Refresh</Button>
               </Column>}
         </Column>
         <Spacer/>

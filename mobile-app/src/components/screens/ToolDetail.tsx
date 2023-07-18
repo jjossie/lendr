@@ -6,6 +6,7 @@ import {ITool} from "../../models/Tool";
 import LenderProfilePreview from "../LenderProfilePreview";
 import {createRelation} from "../../controllers/relation";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
+import Carousel from "../utilities/Carousel";
 
 
 const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
@@ -55,11 +56,28 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
 
   const isOwner = toolData?.lenderUid === authUser?.uid;
 
+  console.log("❇️< ToolDetail > ImageURLs: ", JSON.stringify(toolData?.imageUrls, null, 2));
+
+
   return (
       <ScrollView>
         {toolData ?
             <>
-              <Image source={{uri: imageUrl}} w={"100%"} h={280} alt={toolData.name}/>
+              {(toolData.imageUrls?.length < 2)
+                  ?
+                  <Image source={{uri: imageUrl}} w={"100%"} h={280} alt={toolData.name}/>
+                  :
+                  <Carousel items={
+                    toolData.imageUrls.map((url, index) => {
+                      console.log("URL: ", url);
+                      return (<Image key={`${toolData.name}_${index}`}
+                                     source={{uri: url}}
+                                     w={"100%"}
+                                     h={280}
+                                     alt={`${toolData.name}_${index}`}/>);
+                    })}
+                  />
+              }
               <Column bg="#FFF" p={5} space={3}>
                 <Heading>{toolData.brand} {toolData.name}</Heading>
                 <Text fontWeight={500}
