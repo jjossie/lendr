@@ -35,7 +35,7 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation, verbos
   }
 
 
-  console.log(`❇️${loan.tool.name} Loan Status:`, loan.status);
+  console.log(`❇️${loan.tool.name} - Loan Status:`, loan.status);
   // console.log("❇️Loan:", JSON.stringify(loan, null, 2));
   // console.log("❇️Relation:", JSON.stringify(relation, null, 2));
 
@@ -105,9 +105,15 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation, verbos
              flexWrap="wrap">
           {loan.tool && <>
             <Column alignItems={"flex-start"} justifyContent={"space-between"} p={4} w="60%" h="100%">
-              <Text fontSize="lg">{loan.tool.name} - <Text fontSize={"lg"}
-                                                           bold={true}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}
-              </Text>
+              {verbose // Verbose will take up two lines, otherwise just one
+                  ? <>
+                  <Text fontSize={"lg"}>{loan.tool.name}{"\n"}
+                    <Text fontSize={"xl"}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}</Text>
+                  </>
+                  :
+                  <Text fontSize="lg">{loan.tool.name} - <Text fontSize={"lg"}
+                                                            bold={true}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}
+              </Text>}
 
               {verbose && <AvailabilityChip showAvailable={false} user={lender}/>}
 
@@ -129,7 +135,7 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation, verbos
                     setIsLoading(false);
                   }}>{action?.name}</Button>
                 }
-                {(canCancel) && <Button p={0} variant={"ghost"}>Cancel</Button>}
+                {(canCancel) && <Button variant={"ghost"}>Cancel</Button>}
               </Row>
             </Column>
             <Image source={{

@@ -15,7 +15,7 @@ const LenderInventory: React.FC<NativeStackScreenProps<any>> = ({navigation}) =>
   return (
       <ScrollView>
         <Column p={4}>
-          <Text p={4} bold fontSize="4xl">My Tools</Text>
+          <Text p={4} bold fontSize="4xl">Lending</Text>
           {lendingToolsList.map(tool => {
             return <LenderInventoryItem navigation={navigation}
                                         key={tool.id + tool.name}

@@ -1,14 +1,15 @@
-import React from 'react';
+import React, {Dispatch, SetStateAction} from 'react';
 import {collection, collectionGroup, onSnapshot, query, where} from "firebase/firestore";
 import {db} from "../../config/firebase";
 import {ITool} from "../../models/Tool";
 import {useAuthentication} from "./useAuthentication";
 import {ILoan} from "../../models/Relation";
 
-export function useMyTools(): { lendingToolsList: ITool[], borrowingLoansList: ILoan[] } {
+export function useMyTools(): { lendingToolsList: ITool[], borrowingLoansList: ILoan[], setReload: Dispatch<SetStateAction<boolean>> } {
 
   const [lendingToolsList, setLendingToolsList] = React.useState<ITool[]>([]);
   const [borrowingLoansList, setBorrowingLoansList] = React.useState<ILoan[]>([]);
+  const [reload, setReload] = React.useState(false);
 
   const {authUser, user} = useAuthentication();
 
@@ -55,7 +56,7 @@ export function useMyTools(): { lendingToolsList: ITool[], borrowingLoansList: I
       lendingUnsubscribe();
       borrowingUnsubscribe();
     };
-  }, [authUser]);
+  }, [authUser, reload]);
 
-  return {lendingToolsList, borrowingLoansList};
+  return {lendingToolsList, borrowingLoansList, setReload};
 }

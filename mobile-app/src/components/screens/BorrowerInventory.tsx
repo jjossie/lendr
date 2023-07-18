@@ -14,7 +14,7 @@ export interface BorrowerInventoryProps {
 const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
 
   const navigation = useNavigation();
-  const {borrowingLoansList} = useMyTools();
+  const {borrowingLoansList, setReload} = useMyTools();
 
   const [loansAndRelations, setLoansAndRelations] = React.useState<{loan: ILoan, relation: IRelation }[]>([]);
 
@@ -47,10 +47,12 @@ const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
   return (
       <ScrollView>
         <Column p={4} flex={1} h={"100%"}>
-          <Text p={4} bold fontSize="4xl">Borrowed Tools</Text>
+          <Text p={4} bold fontSize="4xl">Borrowing</Text>
           {(loansAndRelations && loansAndRelations.length > 0)
               ?
-              loansAndRelations.map( ({loan, relation}) => {
+              loansAndRelations
+                  .filter(({loan, relation}) => loan.status !== "returned") // Remove completed loans
+                  .map( ({loan, relation}) => {
                 return (<LoanContextItem verbose key={loan.id} relation={relation} loan={loan}/>);
               })
 
@@ -60,6 +62,7 @@ const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
                 <Button variant={"solid"} size={"lg"} onPress={() => {
                   navigation.getParent()!.navigate("SearchBrowse");
                 }}>Browse Tools</Button>
+                <Button variant={"outline"} size={"lg"} onPress={() => { setReload((r) => !r); }}>Refresh</Button>
               </Column>}
         </Column>
         <Spacer/>

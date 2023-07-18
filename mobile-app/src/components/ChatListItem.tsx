@@ -9,8 +9,8 @@ export const ChatListItem = ({
   if (!item)
     return null;
 
-  console.log("❇️< ChatListItem >" );
-  console.log("❇️< ChatListItem > Item: ", JSON.stringify(item, null, 2));
+  // console.log("❇️< ChatListItem >" );
+  // console.log("❇️< ChatListItem > Item: ", JSON.stringify(item, null, 2));
   const initials = item.displayName.split(" ").map((name: string) => name[0]).join("");
   return (
       <Pressable key={index} onPress={item.onPressCallback} _dark={{
