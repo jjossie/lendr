@@ -92,11 +92,9 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation, verbos
   return (
       <Card onPress={() => {
         if (!loan.tool) return;
-        navigation.getParent()?.navigate("SearchBrowse", { // TODO fix this, it navigates to searchBrowse but not ToolDetail
-          screen: "ToolDetail",
-          params: {
-            toolId: loan.tool.id,
-          },
+        // @ts-ignore
+        navigation.navigate("ToolDetail", {
+          toolId: loan.tool.id,
         });
       }}>
         <Row w="100%"
@@ -107,13 +105,13 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation, verbos
             <Column alignItems={"flex-start"} justifyContent={"space-between"} p={4} w="60%" h="100%">
               {verbose // Verbose will take up two lines, otherwise just one
                   ? <>
-                  <Text fontSize={"lg"}>{loan.tool.name}{"\n"}
-                    <Text fontSize={"xl"}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}</Text>
+                    <Text fontSize={"lg"}>{loan.tool.name}{"\n"}
+                      <Text fontSize={"xl"}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}</Text>
                   </>
                   :
                   <Text fontSize="lg">{loan.tool.name} - <Text fontSize={"lg"}
-                                                            bold={true}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}
-              </Text>}
+                                                               bold={true}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}
+                  </Text>}
 
               {verbose && <AvailabilityChip showAvailable={false} user={lender}/>}
 

@@ -15,6 +15,14 @@ export interface ChatsProps {
 const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
   console.log("❇️️< Chats > Component Rendering");
 
+  if (route.params?.relationId){
+    console.log("❇️< Chats > Navigating to ChatConversation");
+    navigation.navigate("ChatConversation", {
+      relationId: route.params.relationId,
+      draftMessage: route.params?.draftMessage,
+    });
+  }
+
   // Custom Hooks
   const {user} = useAuthentication();
   const {chats, isLoaded} = useMyChats();

@@ -215,7 +215,7 @@ export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentDat
   // Tack on the data for the last message of each relation
   Promise.all(lastMessagePromises).then(lastMessages => {
     for (let i = 0; i < docDataList.length; i++) {
-      docDataList[i].lastMessage = lastMessages[i].docs[0].data();
+      docDataList[i].lastMessage = lastMessages[i].docs[0]?.data();
     }
     // It appears that although we are properly setting the list here with newly hydrated
     // objects, JS thinks the list is unchanged. So we must also set loading state:

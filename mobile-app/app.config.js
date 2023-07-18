@@ -14,6 +14,7 @@ export default {
       "resizeMode": "contain",
       "backgroundColor": "#2e5339"
     },
+    // "scheme": "lendr",
     "jsEngine": "hermes",
     "updates": {
       "fallbackToCacheTimeout": 0

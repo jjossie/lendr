@@ -13,7 +13,7 @@ import LoanContext from "../LoanContext";
 const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
 
   // Content State
-  const [messageText, setMessageText] = useState<string>("");
+  const [messageText, setMessageText] = useState<string>(route.params?.draftMessage ?? "");
   const {messages, relation, loans} = useChatMessages(route.params?.relationId);
   const {user} = useAuthentication();
 
