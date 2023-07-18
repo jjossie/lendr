@@ -11,7 +11,11 @@ const SearchStack: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) =
       <Stack.Navigator screenOptions={{
         // TODO put some title styles here but make em consistent across the app
       }}>
-        <Stack.Screen name="SearchBrowse" component={BorrowSearch} />
+        <Stack.Screen name="SearchBrowse" component={BorrowSearch} options={{
+          // headerTransparent: true,
+          headerShown: false,
+          // statusBarHidden: true,
+        }} />
         <Stack.Screen name="SearchToolDetail" component={ToolDetail} />
       </Stack.Navigator>
   );

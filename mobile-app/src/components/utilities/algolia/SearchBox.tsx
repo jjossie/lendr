@@ -5,7 +5,6 @@
 import React, {useRef, useState} from 'react';
 import {StyleSheet, TextInput, View} from 'react-native';
 import {useSearchBox, UseSearchBoxProps} from 'react-instantsearch-hooks';
-import {theme} from "native-base";
 
 type SearchBoxProps = UseSearchBoxProps & {
   onChange: (newValue: string) => void;
@@ -56,7 +55,7 @@ export function SearchBox({ onChange, ...props }: SearchBoxProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.light[50],
+    // backgroundColor: theme.colors.light[50],
     padding: 18,
   },
   input: {

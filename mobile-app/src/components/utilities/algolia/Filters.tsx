@@ -1,9 +1,10 @@
 //
-// Starter code courtesy of: https://github.com/algolia/doc-code-samples/tree/master/react-instantsearch-hooks-native/getting-started/src
-//
+// Starter code courtesy of:
+// https://github.com/algolia/doc-code-samples/tree/master/react-instantsearch-hooks-native/getting-started/src
 
 import React from 'react';
-import {Button, Modal, SafeAreaView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Button, Text} from "native-base";
+import {Modal, SafeAreaView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useClearRefinements, useCurrentRefinements, useRefinementList} from 'react-instantsearch-hooks';
 
 type FiltersProps = {
@@ -17,18 +18,25 @@ export function Filters({
                           onToggleModal,
                           onChange,
                         }: FiltersProps) {
-  const { items, refine } = useRefinementList({ attribute: 'brand'});
-  const { canRefine: canClear, refine: clear } = useClearRefinements();
-  const { items: currentRefinements } = useCurrentRefinements();
+  const {items, refine} = useRefinementList({attribute: 'brand'});
+  const {canRefine: canClear, refine: clear} = useClearRefinements();
+  const {items: currentRefinements} = useCurrentRefinements();
   const totalRefinements = currentRefinements.reduce(
-      (acc, { refinements }) => acc + refinements.length,
-      0
+      (acc, {refinements}) => acc + refinements.length,
+      0,
   );
 
   return (
       <>
-        <TouchableOpacity style={styles.filtersButton} onPress={onToggleModal}>
-          <Text style={styles.filtersButtonText}>Filters</Text>
+        <TouchableOpacity
+            style={styles.filtersButton}
+            onPress={onToggleModal}
+        >
+          <Button
+              onPress={() => {
+                onToggleModal();
+              }}
+              variant={"ghost"}>Filters</Button>
           {totalRefinements > 0 && (
               <View style={styles.itemCount}>
                 <Text style={styles.itemCountText}>{totalRefinements}</Text>
@@ -54,10 +62,11 @@ export function Filters({
                           style={styles.item}
                       >
                         <Text
-                            style={{
-                              ...styles.labelText,
-                              fontWeight: item.isRefined ? '800' : '400',
-                            }}
+                            // style={{
+                            //   ...styles.labelText,
+                            //   fontWeight: item.isRefined ? '800' : '400',
+                            // }}
+
                         >
                           {item.label}
                         </Text>
@@ -77,17 +86,17 @@ export function Filters({
                       onChange();
                       onToggleModal();
                     }}
-                    title="Clear all"
                     color="#252b33"
                     disabled={!canClear}
-                />
+                    variant={"outline"}
+                >Clear All</Button>
               </View>
               <View style={styles.filterListButton}>
                 <Button
                     onPress={onToggleModal}
-                    title="See results"
                     color="#252b33"
-                />
+                    variant={"solid"}
+                >See Results</Button>
               </View>
             </View>
           </SafeAreaView>
@@ -98,13 +107,14 @@ export function Filters({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 18,
+    padding: 36,
     backgroundColor: '#ffffff',
   },
   title: {
     alignItems: 'center',
   },
   titleText: {
+    paddingTop: 16,
     fontSize: 32,
   },
   list: {
@@ -142,7 +152,7 @@ const styles = StyleSheet.create({
   },
   filtersButton: {
     flexGrow: 1,
-    paddingVertical: 18,
+    paddingVertical: 8,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',

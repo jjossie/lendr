@@ -33,19 +33,17 @@ export const BorrowSearch: React.FC<NativeStackScreenProps<any>> = ({navigation}
         <View style={styles.container}>
           <InstantSearch searchClient={searchClient} indexName={ALGOLIA_INDEX_NAME}>
             <Configure
-              aroundLatLng={geopoint ? `${geopoint[0]},${geopoint[1]}` : ""}
-              aroundRadius={radiusMeters}
+                aroundLatLng={geopoint ? `${geopoint[0]},${geopoint[1]}` : ""}
+                aroundRadius={radiusMeters}
             />
             <SearchBox onChange={scrollToTop}/>
-            <Row w={"100%"} alignItems={"center"}>
-              <Filters
-                  isModalOpen={isModalOpen}
-                  onToggleModal={() => setModalOpen((isOpen) => !isOpen)}
-                  onChange={scrollToTop}
-              />
-              <Select flex={1} selectedValue={searchRadiusString}
+            <Row w={"100%"} justifyContent={"space-between"} alignItems={"center"}>
+              <Select flex={1}
+                      selectedValue={searchRadiusString}
                       mx={4}
                       my={2}
+                      fontSize={"md"}
+                      bgColor={theme.colors.white}
                       onValueChange={(selectValue) => {
                         setSearchRadiusString(selectValue as SearchRadiusString);
                         setRadiusMeters(Math.floor(metersFromMiles(parseInt(selectValue))));
@@ -59,6 +57,11 @@ export const BorrowSearch: React.FC<NativeStackScreenProps<any>> = ({navigation}
                 <Select.Item label="300 miles" value="300"/>
                 <Select.Item label="500 miles" value="500"/>
               </Select>
+              <Filters
+                  isModalOpen={isModalOpen}
+                  onToggleModal={() => setModalOpen((isOpen) => !isOpen)}
+                  onChange={scrollToTop}
+              />
             </Row>
             <InfiniteHits ref={listRef} hitComponent={Hit}/>
           </InstantSearch>
@@ -71,11 +74,11 @@ export const BorrowSearch: React.FC<NativeStackScreenProps<any>> = ({navigation}
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#252b33',
+    // backgroundColor: '#252b33',
   },
   container: {
     flex: 1,
-    backgroundColor: theme.colors.light[100],
+    // backgroundColor: theme.colors.light[100],
     flexDirection: 'column',
   },
 });
