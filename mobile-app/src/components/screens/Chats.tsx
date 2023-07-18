@@ -18,9 +18,13 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
 
   if (route.params?.relationId){
     console.log("❇️< Chats > Navigating to ChatConversation");
+    const relationId = route.params.relationId;
+    const draftMessage = route.params.draftMessage;
+    // @ts-ignore
+    route.params = undefined;
     navigation.navigate("ChatConversation", {
-      relationId: route.params.relationId,
-      draftMessage: route.params?.draftMessage,
+      relationId: relationId,
+      draftMessage: draftMessage,
     });
   }
 
