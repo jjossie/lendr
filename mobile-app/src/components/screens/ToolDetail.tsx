@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Column, Heading, Image, ScrollView, Text, useTheme} from "native-base";
+import {Button, Column, Heading, Image, Row, ScrollView, Text, useTheme} from "native-base";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {getToolById} from "../../controllers/tool";
 import {ITool} from "../../models/Tool";
@@ -101,25 +101,42 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
                                      isDisabled={isLoading}>Message Lender</Button>}
 
                 <Heading pt={4} size="sm">Details</Heading>
-                <Text>
-                  {toolData.preferences?.localPickup
-                      ? (<><AntDesign name="checkcircle" size={24} color={colors.success[500]}/> Local pickup</>)
-                      : (<><AntDesign name="closecircle" size={24} color={colors.secondary[500]}/> No local pickup</>)
-                  }
-                </Text>
-                <Text>
-                  {toolData.preferences?.delivery
-                      ? (<><AntDesign name="checkcircle" size={24} color={colors.success[500]}/> Will deliver</>)
-                      : (<><AntDesign name="closecircle" size={24} color={colors.secondary[500]}/> No delivery</>)
-                  }
-                </Text>
-                <Text>
-                  {toolData.preferences?.useOnSite
-                      ? (<><AntDesign name="checkcircle" size={24} color={colors.success[500]}/> Available to use at
-                        lender location</>)
-                      : (<><AntDesign name="closecircle" size={24} color={colors.secondary[500]}/> Not available to use at lender location</>)
-                  }
-                </Text>
+
+                {toolData.preferences?.localPickup
+                    ? (<Row alignItems={"center"} space={2}>
+                      <AntDesign name="checkcircle" p={4} size={24} color={colors.success[500]}/>
+                      <Text fontSize={"md"}
+                            p={4}>Local pickup</Text>
+                    </Row>)
+                    : (<Row alignItems={"center"} space={2}>
+                      <AntDesign name="closecircle" p={4} size={24} color={colors.secondary[500]}/>
+                      <Text fontSize={"md"} p={4}>No local pickup</Text>
+                    </Row>)
+                }
+
+                {toolData.preferences?.delivery
+                    ? (<Row alignItems={"center"} space={2}>
+                      <AntDesign name="checkcircle" p={4} size={24} color={colors.success[500]}/>
+                      <Text fontSize={"md"}
+                            p={4}>Will deliver</Text>
+                    </Row>)
+                    : (<Row alignItems={"center"} space={2}>
+                      <AntDesign name="closecircle" p={4} size={24} color={colors.secondary[500]}/>
+                      <Text fontSize={"md"} p={4}>No delivery</Text>
+                    </Row>)
+                }
+
+                {toolData.preferences?.useOnSite
+                    ? (<Row alignItems={"center"} space={2}>
+                      <AntDesign name="checkcircle" p={4} size={24} color={colors.success[500]}/>
+                      <Text fontSize={"md"}
+                            p={4}>Available to use at lender location</Text>
+                    </Row>)
+                    : (<Row alignItems={"center"} space={2}>
+                      <AntDesign name="closecircle" p={4} size={24} color={colors.secondary[500]}/>
+                      <Text fontSize={"md"} p={4}>Not available to use at lender location</Text>
+                    </Row>)
+                }
 
 
               </Column>
