@@ -19,8 +19,8 @@ export const BorrowSearch: React.FC<NativeStackScreenProps<any>> = ({navigation}
   const listRef = useRef<FlatList>(null);
 
   // Logical State
-  const [searchRadiusString, setSearchRadiusString] = useState<SearchRadiusString>("5");
-  const [radiusMeters, setRadiusMeters] = useState(Math.floor(metersFromMiles(50))); // convert to int
+  const [searchRadiusString, setSearchRadiusString] = useState<SearchRadiusString>("30");
+  const [radiusMeters, setRadiusMeters] = useState(Math.floor(metersFromMiles(30))); // convert to int
 
   const {geopoint} = useLocation();
 

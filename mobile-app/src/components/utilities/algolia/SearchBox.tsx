@@ -48,6 +48,7 @@ export function SearchBox({ onChange, ...props }: SearchBoxProps) {
             autoCorrect={false}
             spellCheck={false}
             autoComplete="off"
+            placeholder={'Search'}
         />
       </View>
   );
