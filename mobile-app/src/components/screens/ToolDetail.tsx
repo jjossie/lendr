@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Column, Heading, Image, ScrollView, Text} from "native-base";
+import {Button, Column, Heading, Image, ScrollView, Text, useTheme} from "native-base";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {getToolById} from "../../controllers/tool";
 import {ITool} from "../../models/Tool";
@@ -7,6 +7,7 @@ import LenderProfilePreview from "../LenderProfilePreview";
 import {createRelation} from "../../controllers/relation";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
 import Carousel from "../utilities/Carousel";
+import {AntDesign} from "@expo/vector-icons";
 
 
 const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
@@ -14,6 +15,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
   const [toolData, setToolData] = useState<ITool | undefined>();
   const [isLoading, setIsLoading] = useState(false);
   const {authUser} = useAuthentication();
+  const {colors} = useTheme();
   console.log(`❇️ToolDetail rendering with Tool: ${toolData?.name}`);
 
   // Side Effect
@@ -100,13 +102,23 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
 
                 <Heading pt={4} size="sm">Details</Heading>
                 <Text>
-                  {toolData.preferences?.localPickup ? "✅ Local pickup" : "❌ No Local Pickup"}
+                  {toolData.preferences?.localPickup
+                      ? (<><AntDesign name="checkcircle" size={24} color={colors.success[500]}/> Local pickup</>)
+                      : (<><AntDesign name="closecircle" size={24} color={colors.secondary[500]}/> No local pickup</>)
+                  }
                 </Text>
                 <Text>
-                  {toolData.preferences?.delivery ? "✅ Will deliver" : "❌ No delivery"}
+                  {toolData.preferences?.delivery
+                      ? (<><AntDesign name="checkcircle" size={24} color={colors.success[500]}/> Will deliver</>)
+                      : (<><AntDesign name="closecircle" size={24} color={colors.secondary[500]}/> No delivery</>)
+                  }
                 </Text>
                 <Text>
-                  {toolData.preferences?.useOnSite ? "✅ Available to use at lender location" : "❌ Not available to use at lender location"}
+                  {toolData.preferences?.useOnSite
+                      ? (<><AntDesign name="checkcircle" size={24} color={colors.success[500]}/> Available to use at
+                        lender location</>)
+                      : (<><AntDesign name="closecircle" size={24} color={colors.secondary[500]}/> Not available to use at lender location</>)
+                  }
                 </Text>
 
 

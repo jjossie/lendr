@@ -51,7 +51,7 @@ const newColorTheme = {
     800: '#430c0a',
     900: '#1d0100',
   },
-  lendrLight: {
+  ivory: {
     100: "#f5fbef",
   },
 };

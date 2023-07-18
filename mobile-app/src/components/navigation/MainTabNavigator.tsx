@@ -5,7 +5,7 @@ import Account from "../screens/Account";
 import ChatStack from "./ChatStack";
 import SearchStack from "./SearchStack";
 import BorrowStack from './BorrowStack';
-import {FontAwesome, Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
+import {FontAwesome, FontAwesome5, Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useTheme} from "native-base";
 
 const Tab = createBottomTabNavigator();
@@ -44,7 +44,7 @@ const MainTabNavigator: React.FC<Props> = () => {
         <Tab.Screen name="Lend" component={LendStack} options={{
           headerShown: false,
           tabBarIcon: ({focused, color, size}) => {
-            return <MaterialCommunityIcons name="gate-arrow-left" size={24} color={color}/>;
+            return <FontAwesome5 name="toolbox" size={24} color={color} />;
           },
         }}/>
         <Tab.Screen name="Inbox" component={ChatStack} options={{
@@ -54,7 +54,8 @@ const MainTabNavigator: React.FC<Props> = () => {
           },
         }}/>
         <Tab.Screen name="Account" component={Account}  options={{
-          headerShown: false,
+          // headerShown: false,
+          headerTitle: "",
           tabBarIcon: ({focused, color, size}) => {
             return <MaterialCommunityIcons name="account-circle" size={24} color={color} />;
           },

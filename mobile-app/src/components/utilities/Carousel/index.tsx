@@ -1,9 +1,9 @@
 import React from 'react';
-import {ScrollView, Text, View} from 'react-native';
+import {ScrollView, Text} from 'react-native';
 import {Stat} from './Stat';
 import {Slide} from './Slide';
 import {styles} from './styles';
-import {Row} from "native-base";
+import {Box, Row, useTheme} from "native-base";
 
 export type CarouselProps = {
   items: any[],
@@ -16,6 +16,8 @@ export const Carousel: React.FC<CarouselProps> = ({items, variant = "slides", it
   const [interval, setInterval] = React.useState<number | undefined>(1);
   const [intervals, setIntervals] = React.useState(1);
   const [width, setWidth] = React.useState(0);
+
+  const {colors} = useTheme()
 
   const init = (width: number) => {
     // initialise width
@@ -52,7 +54,7 @@ export const Carousel: React.FC<CarouselProps> = ({items, variant = "slides", it
   }
 
   return (
-      <View style={styles.container}>
+      <Box w={"100%"} bgColor={colors.white}>
         <ScrollView
             horizontal={true}
             contentContainerStyle={{...styles.scrollView, width: `${100 * intervals}%`}}
@@ -90,7 +92,7 @@ export const Carousel: React.FC<CarouselProps> = ({items, variant = "slides", it
         <Row justifyContent={"center"} >
           {bullets}
         </Row>
-      </View>
+      </Box>
   );
 };
 

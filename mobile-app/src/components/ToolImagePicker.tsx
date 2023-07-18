@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Center, Column, DeleteIcon, IconButton, Image, Row, theme} from 'native-base';
+import {Button, Center, Column, DeleteIcon, IconButton, Image, Row, theme, useTheme} from 'native-base';
 import * as ImagePicker from "expo-image-picker";
 import {ImagePickerOptions, PermissionStatus} from "expo-image-picker";
 import {LendrBaseError} from "../utils/errors";
@@ -24,6 +24,8 @@ const ToolImagePicker: React.FC<ImagePickerProps> = ({
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasUserChangedImage, setHasUserChangedImage] = useState<boolean>(false);
+
+  const {colors} = useTheme();
 
   // Permissions
   const [cameraPermissionStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
@@ -140,7 +142,7 @@ const ToolImagePicker: React.FC<ImagePickerProps> = ({
                 </Row>
               </Center>
 
-              : <Center w="100%" h="100%" bgColor={theme.colors.light["100"]}>
+              : <Center w="100%" h="100%" >
                 <Button
                     isLoading={isLoading}
                     isLoadingText={"Uploading"}
