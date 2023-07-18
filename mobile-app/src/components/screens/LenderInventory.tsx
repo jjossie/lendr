@@ -8,15 +8,15 @@ import {useMyTools} from "../../utils/hooks/useMyTools";
 const LenderInventory: React.FC<NativeStackScreenProps<any>> = ({navigation}) => {
 
   // State
-  const toolsList = useMyTools();
+  const {lendingToolsList} = useMyTools();
 
   // Side Effects
 
   return (
       <ScrollView>
         <Column p={4}>
-          <Text p={4} bold fontSize="4xl">My Tools</Text>
-          {toolsList.map(tool => {
+          <Text p={4} bold fontSize="4xl">Lending</Text>
+          {lendingToolsList.map(tool => {
             return <LenderInventoryItem navigation={navigation}
                                         key={tool.id + tool.name}
                                         tool={tool}/>;

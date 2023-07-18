@@ -114,7 +114,7 @@ async function createUserInDB(authUser: User, firstName?: string, lastName?: str
     // Add the token to the user's list of tokens (arrayUnion will do a set-style union, ignoring duplicates)
     console.log(`Found user ${authUser.email} with uid: ${authUser.uid}`);
     if (token)
-      await updateDoc(userDocRef, {expoPushTokens: arrayUnion(token), photoURL: authUser?.photoURL ?? undefined});
+      await updateDoc(userDocRef, {expoPushTokens: arrayUnion(token)});
     return userDocSnap;
   }
 }
