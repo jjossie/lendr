@@ -19,6 +19,12 @@ export default {
     "updates": {
       "fallbackToCacheTimeout": 0
     },
+
+    "permissions": [
+      "CAMERA",
+      "CAMERA_ROLL",
+    ],
+
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -47,6 +53,13 @@ export default {
           "ios": {
             "useFrameworks": "static"
           }
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Lendr accesses your photo library to let you upload photos of your tools for lending.",
+          "cameraPermission": "Lendr accesses your camera to let you take photos of your tools for lending."
         }
       ]
     ],
