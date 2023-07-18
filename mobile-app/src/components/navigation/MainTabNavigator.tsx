@@ -6,7 +6,7 @@ import ChatStack from "./ChatStack";
 import SearchStack from "./SearchStack";
 import BorrowStack from './BorrowStack';
 import {FontAwesome, Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
-import {theme} from "native-base";
+import {useTheme} from "native-base";
 
 const Tab = createBottomTabNavigator();
 
@@ -14,13 +14,16 @@ interface Props {
 }
 
 const MainTabNavigator: React.FC<Props> = () => {
+
+  const {colors} = useTheme();
+
   return (
       <Tab.Navigator backBehavior={"history"} screenOptions={{
         headerBackgroundContainerStyle: {
           borderBottomWidth: 0,
           opacity: 0,
         },
-        tabBarActiveTintColor: theme.colors.primary[500],
+        tabBarActiveTintColor: colors.primary[500],
 
         // headerTransparent: true,
         // headerShadowVisible: true,

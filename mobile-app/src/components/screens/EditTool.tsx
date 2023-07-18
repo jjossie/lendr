@@ -366,7 +366,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
                 <Center><Text lineHeight="2xs" bold color={theme.colors.white} fontSize={48}>+</Text></Center>
               </Button>
             </Row>
-            <Slider defaultValue={15} colorScheme="cyan" onChange={v => {
+            <Slider defaultValue={15}  onChange={v => {
               setPrice(Math.floor(v));
             }}>
               <Slider.Track>
