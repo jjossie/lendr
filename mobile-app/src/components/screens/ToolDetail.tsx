@@ -104,37 +104,37 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
 
                 {toolData.preferences?.localPickup
                     ? (<Row alignItems={"center"} space={2}>
-                      <AntDesign name="checkcircle" p={4} size={24} color={colors.success[500]}/>
+                      <AntDesign name="checkcircle" p={2} size={24} color={colors.success[500]}/>
                       <Text fontSize={"md"}
-                            p={4}>Local pickup</Text>
+                            p={2}>Local pickup</Text>
                     </Row>)
                     : (<Row alignItems={"center"} space={2}>
-                      <AntDesign name="closecircle" p={4} size={24} color={colors.secondary[500]}/>
-                      <Text fontSize={"md"} p={4}>No local pickup</Text>
+                      <AntDesign name="closecircle" p={2} size={24} color={colors.secondary[500]}/>
+                      <Text fontSize={"md"} p={2}>No local pickup</Text>
                     </Row>)
                 }
 
                 {toolData.preferences?.delivery
                     ? (<Row alignItems={"center"} space={2}>
-                      <AntDesign name="checkcircle" p={4} size={24} color={colors.success[500]}/>
+                      <AntDesign name="checkcircle" p={2} size={24} color={colors.success[500]}/>
                       <Text fontSize={"md"}
-                            p={4}>Will deliver</Text>
+                            p={2}>Will deliver</Text>
                     </Row>)
                     : (<Row alignItems={"center"} space={2}>
-                      <AntDesign name="closecircle" p={4} size={24} color={colors.secondary[500]}/>
-                      <Text fontSize={"md"} p={4}>No delivery</Text>
+                      <AntDesign name="closecircle" p={2} size={24} color={colors.secondary[500]}/>
+                      <Text fontSize={"md"} p={2}>No delivery</Text>
                     </Row>)
                 }
 
                 {toolData.preferences?.useOnSite
                     ? (<Row alignItems={"center"} space={2}>
-                      <AntDesign name="checkcircle" p={4} size={24} color={colors.success[500]}/>
+                      <AntDesign name="checkcircle" p={2} size={24} color={colors.success[500]}/>
                       <Text fontSize={"md"}
-                            p={4}>Available to use at lender location</Text>
+                            p={2}>Available to use at lender location</Text>
                     </Row>)
                     : (<Row alignItems={"center"} space={2}>
-                      <AntDesign name="closecircle" p={4} size={24} color={colors.secondary[500]}/>
-                      <Text fontSize={"md"} p={4}>Not available to use at lender location</Text>
+                      <AntDesign name="closecircle" p={2} size={24} color={colors.secondary[500]}/>
+                      <Text fontSize={"md"} p={2}>Not available to use at lender location</Text>
                     </Row>)
                 }
 

@@ -101,6 +101,17 @@ const theme = extendTheme({
     heading: "Epilogue",
     body: "Epilogue",
   },
+  components: {
+    Button: {
+      // Can simply pass default props to change default behaviour of components.
+      baseStyle: {
+        rounded: 'md',
+      },
+      defaultProps: {
+        fontWeight: "bold"
+      }
+    },
+  }
 });
 
 const colorModeManager: StorageManager = {

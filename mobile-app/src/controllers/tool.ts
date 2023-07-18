@@ -178,7 +178,8 @@ export async function getToolById(toolId: string, userGeopoint?: Geopoint): Prom
     ...toolData,
   } as ITool;
 
-  if (!result.location.city)
+  // if (!result.location.city)
+  if (!result.location.city || result.location.city.split(",").length < 2)
     result.location.city = await getCityNameFromGeopoint(geopoint);
 
   if (userGeopoint)
