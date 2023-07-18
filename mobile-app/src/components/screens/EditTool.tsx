@@ -268,12 +268,12 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     }
   }, [toolId, navigation]);
 
-  const handleSelectImage = async (uri: string) => {
+  const handleSelectImage = async (uri: string, index = 0) => {
     console.log("❇️handleSelectImage()");
     if (!authUser)
       throw new AuthError("Cannot upload image a user associated");
 
-    const imageUrl = await uploadToolImageToFirebase(uri, toolId);
+    const imageUrl = await uploadToolImageToFirebase(uri, toolId, index);
     if (!imageUrl)
       throw new LendrBaseError(`Image url was blank: ${imageUrl}`);
     console.log("❇️ImageUrl: " + imageUrl);
@@ -282,7 +282,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     console.log("❇️Downloadable Image URL: " + imageUrl);
   };
 
-  const handleDeleteImage = async (uri: string) => {
+  const handleDeleteImage = async (uri: string, index = 0) => {
     console.log("❇️handleDeleteImage()");
     if (!toolId)
       throw new LendrBaseError("Cannot delete image without a tool ID");

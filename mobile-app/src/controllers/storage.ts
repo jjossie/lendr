@@ -14,7 +14,7 @@ export const uploadToolImageToFirebase = async (localImageUri: string, toolId: s
     const blob = await response.blob();
 
     // Get Image Reference
-    const imageRef = ref(storage, getStorageUrlForToolImage(toolId));
+    const imageRef = ref(storage, getStorageUrlForToolImage(toolId, index));
     console.log("🗃imageRef: ", JSON.stringify(imageRef.fullPath));
 
     // Upload file to Firebase Storage

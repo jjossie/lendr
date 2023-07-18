@@ -3,14 +3,21 @@ import {Button, Center, DeleteIcon, IconButton, Image, Row, theme} from 'native-
 import * as ImagePicker from "expo-image-picker";
 import {ImagePickerOptions, PermissionStatus} from "expo-image-picker";
 import {LendrBaseError} from "../utils/errors";
+import Carousel from "./utilities/Carousel";
 
 export interface ImagePickerProps {
-  onSelectImage: (_: any) => Promise<any>;
-  onRemoveImage: (_: any) => Promise<any>;
+  onSelectImage: (_: any, index?: number) => Promise<any>;
+  onRemoveImage: (_: any, index?: number) => Promise<any>;
   existingImageUrl?: string | undefined;
+  existingImageUrls?: string | undefined;
 }
 
-const ToolImagePicker: React.FC<ImagePickerProps> = ({onSelectImage, onRemoveImage, existingImageUrl}) => {
+const ToolImagePicker: React.FC<ImagePickerProps> = ({
+                                                       onSelectImage,
+                                                       onRemoveImage,
+                                                       existingImageUrl,
+                                                       existingImageUrls,
+                                                     }) => {
 
   // State
   const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
@@ -37,7 +44,7 @@ const ToolImagePicker: React.FC<ImagePickerProps> = ({onSelectImage, onRemoveIma
 
   const imagePickerOptions: ImagePickerOptions = {
     allowsEditing: false,
-    allowsMultipleSelection: false,
+    allowsMultipleSelection: true,
     quality: 0.9,
     selectionLimit: 5,
     mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -57,11 +64,17 @@ const ToolImagePicker: React.FC<ImagePickerProps> = ({onSelectImage, onRemoveIma
         throw new LendrBaseError('Invalid image picker type');
     }
 
-    if (!result.canceled) {
+    if (!result.canceled) { // Handle case where cameras can only return one at a time
       setIsLoading(true);
       // setSelectedImage(result.assets[0].uri);
       setSelectedImages(result.assets.map((asset) => asset.uri));
-      await onSelectImage(result.assets[0].uri);
+
+      let promises: Promise<any>[] = [];
+      result.assets.forEach((asset) => {
+        promises.push(onSelectImage(asset.uri));
+      })
+      // await onSelectImage(result.assets[0].uri); // TODO
+      await Promise.all(promises);
       setIsLoading(false);
     } else {
       alert("You did not select any image.");
@@ -71,7 +84,7 @@ const ToolImagePicker: React.FC<ImagePickerProps> = ({onSelectImage, onRemoveIma
   const handleOnRemoveImage = async () => {
     setIsLoading(true);
     try {
-      await onRemoveImage(selectedImage);
+      await onRemoveImage(selectedImage); // TODO
     } catch (e) {
       setIsLoading(false);
       throw e;
@@ -93,16 +106,20 @@ const ToolImagePicker: React.FC<ImagePickerProps> = ({onSelectImage, onRemoveIma
         {
           selectedImage
               ? <Center w="100%" h="100%">
-                <Image source={{uri: selectedImage}} w="100%" h="100%" alt={selectedImage}/>
+
+                <Carousel items={selectedImages.map(imageUrl => {
+                  return (<Image source={{uri: imageUrl}} w="100%" h="100%" alt={imageUrl}/>);
+                })} itemsPerInterval={1} variant={"slides"}/>
+                {/*<Image source={{uri: selectedImage}} w="100%" h="100%" alt={selectedImage}/>*/}
                 <Row w="100%" space={2} p={2} justifyContent={"flex-end"}>
                   <Button isLoading={isLoading}
-                          // isLoadingText={"Uploading"}
+                      // isLoadingText={"Uploading"}
                           variant={"subtle"}
                           onPress={async () => {
                             await pickImage("gallery");
                           }}>Change Photo</Button>
                   <Button isLoading={isLoading}
-                          // isLoadingText={"Uploading"}
+                      // isLoadingText={"Uploading"}
                           variant={"subtle"}
                           onPress={async () => {
                             await pickImage("camera");
