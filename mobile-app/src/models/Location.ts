@@ -89,7 +89,7 @@ const stateAbbreviations: any = {
   "Saskatchewan": "SK",
   "Yukon": "YT",
   "Newfoundland": "NF",
-}
+};
 
 
 export interface ILocation {
@@ -167,13 +167,13 @@ async function reverseGeocode(lat: number, lon: number): Promise<{
   return response.json();
 }
 
-async function geocode(location: ILocationApi)  {
+async function geocode(location: ILocationApi) {
   let url = "https://geocode.maps.co/search?";
-  if (location.street)     url += `street=${location.street}&`;
-  if (location.city)       url += `city=${location.city}&`;
-  if (location.county)     url += `county=${location.county}&`;
-  if (location.state)      url += `state=${location.state}&`;
-  if (location.country)    url += `country=${location.country}&`;
+  if (location.street) url += `street=${location.street}&`;
+  if (location.city) url += `city=${location.city}&`;
+  if (location.county) url += `county=${location.county}&`;
+  if (location.state) url += `state=${location.state}&`;
+  if (location.country) url += `country=${location.country}&`;
   if (location.postalcode) url += `postalcode=${location.postalcode}&`;
 
   requestCount++;
@@ -209,22 +209,23 @@ export async function getCityNameFromGeopoint(geopoint: Geopoint): Promise<strin
   // console.log("📍reverse geocoding response: ", JSON.stringify(response, null, 2));
   const {neighbourhood, city, town, county, state, country} = response.address;
 
-  const specificity = [neighbourhood, town, city, getStateAbbreviation(state), county, country]
+  const locality = [neighbourhood, town, city, county]
       .filter(element => element)
       .slice(0, 2);
 
+  const region = [getStateAbbreviation(state), country]
+      .filter(element => element);
+
   let cityString = "";
-  for (let specificityElement of specificity) {
-    if (specificityElement) {
-      cityString += specificityElement;
+  for (let localityElement of locality) {
+    if (localityElement) {
+      cityString += localityElement;
       cityString += ", ";
     }
   }
+  cityString += region[0];
 
-  if (cityString)
-    return cityString.slice(0, -2);
-
-  return "Unknown";
+  return cityString ?? "Unknown";
 }
 
 export function getStateAbbreviation(state: string) {
