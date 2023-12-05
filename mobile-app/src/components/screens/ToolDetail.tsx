@@ -40,7 +40,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
       console.log("❇️Created new relation: ", relationId);
       setIsLoading(false);
 
-      navigation.navigate("Chats", {
+      navigation.navigate("Inbox", {
         // screen: "ChatConversation",
         relationId,
         draftMessage: `Hey, I'm interested in this ${toolData?.name ?? "tool"}!`,
@@ -81,17 +81,17 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
                   />
               }
               <Column bg="#FFF" p={5} space={3}>
-                <Heading>{toolData.brand} {toolData.name}</Heading>
+                <Heading fontSize={"lg"}>{toolData.brand} {toolData.name}</Heading>
                 <Text fontWeight={500}
                       fontSize={"lg"}><Text bold
                                             fontSize={"2xl"}>${toolData.rate?.price}</Text>/{toolData.rate?.timeUnit}
                 </Text>
                 <Text fontSize="md">{toolData.description}</Text>
 
-                <Heading pt={4} size="sm">Location</Heading>
+                <Heading fontSize={"lg"} pt={4} size="sm">Location</Heading>
                 <Text fontSize="sm">📍{toolData.location.city}</Text>
 
-                <Heading pt={4} size="sm">Lender</Heading>
+                <Heading fontSize={"lg"} pt={4} size="sm">Lender</Heading>
                 <LenderProfilePreview user={toolData.lender!}/>
 
                 {!isOwner && <Button onPress={handleSendMessage}
@@ -100,7 +100,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
                                      isLoadingText={"Loading"}
                                      isDisabled={isLoading}>Message Lender</Button>}
 
-                <Heading pt={4} size="sm">Details</Heading>
+                <Heading fontSize={"lg"} pt={4} size="sm">Details</Heading>
 
                 {toolData.preferences?.localPickup
                     ? (<Row alignItems={"center"} space={2}>
