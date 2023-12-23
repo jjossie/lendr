@@ -1,9 +1,9 @@
 import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import {logger} from "firebase-functions";
 import {getFirestore} from "firebase-admin/firestore";
-import {getCityNameFromGeopoint, getGeohashedLocation} from "./models/Location";
+import {getCityNameFromGeopoint, getGeohashedLocation} from "./utils/location";
 import {Geopoint} from "geofire-common";
-import {ITool, IToolAdminForm} from "./models/Tool";
+import {Tool, ToolAdminForm} from "./models/Tool";
 
 
 export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) => {
@@ -12,9 +12,9 @@ export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) =
   /**
    * Validation
    */
-  const rawDoc = event.data.data() as IToolAdminForm;
+  const rawDoc = event.data.data() as ToolAdminForm;
   // @ts-ignore
-  let hydroDoc: ITool = {...rawDoc};
+  let hydroDoc: Tool = {...rawDoc};
   // @ts-ignore
   delete hydroDoc.geopoint;
 
@@ -69,25 +69,29 @@ export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) =
     rawDoc.holderUid = rawDoc.lenderUid;
 
   if (rawDoc.holderUid === rawDoc.lenderUid) {
+    logger.info("Using lender info as holder info")
     hydroDoc.holder = hydroLender;
-  }
-  const holderSnap = await db.collection("users").doc(rawDoc.holderUid).get();
-  const holder = holderSnap.data();
+  } else {
 
-  if (!holderSnap.exists) {
-    logger.error("Holder does not exist: ", rawDoc.holderUid);
-    // Delete the document if the holder does not exist
-    await event.data.ref.delete();
-    return;
+    const holderSnap = await db.collection("users").doc(rawDoc.holderUid).get();
+    const holder = holderSnap.data();
+    
+    if (!holderSnap.exists) {
+      logger.error("Holder does not exist: ", rawDoc.holderUid);
+      logger.error("Deleting incomplete tool");
+      // Delete the document if the holder does not exist
+      await event.data.ref.delete();
+      return;
+    }
+    
+    logger.info("Found Holder: ", rawDoc.holderUid);
+    const holderDisplayName = `${holder.firstName} ${holder.lastName}`;
+    logger.info("Holder DisplayName: ", holderDisplayName);
+    hydroDoc.holder = {
+      uid: rawDoc.holderUid,
+      displayName: holderDisplayName,
+    };
   }
-
-  logger.info("Found Holder: ", rawDoc.holderUid);
-  const holderDisplayName = `${holder.firstName} ${holder.lastName}`;
-  logger.info("Holder DisplayName: ", holderDisplayName);
-  hydroDoc.holder = {
-    uid: rawDoc.holderUid,
-    displayName: holderDisplayName,
-  };
 
   // Check location geopoint and hydrate geohash and city accordingly
   if (rawDoc.geopoint[0] && rawDoc.geopoint[1]) {

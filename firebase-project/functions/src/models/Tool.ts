@@ -1,9 +1,9 @@
-import {ILocation} from "./Location";
+import {Location} from "./Location";
 import {Geopoint} from "geofire-common";
-import {Timestamp} from "firebase/firestore";
-import {ILendrUserPreview} from "./ILendrUser";
+import {Timestamp} from "firebase-admin/firestore";
+import {LendrUserPreview} from "./LendrUser";
 
-export interface ITool {
+export interface Tool {
 
   id?: string; // Added after retrieving from firestore
   name: string;
@@ -12,8 +12,8 @@ export interface ITool {
   imageUrls: string[];
   lenderUid: string;
   holderUid: string;
-  lender?: ILendrUserPreview, // Hydrated by validateTool
-  holder?: ILendrUserPreview, // Hydrated by validateTool
+  lender?: LendrUserPreview, // Hydrated by validateTool
+  holder?: LendrUserPreview, // Hydrated by validateTool
   createdAt: Timestamp;
   /** @deprecated */
   deletedAt?: any; // Only for firestore use
@@ -27,7 +27,7 @@ export interface ITool {
     localPickup: boolean;
     useOnSite: boolean;
   }
-  location: ILocation;
+  location: Location;
   visibility: ToolVisibility;
 }
 
@@ -37,7 +37,7 @@ export interface ITool {
  * Location may eventually be an exception to this because we may want to let the user specify
  * where they are listing a tool.
  */
-export interface IToolForm {
+export interface ToolForm {
   name: string;
   brand?: string;
   description: string;
@@ -54,12 +54,12 @@ export interface IToolForm {
 /**
  * Should only be used by Firestore seed script
  */
-export interface IToolAdminForm extends IToolForm {
+export interface ToolAdminForm extends ToolForm {
   lenderUid?: string;
   holderUid?: string;
   createdAt?: Timestamp;
   modifiedAt?: Timestamp;
-  location?: ILocation;
+  location?: Location;
 }
 
 export type ToolVisibility = "draft" | "published";
