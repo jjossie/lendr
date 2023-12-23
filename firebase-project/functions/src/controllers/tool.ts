@@ -1,6 +1,6 @@
 import {getFirestore} from "firebase-admin/firestore";
 import {NotFoundError} from "../utils/errors";
-import {ITool} from "../models/Tool";
+import {Tool} from "../models/Tool";
 
 export async function hydrateTool(toolId: string) {
   const db = getFirestore();
@@ -9,7 +9,7 @@ export async function hydrateTool(toolId: string) {
     throw new NotFoundError(`Tool with id ${toolId} does not exist`);
   }
 
-  const toolDoc = doc.data() as ITool;
+  const toolDoc = doc.data() as Tool;
 
   return {
     name: toolDoc.name,

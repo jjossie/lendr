@@ -1,11 +1,12 @@
 import {HttpsError, onCall} from "firebase-functions/v2/https";
 import {getFirestore} from "firebase-admin/firestore";
-import {ITool} from "./models/Tool";
-import {getLoan, getRelationId, setLoanStatus} from "./controllers/relation";
-import {ILoan} from "./models/Relation";
+import {Tool} from "./models/Tool";
+import {getLoan, setLoanStatus} from "./controllers/relation";
+import { getRelationId } from "./utils/relation";
+import {Loan} from "./models/Relation";
 import {logger} from "firebase-functions";
 import {getUserFromUid} from "./controllers/users";
-import {ILendrUserPreview} from "./models/ILendrUser";
+import {LendrUserPreview} from "./models/LendrUser";
 import {firestore} from "firebase-admin";
 import {sendExpoNotifications} from "./utils/notifications";
 import Firestore = firestore.Firestore;
@@ -17,7 +18,7 @@ async function getToolByIdFromCallable(db: Firestore, toolId: string) {
   if (!toolDocSnap.exists) {
     throw new HttpsError("not-found", "Tool doesn't appear to exist 😂");
   }
-  const tool = toolDocSnap.data() as ITool;
+  const tool = toolDocSnap.data() as Tool;
   return {toolDocSnap, tool};
 }
 
@@ -27,7 +28,7 @@ async function getRelevantLoansSnap(db: Firestore, relationId: string, toolId: s
       .get();
 }
 
-async function getRelationFromTool(db: Firestore, uid: string, tool: ITool) {
+async function getRelationFromTool(db: Firestore, uid: string, tool: Tool) {
   // Figure out the other user's UID so that we can get the relation
   const currentUserIsLender = (uid === tool.lenderUid); // TODO this logic doesn't work. Not universally, at least.
   const otherUserId = [tool.lenderUid, tool.holderUid].filter(id => id !== uid)[0];
@@ -68,7 +69,7 @@ export const acceptHandoff = onCall(async (req) => {
 
   // Get the loan from the database
   const db = getFirestore();
-  let loan: ILoan;
+  let loan: Loan;
   try {
     loan = await getLoan(db, relationId, loanId);
   } catch (e) {
@@ -126,7 +127,7 @@ export const acceptHandoff = onCall(async (req) => {
   // Update the tool's holder to the current user
   const currentUser = await getUserFromUid(req.auth.uid);
 
-  let holder: ILendrUserPreview = {
+  let holder: LendrUserPreview = {
     uid: req.auth.uid,
     displayName: currentUser.displayName ?? `${currentUser.firstName} ${currentUser.lastName}`,
   };
@@ -168,7 +169,7 @@ export const startHandoff = onCall(async (req) => {
 
   // Get the loan from the database
   const db = getFirestore();
-  let loan: ILoan;
+  let loan: Loan;
   try {
     loan = await getLoan(db, relationId, loanId);
   } catch (e) {
@@ -241,7 +242,7 @@ export const requestReturn = onCall(async (req) => {
 
   // Set the loan status to loanRequested
   relevantLoansSnap.docs.forEach(doc => {
-    const loan = doc.data() as ILoan;
+    const loan = doc.data() as Loan;
     // Make sure the loan status is valid
     if (loan.status === "loaned") {
       loan.status = "returned";

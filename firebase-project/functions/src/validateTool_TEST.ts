@@ -1,9 +1,9 @@
 import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import {logger} from "firebase-functions";
 import {getFirestore} from "firebase-admin/firestore";
-import {getCityNameFromGeopoint, getGeohashedLocation} from "./models/Location";
+import {getCityNameFromGeopoint, getGeohashedLocation} from "./utils/location";
 import {Geopoint} from "geofire-common";
-import {ITool, IToolAdminForm} from "./models/Tool";
+import {Tool, ToolAdminForm} from "./models/Tool";
 
 
 export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async (event) => {
@@ -12,9 +12,9 @@ export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async
   /**
    * Validation
    */
-  const rawDoc = event.data.data() as IToolAdminForm;
+  const rawDoc = event.data.data() as ToolAdminForm;
   // @ts-ignore
-  let hydroDoc: ITool = {...rawDoc};
+  let hydroDoc: Tool = {...rawDoc};
   // @ts-ignore
   delete hydroDoc.geopoint;
 

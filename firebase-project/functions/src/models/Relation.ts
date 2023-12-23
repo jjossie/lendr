@@ -1,22 +1,22 @@
 import {Timestamp} from "firebase-admin/firestore";
-import {ILendrUser} from "./ILendrUser";
-import {ITool} from "./Tool";
+import {LendrUser} from "./LendrUser";
+import {Tool} from "./Tool";
 
-export interface IRelation {
+export interface Relation {
   id?: string // Added after retrieving from firestore
-  users: ILendrUser[];
+  users: LendrUser[];
   createdAt: Timestamp;
-  lastMessage?: IChatMessage; // Hydrated after retrieval
-  otherUser?: ILendrUser; // Hydrated after retrieval
+  lastMessage?: ChatMessage; // Hydrated after retrieval
+  otherUser?: LendrUser; // Hydrated after retrieval
   // Need to figure out how to include subcollection data. Or don't do it at all?
 }
 
-export interface IChatViewListItem {
+export interface ChatViewListItem {
   id: string // Added after retrieving from firestore
-  users?: ILendrUser[];
+  users?: LendrUser[];
   createdAt: Timestamp;
-  lastMessage?: IChatMessage; // Hydrated after retrieval
-  otherUser: ILendrUser;
+  lastMessage?: ChatMessage; // Hydrated after retrieval
+  otherUser: LendrUser;
 }
 
 export type LoanStatus = "inquired" | "loanRequested" | "loaned" | "returnRequested" | "returned" | "canceled";
@@ -25,10 +25,10 @@ export type LoanStatus = "inquired" | "loanRequested" | "loaned" | "returnReques
  * For now, this is using references instead of embedding documents. Should
  * probably change that in the future.
  */
-export interface ILoan {
+export interface Loan {
   id?: string;
   toolId: string;
-  tool?: ITool;
+  tool?: Tool;
   inquiryDate?: Timestamp;
   loanDate?: Timestamp;
   returnDate?: Timestamp;
@@ -37,18 +37,18 @@ export interface ILoan {
   borrowerUid: string;
 }
 
-export interface IChatMessage {
+export interface ChatMessage {
   id?: string;
   text: string;
   senderUid: string;
   receiverUid: string;
   createdAt: Timestamp;
   replyingToId?: string;
-  reaction?: IChatReaction;
+  reaction?: ChatReaction;
   media?: any;
 }
 
-export interface IChatReaction {
+export interface ChatReaction {
   emoji: string;
   userRef: string;
 }

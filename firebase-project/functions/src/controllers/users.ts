@@ -1,23 +1,23 @@
 import {FieldValue, getFirestore, Timestamp} from "firebase-admin/firestore";
-import {ILendrUser} from "../models/ILendrUser";
+import {LendrUser} from "../models/LendrUser";
 import {auth} from "firebase-admin";
 import UserRecord = auth.UserRecord;
 
-export async function getUserFromUid(uid: string): Promise<ILendrUser | undefined> {
+export async function getUserFromUid(uid: string): Promise<LendrUser | undefined> {
   const db = getFirestore();
   const docSnap = await db.doc("users/" + uid).get();
   if (!docSnap.exists) return undefined;
   return {
     uid: docSnap.id,
     ...docSnap.data(),
-  } as ILendrUser;
+  } as LendrUser;
 }
 
 export async function createUser(userRecord: UserRecord) {
   const db = getFirestore();
 
   const userRef = db.doc("users/" + userRecord.uid);
-  const lendrUser: ILendrUser = {
+  const lendrUser: LendrUser = {
     createdAt: FieldValue.serverTimestamp() as Timestamp,
     firstName: userRecord.displayName.split(" ")[0],
     lastName: userRecord.displayName.split(" ")[1],

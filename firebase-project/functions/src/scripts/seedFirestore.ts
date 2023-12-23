@@ -1,5 +1,5 @@
 // Initialize Firebase Admin App
-import {IToolAdminForm, IToolForm} from "../models/Tool";
+import {ToolAdminForm, ToolForm} from "../models/Tool";
 import {getRandomCityGeopoint} from "../models/Location";
 
 let admin = require("firebase-admin");
@@ -17,7 +17,7 @@ const dummyUsersToCreate = [
   {displayName: "Michael Hawk", email: "joemomma@gmail.com", password: "amogus"},
 ];
 
-const dummyToolsToCreate: IToolAdminForm[] = [
+const dummyToolsToCreate: ToolAdminForm[] = [
   {
     lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
     geopoint: [43.82382353401531, -111.7776913516126],
@@ -228,7 +228,7 @@ const generateAuthUsers = () => {
 
 };
 
-const generateTools = async (toolsToCreate: IToolForm[]) => {
+const generateTools = async (toolsToCreate: ToolForm[]) => {
   const db = admin.firestore();
 
   let timeout = 0;

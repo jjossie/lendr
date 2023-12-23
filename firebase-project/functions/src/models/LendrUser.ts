@@ -1,7 +1,7 @@
 import {Timestamp} from "firebase-admin/firestore";
 
 
-export interface ILendrUser {
+export interface LendrUser {
   createdAt: Timestamp | string,
   firstName: string,
   lastName: string,
@@ -14,7 +14,7 @@ export interface ILendrUser {
   email?: string,
 }
 
-export interface ILendrUserPreview {
+export interface LendrUserPreview {
   uid: string,
   displayName: string,
   firstName?: string,
