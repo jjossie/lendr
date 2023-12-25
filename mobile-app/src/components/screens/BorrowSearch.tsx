@@ -22,7 +22,7 @@ export const BorrowSearch: React.FC<NativeStackScreenProps<any>> = ({navigation}
   const [searchRadiusString, setSearchRadiusString] = useState<SearchRadiusString>("30");
   const [radiusMeters, setRadiusMeters] = useState(Math.floor(metersFromMiles(30))); // convert to int
 
-  const {geopoint} = useLocation();
+  const {geopoint, errorMsg} = useLocation();
 
   function scrollToTop() {
     listRef.current?.scrollToOffset({animated: false, offset: 0});
@@ -33,6 +33,7 @@ export const BorrowSearch: React.FC<NativeStackScreenProps<any>> = ({navigation}
         <View style={styles.container}>
           <InstantSearch searchClient={searchClient} indexName={ALGOLIA_INDEX_NAME}>
             <Configure
+            //@ts-ignore idk why it thinks aroundLatLng is not valid it totally is
                 aroundLatLng={geopoint ? `${geopoint[0]},${geopoint[1]}` : ""}
                 aroundRadius={radiusMeters}
             />

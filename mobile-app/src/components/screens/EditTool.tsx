@@ -65,7 +65,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const {geopoint, errorMsg} = useLocation();
   if (errorMsg) {
-    console.log("❇️UseLocation ErrorMsg:", errorMsg);
+    console.log("❇️UseLocation ErrorMsg:", errorMsg); // TODO if there's an error message, editTool will never load. Fix that.
   }
 
   const {authUser} = useAuthentication();

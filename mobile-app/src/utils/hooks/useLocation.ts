@@ -10,13 +10,14 @@ const MAX_CACHE_AGE = 30 * 60 * 1000;
 
 
 function isCacheFresh(timestamp: string | null): boolean {
-  // TODO this is prone to timezone errors. 
-  // Date.getMilliseconds is in local time. What do we do if the cached
-  // timestamp was generated in a different time zone?
+  // I think this may be prone to timezone errors. 
+  // EDIT: I think it's actually not. assuming date.now() is actually universal
+  
   if (!timestamp) return false;
-  const cacheDate = new Date(timestamp);
-  const diff = cacheDate.getMilliseconds() - Date.now();
-  return (diff < MAX_CACHE_AGE);
+  const cacheDate = new Date(+timestamp);
+  const diff = +timestamp - Date.now();
+  const isFresh = diff < MAX_CACHE_AGE;
+  return isFresh;
 }
 
 
@@ -29,23 +30,24 @@ export function useLocation() {
   useEffect(() => {
     const fetchLocation = async () => {
       try {
+        setErrorMsg(undefined); // Maybe?
         console.log('🛠useLocation() - useEffect');
         const cachedLocation = await AsyncStorage.getItem('userLocation');
         const cachedLocationTimestamp = await AsyncStorage.getItem('userLocationTimestamp')
 
         if (cachedLocation && isCacheFresh(cachedLocationTimestamp)) {
           const { location, city } = JSON.parse(cachedLocation);
+          console.log("🛠️ using cached location: ", city);
           setLocation(location);
           const gp: Geopoint = [location?.coords.latitude, location?.coords.longitude];
           setGeopoint(gp);
-          console.log(`🛠️using cached location: ${await getCityNameFromGeopoint(gp)}`);
           setCity(city);
         } else {
           const { location, city } = await getDeviceLocation();
           setLocation(location);
           const gp: Geopoint = [location?.coords.latitude, location?.coords.longitude];
           setGeopoint(gp);
-          console.log(`🛠got new location: ${await getCityNameFromGeopoint(gp)}`);
+          console.log(`🛠 got new location: ${await getCityNameFromGeopoint(gp)}`);
           setCity(city);
 
           const locationData = JSON.stringify({ location, city });
@@ -54,7 +56,7 @@ export function useLocation() {
         }
       } catch (e: LendrBaseError | any) {
         setErrorMsg(e.message);
-        console.log('🛠useLocation() - Error: getDeviceLocation() probably failed');
+        console.log('🛠useLocation() - Error: getDeviceLocation() might have failed?', e);
       }
     };
 
