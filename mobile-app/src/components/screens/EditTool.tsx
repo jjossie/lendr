@@ -17,7 +17,7 @@ import {
   TextArea,
   theme,
 } from "native-base";
-import {ExchangePreferences, IToolForm, TimeUnit} from "../../models/Tool";
+import {ExchangePreferences, ToolForm, TimeUnit} from "../../models/tool";
 import {createTool, deleteTool, editTool, getNextToolId, getToolById} from "../../controllers/tool";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {Keyboard} from "react-native";
@@ -178,7 +178,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     setIsLoading(true);
     setIsError(false);
 
-    let toolForm: IToolForm = {
+    let toolForm: ToolForm = {
       name,
       imageUrls,
       description,
@@ -213,7 +213,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     // setIsLoading(true);
     setIsError(false);
 
-    let toolForm: IToolForm = {
+    let toolForm: ToolForm = {
       name,
       imageUrls,
       description,

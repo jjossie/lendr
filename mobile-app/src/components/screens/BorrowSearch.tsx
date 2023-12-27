@@ -8,7 +8,7 @@ import {SearchBox} from "../utilities/algolia/SearchBox";
 import {InfiniteHits} from "../utilities/algolia/InfiniteHits";
 import {Hit} from "../utilities/algolia/Hit";
 import {useLocation} from "../../utils/hooks/useLocation";
-import {metersFromMiles} from "../../models/Location";
+import {metersFromMiles} from "../../models/location";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 
 type SearchRadiusString = "5" | "10" | "20" | "30" | "50" | "100" | "300" | "500";

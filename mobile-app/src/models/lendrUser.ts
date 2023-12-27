@@ -3,7 +3,7 @@ import {db} from "../config/firebase";
 import {ObjectValidationError} from "../utils/errors";
 
 
-export interface ILendrUser {
+export interface LendrUser {
   createdAt: Timestamp | string,
   firstName?: string,
   lastName?: string,
@@ -15,7 +15,7 @@ export interface ILendrUser {
   photoURL?: string,
 }
 
-export interface ILendrUserPreview {
+export interface LendrUserPreview {
   uid: string,
   displayName: string,
   firstName?: string,

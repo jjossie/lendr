@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Button, Column, Heading, Image, Row, ScrollView, Text, useTheme} from "native-base";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {getToolById} from "../../controllers/tool";
-import {ITool} from "../../models/Tool";
+import {Tool} from "../../models/tool";
 import LenderProfilePreview from "../LenderProfilePreview";
 import {createRelation} from "../../controllers/relation";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
@@ -12,7 +12,7 @@ import {AntDesign} from "@expo/vector-icons";
 
 const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
   // State
-  const [toolData, setToolData] = useState<ITool | undefined>();
+  const [toolData, setToolData] = useState<Tool | undefined>();
   const [isLoading, setIsLoading] = useState(false);
   const {authUser} = useAuthentication();
   const {colors} = useTheme();

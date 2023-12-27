@@ -1,6 +1,6 @@
 import {Timestamp} from "firebase-admin/firestore";
-import {LendrUser} from "./LendrUser";
-import {Tool} from "./Tool";
+import {LendrUser} from "./lendrUser";
+import {Tool} from "./tool";
 
 export interface Relation {
   id?: string // Added after retrieving from firestore

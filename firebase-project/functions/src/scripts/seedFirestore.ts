@@ -1,5 +1,5 @@
 // Initialize Firebase Admin App
-import {ToolAdminForm, ToolForm} from "../models/Tool";
+import {ToolAdminForm, ToolForm} from "../models/tool";
 import {getRandomCityGeopoint} from "../utils/location";
 
 let admin = require("firebase-admin");

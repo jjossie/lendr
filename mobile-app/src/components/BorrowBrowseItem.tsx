@@ -3,11 +3,11 @@ import {Column, Row, Text} from 'native-base';
 import Card from "./Card";
 import {Image, StyleSheet} from "react-native";
 import {NavigationProp} from "@react-navigation/native";
-import {ITool} from "../models/Tool";
+import {Tool} from "../models/tool";
 
 export interface BorrowBrowseItemProps {
   navigation: NavigationProp<any>;
-  tool: ITool;
+  tool: Tool;
 }
 
 const BorrowBrowseItem: React.FC<BorrowBrowseItemProps> = ({navigation, tool}) => {

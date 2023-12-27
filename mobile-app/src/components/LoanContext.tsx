@@ -1,12 +1,12 @@
 import React from 'react';
 import {Box, useTheme} from 'native-base';
-import {ILoan, IRelation} from "../models/Relation";
+import {Loan, Relation} from "../models/relation";
 import LoanContextItem from "./LoanContextItem";
 import Carousel from "./utilities/Carousel";
 
 export interface LoanContextProps {
-  loans: ILoan[];
-  relation: IRelation;
+  loans: Loan[];
+  relation: Relation;
 }
 
 const LoanContext: React.FC<LoanContextProps> = ({loans, relation}) => {

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Button, Column, Row, Text, theme} from 'native-base';
-import {ILoan, IRelation} from "../models/Relation";
+import {Loan, Relation} from "../models/relation";
 import Card from "./Card";
 import {Image} from "react-native";
 import {acceptHandoff, startHandoff} from "../controllers/relation";
@@ -10,8 +10,8 @@ import {Timestamp} from "firebase/firestore";
 import AvailabilityChip from "./AvailabilityChip";
 
 export interface LoanContextItemProps {
-  loan: ILoan;
-  relation: IRelation;
+  loan: Loan;
+  relation: Relation;
   verbose?: boolean;
 }
 

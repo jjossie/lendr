@@ -1,5 +1,5 @@
-import {ILocation} from "./Location";
-import {ILendrUser} from "./ILendrUser";
+import {LendrLocation} from "./location";
+import {LendrUser} from "./lendrUser";
 import {Geopoint} from "geofire-common";
 import {Timestamp} from "firebase/firestore";
 
@@ -8,7 +8,7 @@ type Rate = {
   timeUnit: TimeUnit
 };
 
-export interface ITool {
+export interface Tool {
 
   id?: string; // Added after retrieving from firestore
   name: string;
@@ -17,8 +17,8 @@ export interface ITool {
   imageUrls: string[];
   lenderUid: string;
   holderUid: string;
-  lender?: ILendrUser, // Hydrated after retrieving from firestore
-  holder?: ILendrUser, // Must be hydrated... after retrieving from firestore?
+  lender?: LendrUser, // Hydrated after retrieving from firestore
+  holder?: LendrUser, // Must be hydrated... after retrieving from firestore?
   createdAt: Timestamp;
   deletedAt?: any; // Only for firestore use, deprecated
   modifiedAt: Timestamp;
@@ -28,11 +28,11 @@ export interface ITool {
     localPickup: boolean;
     useOnSite: boolean;
   }
-  location: ILocation;
+  location: LendrLocation;
   visibility: ToolVisibility;
 }
 
-export interface IToolPreview {
+export interface ToolPreview {
   id: string;
   name: string;
   imageUrl: string;
@@ -41,11 +41,11 @@ export interface IToolPreview {
 
 /**
  * This should represent only data that is physically entered by the user. Everything else
- * should be gathered by the controller - the lenderRef, other assumed information.
+ * should be gathered by the controller - the lenderUid, other assumed information.
  * Location may eventually be an exception to this because we may want to let the user specify
  * where they are listing a tool.
  */
-export interface IToolForm {
+export interface ToolForm {
   name: string;
   brand?: string;
   description: string;

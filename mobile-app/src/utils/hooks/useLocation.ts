@@ -1,5 +1,5 @@
 import {getCurrentPositionAsync, LocationObject, requestForegroundPermissionsAsync} from "expo-location";
-import {getCityNameFromGeopoint} from "../../models/Location";
+import {getCityNameFromGeopoint} from "../../models/location";
 import {Geopoint} from "geofire-common";
 import {LendrBaseError} from "../errors";
 

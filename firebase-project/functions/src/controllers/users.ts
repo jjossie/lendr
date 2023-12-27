@@ -1,5 +1,5 @@
 import {FieldValue, getFirestore, Timestamp} from "firebase-admin/firestore";
-import {LendrUser} from "../models/LendrUser";
+import {LendrUser} from "../models/lendrUser";
 import {auth} from "firebase-admin";
 import UserRecord = auth.UserRecord;
 

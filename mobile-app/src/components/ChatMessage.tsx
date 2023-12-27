@@ -1,12 +1,12 @@
 import React from 'react';
 import {Box, Card, Row, Text, theme} from 'native-base';
 import {useAuthentication} from "../utils/hooks/useAuthentication";
-import {IChatMessage, IRelation} from "../models/Relation";
+import {ChatMessage, Relation} from "../models/relation";
 import AvatarImage from "./AvatarImage";
 
 export interface ChatMessageProps {
-  message: IChatMessage,
-  relation: IRelation,
+  message: ChatMessage,
+  relation: Relation,
   // index: number
 }
 

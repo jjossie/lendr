@@ -3,7 +3,7 @@ import {logger} from "firebase-functions";
 import {getFirestore} from "firebase-admin/firestore";
 import {getCityNameFromGeopoint, getGeohashedLocation} from "./utils/location";
 import {Geopoint} from "geofire-common";
-import {Tool, ToolAdminForm} from "./models/Tool";
+import {Tool, ToolAdminForm} from "./models/tool";
 
 
 export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async (event) => {

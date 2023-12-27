@@ -3,13 +3,13 @@ import {db} from "../../config/firebase";
 import {useAuthentication} from "./useAuthentication";
 import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {getRelationId, handleRelationsQuerySnapshot} from "../../controllers/relation";
-import {IChatViewListItem} from "../../models/Relation";
+import {ChatViewListItem} from "../../models/relation";
 
-export function useMyChats(): { chats: IChatViewListItem[] | undefined, isLoaded: boolean, setIsLoaded: Dispatch<SetStateAction<boolean>>} {
+export function useMyChats(): { chats: ChatViewListItem[] | undefined, isLoaded: boolean, setIsLoaded: Dispatch<SetStateAction<boolean>>} {
   console.log("🛠️useMyChats() - Hook Called");
 
   // State
-  const [chats, setChats] = useState<IChatViewListItem[]>([]);
+  const [chats, setChats] = useState<ChatViewListItem[]>([]);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const {authUser, user} = useAuthentication();
 

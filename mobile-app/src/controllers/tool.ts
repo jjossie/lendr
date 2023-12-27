@@ -16,12 +16,12 @@ import {
   where,
 } from "firebase/firestore";
 import {db} from "../config/firebase";
-import {ITool, IToolForm} from "../models/Tool";
+import {Tool, ToolForm} from "../models/tool";
 import {getAuth} from "firebase/auth";
 import {AuthError, NotFoundError, ObjectValidationError} from "../utils/errors";
 
 import {Geopoint} from "geofire-common";
-import {distanceBetweenMi, getCityNameFromGeopoint, getGeohashedLocation, metersFromMiles} from "../models/Location";
+import {distanceBetweenMi, getCityNameFromGeopoint, getGeohashedLocation, metersFromMiles} from "../models/location";
 
 const geofire = require("geofire-common");
 
@@ -32,7 +32,7 @@ export function getNextToolId() {
   return docRef.id;
 }
 
-export async function createTool(toolForm: IToolForm, toolId: string) {
+export async function createTool(toolForm: ToolForm, toolId: string) {
   if (!toolId)
     throw new ObjectValidationError("ToolId is required for creation");
 
@@ -64,7 +64,7 @@ export async function createTool(toolForm: IToolForm, toolId: string) {
   if (!auth.currentUser)
     throw new AuthError();
 
-  const toolData: ITool = {
+  const toolData: Tool = {
     lenderUid: auth.currentUser.uid,
     holderUid: auth.currentUser.uid,
     createdAt: serverTimestamp() as Timestamp,
@@ -87,7 +87,7 @@ export async function createTool(toolForm: IToolForm, toolId: string) {
   console.log("🪛Added New Tool: ", toolDocRef.id);
 }
 
-export async function editTool(toolId: string, toolForm: IToolForm) {
+export async function editTool(toolId: string, toolForm: ToolForm) {
   console.log(`🪛Editing tool ${toolId}`);
   // Validate Fields
   if (!(
@@ -135,7 +135,7 @@ export async function deleteTool(toolId: string) {
     throw new NotFoundError(`Tool with id ${toolId} not found 🤷‍`);
 
   // Confirm this user owns it
-  const tool = toolSnap.data() as ITool;
+  const tool = toolSnap.data() as Tool;
   if (tool.lenderUid != auth.currentUser.uid)
     throw new AuthError("You are not authorized to delete this tool 🤨");
 
@@ -144,27 +144,27 @@ export async function deleteTool(toolId: string) {
 
 /**
  * @deprecated Use getToolsWithinRadius instead
- * @returns {Promise<ITool[]>}
+ * @returns {Promise<Tool[]>}
  */
-export async function getAllTools(): Promise<ITool[]> {
+export async function getAllTools(): Promise<Tool[]> {
   const querySnapshot = await getDocs(collection(db, "tools"));
-  let tools: ITool[] = [];
+  let tools: Tool[] = [];
   querySnapshot.forEach(doc => tools.push({
     id: doc.id,
     ...doc.data(),
-  } as ITool));
+  } as Tool));
   return tools;
 }
 
 
-export async function getToolById(toolId: string, userGeopoint?: Geopoint): Promise<ITool | undefined> {
+export async function getToolById(toolId: string, userGeopoint?: Geopoint): Promise<Tool | undefined> {
   const toolDocRef = doc(db, "tools", toolId);
   const toolDocSnap = await getDoc(toolDocRef);
 
   if (!toolDocSnap.exists())
     throw new NotFoundError(`Tool with id ${toolId} does not exist in database 🫢`);
 
-  const toolData = toolDocSnap.data() as ITool;
+  const toolData = toolDocSnap.data() as Tool;
 
   const lenderSnap = await getDoc(doc(db, "users", toolData.lenderUid));
 
@@ -172,11 +172,11 @@ export async function getToolById(toolId: string, userGeopoint?: Geopoint): Prom
     throw new NotFoundError(`Lender with id ${toolData.lenderUid} not found ⁉️`);
 
   const geopoint: Geopoint = [toolData.location.latitude, toolData.location.longitude];
-  let result: ITool = {
+  let result: Tool = {
     id: toolDocSnap.id,
     lender: lenderSnap.data(),
     ...toolData,
-  } as ITool;
+  } as Tool;
 
   // if (!result.location.city)
   if (!result.location.city || result.location.city.split(",").length < 2)
@@ -212,16 +212,16 @@ export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
 
 
   const snapshots = await Promise.all(promises);
-  const tools: ITool[] = [];
+  const tools: Tool[] = [];
   snapshots.forEach(snapshot => {
     snapshot.forEach(document => {
-      const toolData = document.data() as ITool;
+      const toolData = document.data() as Tool;
       // Get geopoint from tool data
       const geopoint: Geopoint = [toolData.location.latitude, toolData.location.longitude];
       // Check if geopoint is within radius
       if (distanceBetweenMi(center, geopoint) < radiusMi) {
         // Populate tool fields
-        const tool: ITool = {
+        const tool: Tool = {
           id: document.id,
           ...toolData,
           location: {
@@ -240,7 +240,7 @@ export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
 export function validateTools() {
   getAllTools()
       .then((tools) => {
-        tools.forEach((tool: ITool) => {
+        tools.forEach((tool: Tool) => {
 
           if (tool.deletedAt) {
             console.log(`🪛Skipping deleted tool ${tool.id}`);

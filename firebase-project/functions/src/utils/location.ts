@@ -1,6 +1,6 @@
 import {distanceBetween, geohashForLocation, Geopoint} from "geofire-common";
 
-import { Location } from "../models/Location";
+import { Location } from "../models/location";
 
 
 export const KM_TO_MILE = 0.621371;

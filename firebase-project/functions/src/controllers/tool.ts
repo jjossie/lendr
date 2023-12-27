@@ -1,6 +1,6 @@
 import {getFirestore} from "firebase-admin/firestore";
 import {NotFoundError} from "../utils/errors";
-import {Tool} from "../models/Tool";
+import {Tool} from "../models/tool";
 
 export async function hydrateTool(toolId: string) {
   const db = getFirestore();

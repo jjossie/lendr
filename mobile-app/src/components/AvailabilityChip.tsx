@@ -1,13 +1,13 @@
 import React from 'react';
 import {Circle, Pressable, Row, Text, theme} from 'native-base';
-import {ILendrUserPreview} from "../models/ILendrUser";
+import {LendrUserPreview} from "../models/lendrUser";
 import AvatarImage from "./AvatarImage";
 import {useNavigation} from "@react-navigation/native";
 import {useAuthentication} from "../utils/hooks/useAuthentication";
 import {getRelationId} from "../controllers/relation";
 
 export interface AvailabilityChipProps {
-  user?: ILendrUserPreview;
+  user?: LendrUserPreview;
   showAvailable?: boolean;
 }
 

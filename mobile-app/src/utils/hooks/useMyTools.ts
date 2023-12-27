@@ -1,14 +1,14 @@
 import React, {Dispatch, SetStateAction} from 'react';
 import {collection, collectionGroup, onSnapshot, query, where} from "firebase/firestore";
 import {db} from "../../config/firebase";
-import {ITool} from "../../models/Tool";
+import {Tool} from "../../models/tool";
 import {useAuthentication} from "./useAuthentication";
-import {ILoan} from "../../models/Relation";
+import {Loan} from "../../models/relation";
 
-export function useMyTools(): { lendingToolsList: ITool[], borrowingLoansList: ILoan[], setReload: Dispatch<SetStateAction<boolean>> } {
+export function useMyTools(): { lendingToolsList: Tool[], borrowingLoansList: Loan[], setReload: Dispatch<SetStateAction<boolean>> } {
 
-  const [lendingToolsList, setLendingToolsList] = React.useState<ITool[]>([]);
-  const [borrowingLoansList, setBorrowingLoansList] = React.useState<ILoan[]>([]);
+  const [lendingToolsList, setLendingToolsList] = React.useState<Tool[]>([]);
+  const [borrowingLoansList, setBorrowingLoansList] = React.useState<Loan[]>([]);
   const [reload, setReload] = React.useState(false);
 
   const {authUser, user} = useAuthentication();
@@ -24,9 +24,9 @@ export function useMyTools(): { lendingToolsList: ITool[], borrowingLoansList: I
     );
 
     const lendingUnsubscribe = onSnapshot(lendingQuery, (snapshot) => {
-      const docDataList: ITool[] = [];
+      const docDataList: Tool[] = [];
       snapshot.forEach(document => {
-        docDataList.push({id: document.id, ...document.data()} as ITool);
+        docDataList.push({id: document.id, ...document.data()} as Tool);
       });
       setLendingToolsList(docDataList);
     });
@@ -43,10 +43,10 @@ export function useMyTools(): { lendingToolsList: ITool[], borrowingLoansList: I
 
       borrowingUnsubscribe = onSnapshot(borrowingQuery, (snapshot) => {
         console.log("🛠️borrowingQuery results:", snapshot.size);
-        const docDataList: ILoan[] = [];
+        const docDataList: Loan[] = [];
         snapshot.forEach(document => {
           // console.log("🛠️Found borrowing loan:", JSON.stringify(document.data(), null, 2));
-          docDataList.push({id: document.id, ...document.data()} as ILoan);
+          docDataList.push({id: document.id, ...document.data()} as Loan);
         });
         setBorrowingLoansList(docDataList);
       });

@@ -5,7 +5,7 @@ import {useNavigation} from "@react-navigation/native";
 import {useMyTools} from "../../utils/hooks/useMyTools";
 import LoanContextItem from "../LoanContextItem";
 import {getRelationById, getRelationId} from "../../controllers/relation";
-import {ILoan, IRelation} from "../../models/Relation";
+import {Loan, Relation} from "../../models/relation";
 import {RefreshControl} from 'react-native';
 
 export interface BorrowerInventoryProps {
@@ -18,14 +18,14 @@ const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
   const navigation = useNavigation();
   const {borrowingLoansList, setReload} = useMyTools();
   const [refreshing, setRefreshing] = useState<boolean>(false);
-  const [loansAndRelations, setLoansAndRelations] = React.useState<{loan: ILoan, relation: IRelation }[]>([]);
+  const [loansAndRelations, setLoansAndRelations] = React.useState<{loan: Loan, relation: Relation }[]>([]);
 
   // console.log("❇️BorrowingLoansList:", JSON.stringify(borrowingLoansList, null, 2));
 
   // Side Effects
   useEffect(() => {
     // console.log("❇️< BorrowerInventory > useEffect()");
-    let promises: Promise<{loan: ILoan, relation: IRelation }>[] = [];
+    let promises: Promise<{loan: Loan, relation: Relation }>[] = [];
 
     borrowingLoansList.forEach(loan => promises.push(getRelationFromLoan(loan)));
 
@@ -44,7 +44,7 @@ const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
     }, 1000)
   };
 
-  const getRelationFromLoan = async (loan: ILoan) => {
+  const getRelationFromLoan = async (loan: Loan) => {
     const relationID = getRelationId(loan.borrowerUid, loan.lenderUid);
     // console.log(`❇️getting relation ${relationID}`);
     const relation = await getRelationById(relationID);

@@ -6,7 +6,7 @@ import Card from "../../Card";
 import {useNavigation} from "@react-navigation/native";
 import {Highlight} from "./Highlight";
 import {useLocation} from "../../../utils/hooks/useLocation";
-import {distanceBetweenMi} from "../../../models/Location";
+import {distanceBetweenMi} from "../../../models/location";
 
 type HitProps = {
   hit: ProductHit;

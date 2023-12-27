@@ -92,7 +92,7 @@ const stateAbbreviations: any = {
 };
 
 
-export interface ILocation {
+export interface LendrLocation {
   latitude: number;
   longitude: number;
   geohash: string; // Added after retrieving from firestore
@@ -101,7 +101,7 @@ export interface ILocation {
 }
 
 
-export function getGeohashedLocation(geopoint: Geopoint): ILocation {
+export function getGeohashedLocation(geopoint: Geopoint): LendrLocation {
   const geohash = geohashForLocation(geopoint);
   return {
     latitude: geopoint[0],

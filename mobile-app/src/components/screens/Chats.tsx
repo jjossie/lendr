@@ -4,7 +4,7 @@ import {ChatListItem} from "../ChatListItem";
 import {SwipeListView} from "react-native-swipe-list-view";
 import {useMyChats} from "../../utils/hooks/useMyChats";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
-import {ILendrUserPreview} from "../../models/ILendrUser";
+import {LendrUserPreview} from "../../models/lendrUser";
 
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {RefreshControl} from "react-native";
@@ -53,7 +53,7 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
                 : chat.otherUser.displayName;
             const timeStampSeconds = chat.lastMessage ? chat.lastMessage.createdAt?.seconds : chat.createdAt?.seconds;
             const timeStamp = new Date(timeStampSeconds * 1000).toLocaleTimeString();
-            const otherUserPreview: ILendrUserPreview = {
+            const otherUserPreview: LendrUserPreview = {
               displayName,
               photoURL: chat.otherUser?.photoURL ?? "",
               uid: chat.otherUser.uid
