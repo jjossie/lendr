@@ -3,7 +3,7 @@ import {Box, ChevronRightIcon, Column, IconButton, Input, KeyboardAvoidingView, 
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {useChatMessages} from "../../utils/hooks/useChatMessages";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
-import ChatMessage from "../ChatMessage";
+import ChatSingleMessage from "../ChatMessage";
 import {getOtherUserInRelation, sendChatMessage} from "../../controllers/relation";
 import {LendrBaseError} from "../../utils/errors";
 import {Platform, ScrollView} from "react-native";
@@ -84,7 +84,7 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
               onContentSizeChange={scrollToBottom}
           >
             {messages.map((message, index) => (
-                <ChatMessage message={message} relation={relation} key={index}/>
+                <ChatSingleMessage message={message} relation={relation} key={index}/>
             ))
             }
           </ScrollView>

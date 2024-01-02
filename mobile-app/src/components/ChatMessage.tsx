@@ -10,7 +10,7 @@ export interface ChatMessageProps {
   // index: number
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({message, relation}) => {
+const ChatSingleMessage: React.FC<ChatMessageProps> = ({message, relation}) => {
   const {user} = useAuthentication()
   if (!user || !relation.otherUser) return null;
 
@@ -42,4 +42,4 @@ const ChatMessage: React.FC<ChatMessageProps> = ({message, relation}) => {
   );
 };
 
-export default ChatMessage;
+export default ChatSingleMessage;
