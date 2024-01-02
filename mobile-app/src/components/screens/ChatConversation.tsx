@@ -8,14 +8,23 @@ import {getOtherUserInRelation, sendChatMessage} from "../../controllers/relatio
 import {LendrBaseError} from "../../utils/errors";
 import {Platform, ScrollView} from "react-native";
 import LoanContext from "../LoanContext";
+// import { ParamListBase } from '@react-navigation/native';
 
+// export interface ChatConversationProps extends ParamListBase {
+//   chatConversationPropception?: {
+//     title?: string;
+//   }
+// }
 
 const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
 
   // Content State
   const [messageText, setMessageText] = useState<string>(route.params?.draftMessage ?? "");
+  const [screenTitle, setScreenTitle] = useState<string>(route.params?.title ?? "");
   const {messages, relation, loans} = useChatMessages(route.params?.relationId);
   const {user} = useAuthentication();
+  
+  console.log("🌀 ChatConversation screen title: ", screenTitle);
 
   // UI State
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -40,7 +49,7 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
   };
 
   const scrollToBottom = () => {
-    setTimeout((e) => {
+    setTimeout(() => {
       if (scrollViewRef && scrollViewRef.current) {
         scrollViewRef.current.scrollToEnd({animated: true});
       }

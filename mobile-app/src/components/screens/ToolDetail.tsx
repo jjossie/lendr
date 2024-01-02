@@ -16,7 +16,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
   const [isLoading, setIsLoading] = useState(false);
   const {authUser} = useAuthentication();
   const {colors} = useTheme();
-  console.log(`❇️ToolDetail rendering with Tool: ${toolData?.name}`);
+  console.log(`🌀ToolDetail rendering with Tool: ${toolData?.name}`);
 
   // Side Effect
   useEffect(() => {
@@ -25,7 +25,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
           setToolData(data!);
         })
         .catch((e) => {
-          console.log("❇️Error in retrieving ToolData 👹");
+          console.log("🌀Error in retrieving ToolData 👹");
           console.log(e.message);
           navigation.goBack();
         });
@@ -37,16 +37,16 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
     try {
       setIsLoading(true);
       const relationId = await createRelation(toolData!.lenderUid, toolData!.id!);
-      console.log("❇️Created new relation: ", relationId);
+      console.log("🌀Created new relation: ", relationId);
       setIsLoading(false);
 
       navigation.navigate("Inbox", {
-        // screen: "ChatConversation",
+        screen: "ChatConversation",
         relationId,
         draftMessage: `Hey, I'm interested in this ${toolData?.name ?? "tool"}!`,
       });
     } catch (e) {
-      console.log("❇️Failed to create relation", e);
+      console.log("🌀Failed to create relation", e);
     }
   };
 
@@ -58,7 +58,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
 
   const isOwner = toolData?.lenderUid === authUser?.uid;
 
-  console.log("❇️< ToolDetail > ImageURLs: ", JSON.stringify(toolData?.imageUrls, null, 2));
+  console.log("🌀< ToolDetail > ImageURLs: ", JSON.stringify(toolData?.imageUrls, null, 2));
 
 
   return (
