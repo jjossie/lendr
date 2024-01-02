@@ -14,10 +14,10 @@ export interface ChatsProps {
 }
 
 const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
-  console.log("❇️️< Chats > Component Rendering");
+  console.log("🌀️< Chats > Component Rendering");
 
   if (route.params?.relationId){
-    console.log("❇️< Chats > Navigating to ChatConversation");
+    console.log("🌀< Chats > Navigating to ChatConversation");
     const relationId = route.params.relationId;
     const draftMessage = route.params.draftMessage;
     // @ts-ignore

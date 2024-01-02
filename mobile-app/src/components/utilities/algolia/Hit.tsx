@@ -40,7 +40,7 @@ export function Hit({hit}: HitProps) {
       <Card
           px={0} py={0}
           onPress={() => {
-            console.log("❇️onPress => navigating to ToolDetail ", tool.objectID);
+            console.log("🌀onPress => navigating to ToolDetail ", tool.objectID);
             (navigation.getParent());
             // @ts-ignore
             navigation.navigate("SearchToolDetail", {

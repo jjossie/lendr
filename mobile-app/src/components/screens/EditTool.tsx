@@ -65,7 +65,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const {geopoint, errorMsg} = useLocation();
   if (errorMsg) {
-    console.log("❇️UseLocation ErrorMsg:", errorMsg); // TODO if there's an error message, editTool will never load. Fix that.
+    console.log("🌀UseLocation ErrorMsg:", errorMsg); // TODO if there's an error message, editTool will never load. Fix that.
   }
 
   const {authUser} = useAuthentication();
@@ -136,16 +136,16 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   }, [retryCount, geopoint, toolId]); // Retry whenever retryCount changes
 
   useEffect(() => {
-    console.log("❇️useEffect:toolId:", toolId);
+    console.log("🌀useEffect:toolId:", toolId);
     if (unsubOnBlur) unsubOnBlur();
     if (unsubBeforeRemove) unsubBeforeRemove();
     const unsubB = navigation.addListener("blur", (e) => {
-      console.log("❇️Blur", e.type);
+      console.log("🌀Blur", e.type);
       deleteDraftIfUnedited();
     });
     setUnsubOnBlur(unsubB);
     const unsubBR = navigation.addListener("beforeRemove", (e) => {
-      console.log("❇️BeforeRemove", e.type);
+      console.log("🌀BeforeRemove", e.type);
       deleteDraftIfUnedited();
     });
     setUnsubBeforeRemove(unsubBR);
@@ -155,7 +155,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   // Callbacks
   const deleteDraftIfUnedited = () => {
     // Delete the tool if the draft tool is unchanged
-    console.log("❇️Attempting to delete draft");
+    console.log("🌀Attempting to delete draft");
     if (
         !isEditing &&
         name == DEFAULT_NAME &&
@@ -169,7 +169,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     ) {
       // Delete the tool
       deleteTool(toolId).then(() => {
-        console.log("❇️Deleted draft tool");
+        console.log("🌀Deleted draft tool");
       });
     }
   };
@@ -196,11 +196,11 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       // Save existing tool
       if (publish) toolForm.visibility = "published";
       await editTool(toolId, toolForm);
-      console.log("❇️Tool Saved!");
+      console.log("🌀Tool Saved!");
       setIsLoading(false);
       navigation.goBack();
     } catch (e) {
-      console.log("❇️Failed to edit tool 📛");
+      console.log("🌀Failed to edit tool 📛");
       console.error(e);
       setErrorMessage("Failed to save tool");
       setIsError(true);
@@ -227,23 +227,23 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     };
     if (brand) toolForm.brand = brand;
     if (toolExists) {
-      console.log("❇️Tool already exists");
+      console.log("🌀Tool already exists");
       return;
     }
     if (!toolId) {
       const nextToolId = getNextToolId();
-      console.log("❇️Next Tool ID: " + nextToolId);
+      console.log("🌀Next Tool ID: " + nextToolId);
       setToolId(nextToolId);
       return;
     }
     try {
       // Create new tool. This will be done immediately when "Add New Tool" is clicked.
-      console.log("❇️Attempting to create draft tool");
+      console.log("🌀Attempting to create draft tool");
       await createTool(toolForm, toolId);
       setToolExists(true);
       setIsLoading(false);
     } catch (e) {
-      console.log("❇️Failed to create tool");
+      console.log("🌀Failed to create tool");
       console.log(e);
       setIsLoading(false);
       throw e;
@@ -269,26 +269,26 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
   }, [toolId, navigation]);
 
   const handleSelectImage = async (uri: string, index = 0) => {
-    console.log("❇️handleSelectImage()");
+    console.log("🌀handleSelectImage()");
     if (!authUser)
       throw new AuthError("Cannot upload image a user associated");
 
     const imageUrl = await uploadToolImageToFirebase(uri, toolId, index);
     if (!imageUrl)
       throw new LendrBaseError(`Image url was blank: ${imageUrl}`);
-    console.log("❇️ImageUrl: " + imageUrl);
+    console.log("🌀ImageUrl: " + imageUrl);
 
     setImageUrls(list => [...list, imageUrl]);
-    console.log("❇️Downloadable Image URL: " + imageUrl);
+    console.log("🌀Downloadable Image URL: " + imageUrl);
   };
 
   const handleDeleteImage = async (uri: string, index = 0) => {
-    console.log("❇️handleDeleteImage()");
+    console.log("🌀handleDeleteImage()");
     if (!toolId)
       throw new LendrBaseError("Cannot delete image without a tool ID");
     try {
       await deleteToolImageFromFirebase(toolId);
-      console.log("❇️Tool deleted successfully");
+      console.log("🌀Tool deleted successfully");
     } catch (e) {
       throw new LendrBaseError("Failed to delete tool image");
     }

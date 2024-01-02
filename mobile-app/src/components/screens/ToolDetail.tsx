@@ -15,8 +15,7 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
   const [toolData, setToolData] = useState<Tool | undefined>();
   const [isLoading, setIsLoading] = useState(false);
   const {authUser} = useAuthentication();
-  const {colors} = useTheme();
-  console.log(`🌀ToolDetail rendering with Tool: ${toolData?.name}`);
+  const {colors} = useTheme();  console.log(`🌀ToolDetail rendering with Tool: ${toolData?.name}`);
 
   // Side Effect
   useEffect(() => {

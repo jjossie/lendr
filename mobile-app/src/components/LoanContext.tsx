@@ -10,7 +10,7 @@ export interface LoanContextProps {
 }
 
 const LoanContext: React.FC<LoanContextProps> = ({loans, relation}) => {
-  console.log("❇️< LoanContext >", JSON.stringify(loans, null, 2));
+  console.log("🌀< LoanContext >", JSON.stringify(loans, null, 2));
 
   const {colors} = useTheme();
 

@@ -20,17 +20,17 @@ const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [loansAndRelations, setLoansAndRelations] = React.useState<{loan: Loan, relation: Relation }[]>([]);
 
-  // console.log("❇️BorrowingLoansList:", JSON.stringify(borrowingLoansList, null, 2));
+  // console.log("🌀BorrowingLoansList:", JSON.stringify(borrowingLoansList, null, 2));
 
   // Side Effects
   useEffect(() => {
-    // console.log("❇️< BorrowerInventory > useEffect()");
+    // console.log("🌀< BorrowerInventory > useEffect()");
     let promises: Promise<{loan: Loan, relation: Relation }>[] = [];
 
     borrowingLoansList.forEach(loan => promises.push(getRelationFromLoan(loan)));
 
     Promise.all(promises).then((results) => {
-      // console.log("❇️< BorrowerInventory > loansAndRelations results:", JSON.stringify(results, null, 2));
+      // console.log("🌀< BorrowerInventory > loansAndRelations results:", JSON.stringify(results, null, 2));
       setLoansAndRelations(results);
     });
   }, [borrowingLoansList]);

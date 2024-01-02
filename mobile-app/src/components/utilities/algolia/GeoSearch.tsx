@@ -28,7 +28,7 @@ export function GeoSearch(props: UseGeoSearchProps) {
 
   const {geopoint} = useLocation();
 
-  console.log("❇️GeoSearch Position: ", JSON.stringify(position));
+  console.log("🌀GeoSearch Position: ", JSON.stringify(position));
 
   return <>
     <Text>{JSON.stringify(position)}</Text>

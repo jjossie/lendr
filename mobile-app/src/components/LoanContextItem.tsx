@@ -30,14 +30,14 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation, verbos
   const [isLoading, setIsLoading] = useState(false);
 
   if (!loan.tool) {
-    console.log("❇️< LoanContextItem > No tool attached");
+    console.log("🌀< LoanContextItem > No tool attached");
     return (<></>);
   }
 
 
   console.log(`❇️${loan.tool.name} - Loan Status:`, loan.status);
-  // console.log("❇️Loan:", JSON.stringify(loan, null, 2));
-  // console.log("❇️Relation:", JSON.stringify(relation, null, 2));
+  // console.log("🌀Loan:", JSON.stringify(loan, null, 2));
+  // console.log("🌀Relation:", JSON.stringify(relation, null, 2));
 
 
   // Derived state

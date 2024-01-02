@@ -87,9 +87,9 @@ const ToolImagePicker: React.FC<ImagePickerProps> = ({
     setIsLoading(true);
     try {
       await onRemoveImage(selectedImages[index], index);
-      console.log("❇️Before removing image: ", selectedImages);
+      console.log("🌀Before removing image: ", selectedImages);
       setSelectedImages(images => images.filter(img => img !== selectedImages[index]));
-      console.log("❇️Removed image: ", selectedImages);
+      console.log("🌀Removed image: ", selectedImages);
       setIsLoading(false);
     } catch (e) {
       setIsLoading(false);
@@ -98,7 +98,7 @@ const ToolImagePicker: React.FC<ImagePickerProps> = ({
   };
 
   if (existingImageUrls?.length && existingImageUrls.length > 0 && !hasUserChangedImage) {
-    console.log("❇️Using existing images: ", existingImageUrls);
+    console.log("🌀Using existing images: ", existingImageUrls);
     setSelectedImages(existingImageUrls);
     setHasUserChangedImage(true);
   }

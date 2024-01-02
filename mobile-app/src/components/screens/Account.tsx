@@ -58,7 +58,7 @@ const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
               </Column>
             }
             <Button onPress={() => {
-              signOutUser().then(r => console.log("❇️Signed out"));
+              signOutUser().then(r => console.log("🌀Signed out"));
             }}>Sign Out</Button>
 
 
