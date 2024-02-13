@@ -2,6 +2,8 @@
 
 Lendr is a cross-platform mobile application enabling users to list their tools for rental within their local community.
 
+![Lendr Logo](https://github.com/jjossie/lendr/blob/main/mobile-app/assets/lendr-logo-square-v2-2.png?raw=true)
+
 ## Overview
 
 Many people purchase tools to build, fix, and work on things in their homes and cars, and end up with a collection of tools that end up not getting used very often. Rather than viewing tool purchases as a consumption where a specific tool gets purchase for a single job, then never gets used again, Lendr seeks to turn these tools into investments by allowing users to rent them out to people for a small fee. Lendr will provide a platform for tool owners to list their tools available for rent, while those who need a tool for a job but don’t want to buy it can browse local listings and find the tool they’re looking for.
