@@ -3,7 +3,7 @@ import {FlatList, SafeAreaView, StyleSheet} from "react-native";
 import {Filters} from "../utilities/algolia/Filters";
 import {ALGOLIA_INDEX_NAME, searchClient} from "../../config/algolia";
 import {Configure, InstantSearch} from "react-instantsearch-hooks-web";
-import {Row, Select, theme, View} from "native-base";
+import {Row, Select, Text, theme, View} from "native-base";
 import {SearchBox} from "../utilities/algolia/SearchBox";
 import {InfiniteHits} from "../utilities/algolia/InfiniteHits";
 import {Hit} from "../utilities/algolia/Hit";
@@ -67,6 +67,7 @@ export const BorrowSearch: React.FC<NativeStackScreenProps<any>> = ({navigation}
             <InfiniteHits ref={listRef} hitComponent={Hit}/>
           </InstantSearch>
         </View>
+        <Text>{errorMsg}</Text>
       </SafeAreaView>
   );
 };

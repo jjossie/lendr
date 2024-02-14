@@ -163,8 +163,14 @@ async function reverseGeocode(lat: number, lon: number): Promise<{
   requestCount++;
   console.log(`📍Sending a Free Geocoder Request - ${requestCount} requests so far`);
   const url = `https://geocode.maps.co/reverse?lat=${lat}&lon=${lon}`;
-  const response = await fetch(url);
-  return response.json();
+  try {
+    const response = await fetch(url);
+    console.log("📍 Fetch Response: ", JSON.stringify(response, null, 2))
+    return response.json();
+  } catch (e) {
+    console.log("📍🗣️ FAILED TO FETCH GEOCODER, ", JSON.stringify(e, null, 2));
+    throw e;
+  }
 }
 
 async function geocode(location: ILocationApi) {
