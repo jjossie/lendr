@@ -6,7 +6,9 @@ import {Geopoint} from "geofire-common";
 import {Tool, ToolAdminForm} from "./models/tool";
 import { LendrUser, LendrUserPreview } from "./models/lendrUser";
 
-
+/**
+ * @deprecated This TEST function is behind the PROD version.
+ */
 export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async (event) => {
   logger.info("Validating new tool: ", event.data.id);
   const db = getFirestore();

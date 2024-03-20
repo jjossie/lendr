@@ -1,7 +1,9 @@
 import {FieldValue, getFirestore, Timestamp} from "firebase-admin/firestore";
-import {LendrUser} from "../models/lendrUser";
+import {LendrUser, LendrUserPreview} from "../models/lendrUser";
 import {auth} from "firebase-admin";
 import UserRecord = auth.UserRecord;
+import { LendrBaseError, NotFoundError } from "../utils/errors";
+import { logger } from "firebase-functions/v1";
 
 export async function getUserFromUid(uid: string): Promise<LendrUser | undefined> {
   const db = getFirestore();
@@ -43,4 +45,24 @@ export async function deleteUser(uid: string) {
   const db = getFirestore();
   const userRef = db.doc("users/" + uid);
   await userRef.delete();
+}
+
+export async function getHydratedUserPreview(uid:string): Promise<LendrUserPreview> {
+  if (!uid) throw new LendrBaseError('uid not provided');
+  const lender = await getUserFromUid(uid);
+  if (!lender){
+    // logger.error("Lender does not exist: ", uid);
+    // Delete the document if the lender does not exist
+    // await event.data.ref.delete();
+    // return;
+    throw new NotFoundError();
+  }
+  const displayName = `${lender.firstName} ${lender.lastName}`;
+  const hydroLender: LendrUserPreview = {
+    uid: uid,
+    displayName: displayName,
+    photoURL: lender.photoURL,
+  };
+  // logger.info("Found Lender: ", displayName);
+  return hydroLender;
 }
