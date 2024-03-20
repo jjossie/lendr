@@ -1,9 +1,10 @@
 import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import {logger} from "firebase-functions";
-import {getFirestore} from "firebase-admin/firestore";
+import {DocumentData, getFirestore} from "firebase-admin/firestore";
 import {getCityNameFromGeopoint, getGeohashedLocation} from "./utils/location";
 import {Geopoint} from "geofire-common";
 import {Tool, ToolAdminForm} from "./models/tool";
+import { LendrUser, LendrUserPreview } from "./models/lendrUser";
 
 
 export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async (event) => {
@@ -45,16 +46,17 @@ export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async
 
   // Check lenderUid and hydrate lender object accordingly
   const lenderSnap = await db.collection("users").doc(rawDoc.lenderUid).get();
-  const lender = lenderSnap.data();
-  const lenderDisplayName = `${lender.firstName} ${lender.lastName}`;
-
-  if (!lender.exists) {
+  if (!lenderSnap.exists) {
     logger.error("Lender does not exist: ", rawDoc.lenderUid);
   }
+  const lender = lenderSnap.data() as LendrUser;
+  const lenderDisplayName = `${lender.firstName} ${lender.lastName}`;
+
   logger.info("Found Lender: ", lenderDisplayName);
-  const hydroLender = {
+  const hydroLender: LendrUserPreview = {
     uid: rawDoc.lenderUid,
-    displayName: lenderDisplayName, // TODO: Add picture
+    displayName: lenderDisplayName, 
+    photoURL: lender.photoURL,
   };
   hydroDoc.lender = hydroLender;
 
@@ -63,16 +65,17 @@ export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async
     hydroDoc.holder = hydroLender;
   }
   const holderSnap = await db.collection("users").doc(rawDoc.holderUid).get();
-  const holder = holderSnap.data();
-  const holderDisplayName = `${holder.firstName} ${holder.lastName}`;
-
-  if (!holder.exists) {
+  if (!holderSnap.exists) {
     logger.error("Holder does not exist: ", rawDoc.holderUid);
   }
+  const holder = holderSnap.data() as LendrUser;
+  const holderDisplayName = `${holder.firstName} ${holder.lastName}`;
+
   logger.info("Found Holder: ", holderDisplayName);
   hydroDoc.holder = {
     uid: rawDoc.holderUid,
     displayName: holderDisplayName,
+    photoURL: holder.photoURL,
   };
 
   // Check location geopoint and hydrate geohash and city accordingly
