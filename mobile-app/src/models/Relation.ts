@@ -1,35 +1,35 @@
 import {Timestamp} from "firebase/firestore";
-import {ILendrUser} from "./ILendrUser";
-import {IToolPreview} from "./Tool";
+import {LendrUser} from "./lendrUser";
+import {ToolPreview} from "./tool";
 
-export interface IRelation {
+export interface Relation {
   id?: string // Added after retrieving from firestore
-  users: ILendrUser[];
+  users: LendrUser[];
   createdAt: Timestamp;
-  lastMessage?: IChatMessage; // Hydrated after retrieval
-  otherUser?: ILendrUser; // Hydrated after retrieval
+  lastMessage?: ChatMessage; // Hydrated after retrieval
+  otherUser?: LendrUser; // Hydrated after retrieval
   // Need to figure out how to include subcollection data. Or don't do it at all?
 }
 
-export interface IRelationHydrated extends IRelation {
-  otherUser: ILendrUser;
-  lastMessage: IChatMessage;
+export interface RelationHydrated extends Relation {
+  otherUser: LendrUser;
+  lastMessage: ChatMessage;
   // loans: ILoan[];
 }
 
-export interface IChatViewListItem {
+export interface ChatViewListItem {
   id: string // Added after retrieving from firestore
-  users?: ILendrUser[];
+  users?: LendrUser[];
   createdAt: Timestamp;
-  lastMessage?: IChatMessage; // Hydrated after retrieval
-  otherUser: ILendrUser;
+  lastMessage?: ChatMessage; // Hydrated after retrieval
+  otherUser: LendrUser;
 }
 
 
-export interface ILoan {
+export interface Loan {
   id?: string;
   toolId: string;
-  tool?: IToolPreview;
+  tool?: ToolPreview;
   inquiryDate?: Timestamp;
   loanDate?: Timestamp;
   returnDate?: Timestamp;
@@ -38,18 +38,18 @@ export interface ILoan {
   borrowerUid: string;
 }
 
-export interface IChatMessage {
+export interface ChatMessage {
   id?: string;
   text: string;
   senderUid: string;
   receiverUid: string;
   createdAt: Timestamp;
   replyingToId?: string;
-  reaction?: IChatReaction;
+  reaction?: ChatReaction;
   media?: any;
 }
 
-export interface IChatReaction {
+export interface ChatReaction {
   emoji: string;
   userRef: string;
 }

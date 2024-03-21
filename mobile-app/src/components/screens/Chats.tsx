@@ -1,27 +1,42 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Text} from 'native-base';
+import {Box, Heading} from 'native-base';
 import {ChatListItem} from "../ChatListItem";
 import {SwipeListView} from "react-native-swipe-list-view";
 import {useMyChats} from "../../utils/hooks/useMyChats";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
-import {ILendrUserPreview} from "../../models/ILendrUser";
+import {LendrUserPreview} from "../../models/lendrUser";
 
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
+import {RefreshControl} from "react-native";
 
 export interface ChatsProps {
 
 }
 
 const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
-  console.log("❇️️< Chats > Component Rendering");
+  console.log("🌀️< Chats > Component Rendering");
+
+  if (route.params?.relationId){
+    console.log("🌀< Chats > Navigating to ChatConversation");
+    const relationId = route.params.relationId;
+    const draftMessage = route.params.draftMessage;
+    // @ts-ignore
+    route.params = undefined;
+    navigation.navigate("ChatConversation", {
+      relationId: relationId,
+      draftMessage: draftMessage,
+    });
+  }
 
   // Custom Hooks
   const {user} = useAuthentication();
-  const {chats, isLoaded} = useMyChats();
+  const {chats, isLoaded, setIsLoaded} = useMyChats();
 
   // State
   const [listData, setListData] = useState<any[] | undefined>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
+  // Side Effects
   useEffect(() => {
     if (user && chats && chats.length !== 0) {
       const data = chats
@@ -38,9 +53,9 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
                 : chat.otherUser.displayName;
             const timeStampSeconds = chat.lastMessage ? chat.lastMessage.createdAt?.seconds : chat.createdAt?.seconds;
             const timeStamp = new Date(timeStampSeconds * 1000).toLocaleTimeString();
-            const otherUserPreview: ILendrUserPreview = {
+            const otherUserPreview: LendrUserPreview = {
               displayName,
-              photoURL: chat.otherUser.providerData?.photoURL ?? "", // TODO update when refactoring user
+              photoURL: chat.otherUser?.photoURL ?? "",
               uid: chat.otherUser.uid
             }
             return {
@@ -60,6 +75,15 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
     }
   }, [chats, isLoaded]);
 
+  // Callbacks
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setIsLoaded(b => !b);
+    // await useMyChats();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000)
+  };
   const closeRow = (rowMap: any[], rowKey: any) => {
     // if (rowMap[rowKey]) {
     //   rowMap[rowKey].closeRow();
@@ -119,9 +143,10 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
   };
 
   return <Box p={4} flex="1">
-    <Text p={4} bold fontSize="4xl">Inbox</Text>
+    <Heading>Inbox</Heading>
 
     <SwipeListView data={listData}
+                   refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
                    renderItem={ChatListItem}
                    renderHiddenItem={renderHiddenItem}
                    rightOpenValue={-130}

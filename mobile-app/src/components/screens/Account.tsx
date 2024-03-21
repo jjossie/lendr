@@ -1,12 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Box, Button, Column, ScrollView, Text} from 'native-base';
+import {Box, Button, Column, Heading, ScrollView, Text} from 'native-base';
 import {BottomTabScreenProps} from "@react-navigation/bottom-tabs";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
 import {signOutUser} from "../../controllers/auth";
-import LenderProfilePreview from "../LenderProfilePreview";
 import {useLocation} from "../../utils/hooks/useLocation";
 import {registerForPushNotificationsAsync} from "../../config/device/notifications";
 import * as Notifications from "expo-notifications";
+import AvatarImage from "../AvatarImage";
 
 
 const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
@@ -45,15 +45,20 @@ const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
       <Box>
         <ScrollView p={4}>
           <Column space="lg">
-            <Text p={4} bold fontSize="4xl">Account</Text>
+            <Heading>Account</Heading>
 
-            {user && <LenderProfilePreview user={user}/>}
-            <Text fontSize="md">{authUser?.email}</Text>
+            {user &&
+              <Column space="lg" alignItems={"center"} justifyContent={"center"} p={4}>
+                <AvatarImage user={user} size={"xl"}/>
+                <Text fontSize={"2xl"}  bold>{user.displayName ?? `${user.firstName} ${user.lastName}` }</Text>
+                <Text fontSize="md">{authUser?.email}</Text>
 
-            <Text>City: {city}</Text>
+                <Text>City: {city}</Text>
 
+              </Column>
+            }
             <Button onPress={() => {
-              signOutUser().then(r => console.log("❇️Signed out"));
+              signOutUser().then(r => console.log("🌀Signed out"));
             }}>Sign Out</Button>
 
 

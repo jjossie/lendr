@@ -1,7 +1,7 @@
 import {createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut, User} from "firebase/auth";
 import {arrayRemove, arrayUnion, doc, getDoc, setDoc, Timestamp, updateDoc} from "firebase/firestore";
 import {db} from "../config/firebase";
-import {ILendrUser} from "../models/ILendrUser";
+import {LendrUser} from "../models/lendrUser";
 import {registerForPushNotificationsAsync} from "../config/device/notifications";
 
 
@@ -90,7 +90,7 @@ async function createUserInDB(authUser: User, firstName?: string, lastName?: str
   // Create the user if it doesn't exist; otherwise, just update the Expo push tokens // TODO simplify that logic
   if (!userDocSnap.exists()) {
     console.log(`Creating user ${authUser.email} with uid ${authUser.uid} in firestore`);
-    let lendrUser: ILendrUser = {
+    let lendrUser: LendrUser = {
       relations: [],
       uid: authUser.uid,
       providerData: {
@@ -119,18 +119,18 @@ async function createUserInDB(authUser: User, firstName?: string, lastName?: str
   }
 }
 
-export async function getUserFromAuth(authUser: User): Promise<ILendrUser | undefined> {
+export async function getUserFromAuth(authUser: User): Promise<LendrUser | undefined> {
   const docSnap = await getDoc(doc(db, "users", authUser.uid));
   return {
     uid: docSnap.id,
     ...docSnap.data(),
-  } as ILendrUser;
+  } as LendrUser;
 }
 
-export async function getUserFromUid(uid: string): Promise<ILendrUser | undefined> {
+export async function getUserFromUid(uid: string): Promise<LendrUser | undefined> {
   const docSnap = await getDoc(doc(db, "users", uid));
   return {
     uid: docSnap.id,
     ...docSnap.data(),
-  } as ILendrUser;
+  } as LendrUser;
 }

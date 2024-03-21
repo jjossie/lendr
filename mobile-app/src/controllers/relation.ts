@@ -21,9 +21,10 @@ import {httpsCallable} from "firebase/functions";
 import {auth, db, functions} from "../config/firebase";
 import {User} from "firebase/auth";
 import {AuthError, LendrBaseError, NotFoundError, NotImplementedError, ObjectValidationError} from "../utils/errors";
-import {IChatMessage, IChatViewListItem, ILoan, IRelation} from "../models/Relation";
+import {ChatMessage, ChatViewListItem, Loan, Relation} from "../models/relation";
 import {getUserFromAuth, getUserFromUid} from "./auth";
-import {ILendrUser} from "../models/ILendrUser";
+import {LendrUser} from "../models/lendrUser";
+import {Dispatch, SetStateAction} from "react";
 
 // Constants
 const MESSAGE_LOAD_LIMIT = 20;
@@ -98,7 +99,7 @@ export async function createRelation(otherUserId: string, toolId: string): Promi
     await setDoc(relationDocRef, {
       users: [user, otherUser],
       createdAt: serverTimestamp() as Timestamp,
-    } as IRelation);
+    } as Relation);
   } else {
     console.log("🤝Found existing relation");
   }
@@ -111,7 +112,7 @@ export async function createRelation(otherUserId: string, toolId: string): Promi
     lenderUid: otherUserId,
     toolId,
     inquiryDate: serverTimestamp() as Timestamp,
-  } as ILoan);
+  } as Loan);
   console.log("");
 
   // Add the other uid to each User's relations list
@@ -128,7 +129,7 @@ export async function createRelation(otherUserId: string, toolId: string): Promi
   return relationId;
 }
 
-export async function getRelationById(relationId: string): Promise<IRelation> {
+export async function getRelationById(relationId: string): Promise<Relation> {
   const relationsCollection = collection(db, "relations");
   const relationDocRef = doc(relationsCollection, relationId);
   const relationDoc = await getDoc(relationDocRef);
@@ -137,10 +138,10 @@ export async function getRelationById(relationId: string): Promise<IRelation> {
 
   const relationDocumentData = relationDoc.data();
 
-  return {id: relationId, ...relationDocumentData} as IRelation;
+  return {id: relationId, ...relationDocumentData} as Relation;
 }
 
-export function getOtherUserInRelation(relation: IRelation, user: ILendrUser | User): ILendrUser {
+export function getOtherUserInRelation(relation: Relation, user: LendrUser | User): LendrUser {
   return relation.users.filter((chatUser) => chatUser.uid != user.uid)[0];
 }
 
@@ -155,7 +156,7 @@ export async function sendChatMessage(receiverUid: string,
   const relationsCollection = collection(db, "relations");
   const messagesCollection = collection(relationsCollection, getRelationId(auth.currentUser.uid, receiverUid), "messages");
 
-  const newMessage: IChatMessage = {
+  const newMessage: ChatMessage = {
     text,
     receiverUid,
     senderUid: auth.currentUser.uid,
@@ -182,19 +183,19 @@ export async function sendChatMessage(receiverUid: string,
 export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentData>,
                                              authUser: User,
                                              setChats: ((chats: any) => any),
-                                             setIsLoaded: (isLoaded: boolean) => void): void {
+                                             setIsLoaded: Dispatch<SetStateAction<boolean>>): void {
   console.log("🤝useMyChats() - onSnapshot() called");
 
   if (!authUser) return;
 
-  const docDataList: IChatViewListItem[] = [];
+  const docDataList: ChatViewListItem[] = [];
   const lastMessagePromises: Promise<any>[] = [];
   snapshot.forEach(async relationDocument => {
     if (!relationDocument || !relationDocument.exists())
       throw new NotFoundError(`🤝Relation not found ⁉️`);
 
     // Extract the data from the document
-    const relationDocumentData: IRelation = relationDocument.data() as IRelation;
+    const relationDocumentData: Relation = relationDocument.data() as Relation;
 
     // Get the info of the other user to be displayed in the chats list
     const otherUser = getOtherUserInRelation(relationDocumentData, authUser);
@@ -209,20 +210,20 @@ export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentDat
       id: relationDocument.id,
       otherUser: otherUser,
       ...relationDocumentData,
-    } as IChatViewListItem);
+    } as ChatViewListItem);
   });
 
   // Tack on the data for the last message of each relation
   Promise.all(lastMessagePromises).then(lastMessages => {
     for (let i = 0; i < docDataList.length; i++) {
-      docDataList[i].lastMessage = lastMessages[i].docs[0].data();
+      docDataList[i].lastMessage = lastMessages[i].docs[0]?.data();
     }
     // It appears that although we are properly setting the list here with newly hydrated
     // objects, JS thinks the list is unchanged. So we must also set loading state:
     setChats((_oldList: any) => {
       return docDataList;
     });
-    setIsLoaded(true);
+    setIsLoaded(b => !b);
   });
 
   // Don't use this yet because it will screw up the loop in the Promise.all() call.
@@ -264,13 +265,13 @@ export async function requestReturn(relationId: string, loanId: string) {
  *
  * @param {(messages: any) => any} setMessages The React setState function to set the messages
  * @param {User} authUser
- * @param {ILendrUser} user
- * @param {IRelation} relation
+ * @param {LendrUser} user
+ * @param {Relation} relation
  */
 export function getLiveMessages(setMessages: ((messages: any) => any),
                                 authUser: User,
-                                user: ILendrUser,
-                                relation: IRelation): Unsubscribe | undefined {
+                                user: LendrUser,
+                                relation: Relation): Unsubscribe | undefined {
 
   // This might run before user is initialized - just skip if that's the case
   if (!authUser || !user) return;
@@ -285,12 +286,12 @@ export function getLiveMessages(setMessages: ((messages: any) => any),
       limit(MESSAGE_LOAD_LIMIT),
   );
   return onSnapshot(messagesQuery, (snapshot: QuerySnapshot<DocumentData>) => {
-    let messages: IChatMessage[] = [];
+    let messages: ChatMessage[] = [];
     snapshot.forEach(messageSnap => {
       messages.push({
         id: messageSnap.id,
         ...messageSnap.data(),
-      } as IChatMessage);
+      } as ChatMessage);
     });
     setMessages(messages.reverse());
   });
@@ -302,12 +303,12 @@ export function getLiveMessages(setMessages: ((messages: any) => any),
  *
  * @param {(loans: any) => any} setLoans The React setState function
  * @param {User} authUser The authenticated user
- * @param {IRelation} relation The Relation object to get the loans for. Must have an ID.
+ * @param {Relation} relation The Relation object to get the loans for. Must have an ID.
  * @returns {Unsubscribe | undefined} The unsubscribe function if it was successful, undefined otherwise.
  */
 export function getLiveLoans(setLoans: (loans: any) => any,
                              authUser: User,
-                             relation: IRelation): Unsubscribe | undefined {
+                             relation: Relation): Unsubscribe | undefined {
   console.log("🤝getLiveLoans()");
   if (!authUser || !relation.id) return;
 
@@ -316,9 +317,9 @@ export function getLiveLoans(setLoans: (loans: any) => any,
       orderBy("inquiryDate", "desc"), //TODO fix inquiry date problem: this rejects docs w/o an inquiry date
   );
   return onSnapshot(loansQuery, (snapshot: QuerySnapshot<DocumentData>) => {
-    let loans: ILoan[] = [];
+    let loans: Loan[] = [];
     snapshot.forEach(async loanSnap => {
-      let loanDoc = loanSnap.data() as ILoan;
+      let loanDoc = loanSnap.data() as Loan;
       // if (!loanDoc.tool) // Pretty sure it's actually not necessary 'cause they're hydrated on the backend now
       //   // Front-end Hydration necessary
       //   loanDoc.tool = await getToolById(loanDoc.toolId) as IToolPreview;
@@ -326,7 +327,7 @@ export function getLiveLoans(setLoans: (loans: any) => any,
       loans.push({
         id: loanSnap.id,
         ...loanDoc,
-      } as ILoan);
+      } as Loan);
     });
     setLoans(loans.reverse());
   });

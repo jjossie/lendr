@@ -1,6 +1,6 @@
 import React from 'react';
 import {Avatar, theme} from 'native-base';
-import {ILendrUserPreview} from "../models/ILendrUser";
+import {LendrUserPreview} from "../models/lendrUser";
 import {ColorType, ResponsiveValue, ThemeComponentSizeType} from "native-base/lib/typescript/components/types";
 
 
@@ -13,7 +13,7 @@ function numberFromText(text: string): number {
 
 
 export interface AvatarImageProps {
-  user: ILendrUserPreview;
+  user: LendrUserPreview;
   size?: ThemeComponentSizeType<"Avatar">
 }
 

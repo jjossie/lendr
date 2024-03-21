@@ -4,9 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "expo start --dev-client",
-    "startDev": "expo start --dev-client",
-    "startTunnel": "expo start --tunnel",
-    "startDevTunnel": "expo start --dev-client --tunnel",
+    "start:tunnel": "expo start --dev-client --tunnel",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web"
@@ -14,6 +12,7 @@
   "dependencies": {
     "@expo-google-fonts/epilogue": "^0.2.3",
     "@expo/metro-config": "^0.7.1",
+    "@expo/vector-icons": "^13.0.0",
     "@react-native-async-storage/async-storage": "1.17.11",
     "@react-native-firebase/app": "^18.2.0",
     "@react-native-firebase/auth": "^18.2.0",
@@ -23,12 +22,13 @@
     "@react-navigation/native-stack": "^6.9.12",
     "@types/firebase": "^3.2.1",
     "algoliasearch": "^4.17.0",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.3.1",
     "expo": "~48.0.18",
     "expo-build-properties": "~0.6.0",
     "expo-dev-client": "~2.2.1",
     "expo-device": "~5.2.1",
     "expo-image-picker": "~14.1.1",
+    "expo-linking": "~4.0.1",
     "expo-location": "~15.1.1",
     "expo-notifications": "~0.18.1",
     "expo-splash-screen": "~0.18.2",

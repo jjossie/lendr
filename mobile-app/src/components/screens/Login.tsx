@@ -3,6 +3,7 @@ import {Button, Center, Column, FormControl, Input, ScrollView} from 'native-bas
 import {logInUser} from "../../controllers/auth";
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {onGoogleButtonPress} from "../../config/googlesignin";
+import {Ionicons} from "@expo/vector-icons";
 
 const Login: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
 
@@ -49,9 +50,9 @@ const Login: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
 
             <Button size="lg" onPress={handleLogIn} variant="solid">Sign In</Button>
             <Button size="lg" onPress={handleRegister} variant="outline">Register</Button>
-            <Button
+            <Button size="lg" colorScheme={"blue"} variant="solid" leftIcon={<Ionicons name="logo-google" size={24} color="white" />}
                 onPress={() => onGoogleButtonPress().then(() => console.log('Signed in with Google!'))}
-            >Google Sign-In</Button>
+            >Sign in with Google</Button>
           </Column>
         </Center>
       </ScrollView>

@@ -1,18 +1,22 @@
-import React from 'react';
+import React, {ReactNode} from 'react';
 import {Text, View} from 'react-native';
 import {styles} from './styles';
 
-export const Slide = (props: any) => {
+export type SlideProps = {
+  title?: string;
+  item: ReactNode;
+}
 
-  const { title } = props;
+export const Slide: React.FC<SlideProps> = ({item, title}) => {
 
   return (
-    <View style={styles.slide}>
-      <Text style={{ ...styles.slideText }}>
-        {title}
-      </Text>
-    </View>
+      <View style={styles.slide}>
+        {item}
+        <Text style={{...styles.slideText}}>
+          {title}
+        </Text>
+      </View>
   );
-}
+};
 
 export default Slide;

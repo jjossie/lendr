@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Column, Row, ScrollView, Select, Spacer} from 'native-base';
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import BorrowBrowseItem from "../BorrowBrowseItem";
-import {ITool} from "../../models/Tool";
+import {Tool} from "../../models/tool";
 import {getToolsWithinRadius} from "../../controllers/tool";
 import {useLocation} from "../../utils/hooks/useLocation";
 
@@ -16,7 +16,7 @@ import {useLocation} from "../../utils/hooks/useLocation";
  */
 const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
 
-  const [toolsList, setToolsList]: [ITool[], any] = useState([]);
+  const [toolsList, setToolsList]: [Tool[], any] = useState([]);
   const [searchRadius, setSearchRadius] = useState(5);
   const [searchRadiusString, setSearchRadiusString] = useState<SearchRadiusString>("5");
 
@@ -24,9 +24,9 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
 
   // Side Effects
   useEffect(() => {
-    // console.log("❇️BorrowBrowse - useEffect - geopoint: ", geopoint);
+    // console.log("🌀BorrowBrowse - useEffect - geopoint: ", geopoint);
     (async () => {
-      // console.log("❇️BorrowBrowse - useEffect - (async) geopoint: ", geopoint);
+      // console.log("🌀BorrowBrowse - useEffect - (async) geopoint: ", geopoint);
       if (geopoint &&
           geopoint.length === 2 &&
           geopoint[0] !== undefined &&
@@ -35,7 +35,7 @@ const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}
         const tools = await getToolsWithinRadius(searchRadius, geopoint);
         setToolsList(tools);
       }else{
-        console.log("❇️Cannot fetch tools - Location is uninitialized");
+        console.log("🌀Cannot fetch tools - Location is uninitialized");
         setToolsList([]);
       }
     })();

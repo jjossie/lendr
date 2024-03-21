@@ -2,12 +2,12 @@ import React from 'react';
 import {Image, StyleSheet} from 'react-native';
 
 import {Column, Row, Text} from "native-base";
-import {ITool} from "../models/Tool";
+import {Tool} from "../models/tool";
 import Card from "./Card";
 import AvailabilityChip from "./AvailabilityChip";
 
 export type LenderInventoryItemProps = {
-  tool: ITool
+  tool: Tool
   navigation: any
 }
 
