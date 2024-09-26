@@ -1,5 +1,5 @@
 import {FieldValue, getFirestore, Timestamp} from "firebase-admin/firestore";
-import {LendrUser, LendrUserPreview} from "../models/lendrUser";
+import {LendrUser, LendrUserPreview} from "../models/lendrUser.model";
 import {auth} from "firebase-admin";
 import UserRecord = auth.UserRecord;
 import { LendrBaseError, NotFoundError } from "../utils/errors";

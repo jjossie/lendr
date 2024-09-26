@@ -1,7 +1,7 @@
-import {Location} from "./location";
+import {Location} from "./location.model";
 import {Geopoint} from "geofire-common";
 import {Timestamp} from "firebase-admin/firestore";
-import {LendrUserPreview} from "./lendrUser";
+import {LendrUserPreview} from "./lendrUser.model";
 
 export interface Tool {
 

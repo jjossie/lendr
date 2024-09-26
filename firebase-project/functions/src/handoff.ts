@@ -1,12 +1,12 @@
 import {HttpsError, onCall} from "firebase-functions/v2/https";
 import {getFirestore} from "firebase-admin/firestore";
-import {Tool} from "./models/tool";
-import {getLoan, setLoanStatus} from "./controllers/relation";
+import {Tool} from "./models/tool.model";
+import {getLoan, setLoanStatus} from "./controllers/relation.controller";
 import { getRelationId } from "./utils/relation";
-import {Loan} from "./models/relation";
+import {Loan} from "./models/relation.model";
 import {logger} from "firebase-functions";
-import {getUserFromUid} from "./controllers/users";
-import {LendrUserPreview} from "./models/lendrUser";
+import {getUserFromUid} from "./controllers/users.controller";
+import {LendrUserPreview} from "./models/lendrUser.model";
 import {firestore} from "firebase-admin";
 import {sendExpoNotifications} from "./utils/notifications";
 import Firestore = firestore.Firestore;

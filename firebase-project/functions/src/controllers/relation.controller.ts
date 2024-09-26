@@ -1,5 +1,5 @@
 import {NotFoundError} from "../utils/errors";
-import {Loan, LoanStatus} from "../models/relation";
+import {Loan, LoanStatus} from "../models/relation.model";
 import {logger} from "firebase-functions";
 import {FieldValue} from "firebase-admin/firestore";
 

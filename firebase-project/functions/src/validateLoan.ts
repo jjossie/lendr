@@ -1,5 +1,5 @@
 import {onDocumentCreated} from "firebase-functions/v2/firestore";
-import {hydrateTool} from "./controllers/tool";
+import {hydrateTool} from "./controllers/tool.controller";
 import {logger} from "firebase-functions";
 import {FieldValue} from "firebase-admin/firestore";
 import {HttpsError} from "firebase-functions/v2/https";

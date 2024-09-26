@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import {logger} from "firebase-functions";
-import {createUser, getUserFromUid} from "./controllers/users";
+import {createUser, getUserFromUid} from "./controllers/users.controller";
 
 export const onUserCreate = functions.auth.user().onCreate(async (user) => {
   // TODO authProfileRefactoring

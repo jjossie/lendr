@@ -1,7 +1,7 @@
 import {CallableRequest, onCall} from 'firebase-functions/v2/https';
 import * as logger from "firebase-functions/logger";
 import {getFirestore} from 'firebase-admin/firestore';
-import {Tool, ToolForm} from "./models/tool";
+import {Tool, ToolForm} from "./models/tool.model";
 
 export const algoliaTransformOnIndex = onCall(async (request: CallableRequest<any>) => {
   logger.info("Algolia ft Joel is Indexing");

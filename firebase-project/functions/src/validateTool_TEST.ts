@@ -3,8 +3,8 @@ import {logger} from "firebase-functions";
 import {DocumentData, getFirestore} from "firebase-admin/firestore";
 import {getCityNameFromGeopoint, getGeohashedLocation} from "./utils/location";
 import {Geopoint} from "geofire-common";
-import {Tool, ToolAdminForm} from "./models/tool";
-import { LendrUser, LendrUserPreview } from "./models/lendrUser";
+import {Tool, ToolAdminForm} from "./models/tool.model";
+import { LendrUser, LendrUserPreview } from "./models/lendrUser.model";
 
 /**
  * @deprecated This TEST function is behind the PROD version.
