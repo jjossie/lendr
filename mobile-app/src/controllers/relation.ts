@@ -4,6 +4,7 @@ import {
   collection,
   doc,
   DocumentData,
+  documentId,
   getDoc,
   getDocs,
   limit,
@@ -16,53 +17,19 @@ import {
   Timestamp,
   Unsubscribe,
   updateDoc,
+  where,
 } from "firebase/firestore";
-import {httpsCallable} from "firebase/functions";
-import {auth, db, functions} from "../config/firebase";
+import {auth, db} from "../config/firebase";
 import {User} from "firebase/auth";
 import {AuthError, LendrBaseError, NotFoundError, NotImplementedError, ObjectValidationError} from "../utils/errors";
 import {ChatMessage, ChatViewListItem, Loan, Relation} from "../models/relation";
 import {getUserFromAuth, getUserFromUid} from "./auth";
 import {LendrUser} from "../models/lendrUser";
 import {Dispatch, SetStateAction} from "react";
+import { callCloudFunction } from "../utils/firebase.utils";
 
 // Constants
 const MESSAGE_LOAD_LIMIT = 20;
-
-
-// TODO: This is all very stateful. Let's make it into a class.
-
-// // CodeWhisperer nonsense
-// class Relation {
-//   private readonly relationId: string;
-//   private otherUserId: string;
-//   private toolId: string;
-//   private messagesCollection: CollectionReference;
-//
-//   constructor(otherUserId: string, toolId: string) {
-//     this.otherUserId = otherUserId;
-//     this.toolId = toolId;
-//     this.relationId = getRelationId(getAuth().currentUser.uid, otherUserId);
-//     this.messagesCollection = collection(db, "relations", this.relationId, "messages");
-//   }
-//
-//   public async sendMessage(text: string, replyingToId?: string, media?: any) {
-//     const auth = getAuth(app);
-//     if (!auth.currentUser)
-//       throw new AuthError();
-//
-//     const newMessage: IChatMessage = {
-//       text,
-//       receiverUid: this.otherUserId,
-//       senderUid: auth.currentUser.uid,
-//       createdAt: serverTimestamp() as Timestamp,
-//     };
-//     if (replyingToId)
-//       newMessage.replyingToId = replyingToId;
-//     if (media)
-//       newMessage.media = media;
-// }
-
 
 export function getRelationId(currentUserId: string, otherUserId: string) {
   // Sort the two user IDs alphabetically to ensure that the relation is unique.
@@ -77,17 +44,15 @@ export function getRelationId(currentUserId: string, otherUserId: string) {
  * @returns {Promise<string>} the ID of the newly created Relation
  */
 export async function createRelation(otherUserId: string, toolId: string): Promise<string> {
-
   // Get Auth
-  if (!auth.currentUser)
-    throw new AuthError();
+  if (!auth.currentUser) throw new AuthError();
 
   // Get the hydrated LendrUser objects
-  const user = await getUserFromAuth(auth.currentUser); // TODO wrap with promise.all
-  const otherUser = await getUserFromUid(otherUserId);
-  if (!user)
-    throw new LendrBaseError("Couldn't get LendrUsers from UIDs");
-
+  const [user, otherUser] = await Promise.all([
+    getUserFromAuth(auth.currentUser),
+    getUserFromUid(otherUserId),
+  ]);
+  if (!user) throw new LendrBaseError("Couldn't get LendrUsers from UIDs");
 
   // Add the Relation to Firestore
   const relationsCollection = collection(db, "relations");
@@ -103,7 +68,6 @@ export async function createRelation(otherUserId: string, toolId: string): Promi
   } else {
     console.log("🤝Found existing relation");
   }
-
 
   // Create the loan record
   const loansCollection = collection(relationDocRef, "loans");
@@ -170,82 +134,6 @@ export async function sendChatMessage(receiverUid: string,
   await addDoc(messagesCollection, newMessage);
 }
 
-
-/**
- * Oops my abstraction is leaking 🫠 Anyway this takes a query snapshot of the relations
- * in the database and then hydrates them into a list of chat view objects.
- *
- * @param {QuerySnapshot<DocumentData>} snapshot
- * @param {User} authUser
- * @param {(chats: any) => any} setChats
- * @param {(isLoaded: boolean) => void} setIsLoaded
- */
-export function handleRelationsQuerySnapshot(snapshot: QuerySnapshot<DocumentData>,
-                                             authUser: User,
-                                             setChats: ((chats: any) => any),
-                                             setIsLoaded: Dispatch<SetStateAction<boolean>>): void {
-  console.log("🤝useMyChats() - onSnapshot() called");
-
-  if (!authUser) return;
-
-  const docDataList: ChatViewListItem[] = [];
-  const lastMessagePromises: Promise<any>[] = [];
-  snapshot.forEach(async relationDocument => {
-    if (!relationDocument || !relationDocument.exists())
-      throw new NotFoundError(`🤝Relation not found ⁉️`);
-
-    // Extract the data from the document
-    const relationDocumentData: Relation = relationDocument.data() as Relation;
-
-    // Get the info of the other user to be displayed in the chats list
-    const otherUser = getOtherUserInRelation(relationDocumentData, authUser);
-
-    // Get the most recent message for each relation
-    const lastMessageQuery = query(collection(relationDocument.ref, "messages"),
-        orderBy("createdAt", "desc"), limit(1));
-    lastMessagePromises.push(getDocs(lastMessageQuery));
-
-    // Add the (incomplete) relation to the list
-    docDataList.push({
-      id: relationDocument.id,
-      otherUser: otherUser,
-      ...relationDocumentData,
-    } as ChatViewListItem);
-  });
-
-  // Tack on the data for the last message of each relation
-  Promise.all(lastMessagePromises).then(lastMessages => {
-    for (let i = 0; i < docDataList.length; i++) {
-      docDataList[i].lastMessage = lastMessages[i].docs[0]?.data();
-    }
-    // It appears that although we are properly setting the list here with newly hydrated
-    // objects, JS thinks the list is unchanged. So we must also set loading state:
-    setChats((_oldList: any) => {
-      return docDataList;
-    });
-    setIsLoaded(b => !b);
-  });
-
-  // Don't use this yet because it will screw up the loop in the Promise.all() call.
-  // docDataList.sort((a, b) => a.createdAt.seconds - b.createdAt.seconds)
-
-  setChats(docDataList);
-}
-
-async function callCloudFunction(functionName: string, requestData: any) {
-  console.log(`🤝Calling Cloud Function ${functionName} with data: ${JSON.stringify(requestData)}`);
-  const cloudFunction = httpsCallable(functions, functionName);
-  console.log(`🤝Cloud function:`, cloudFunction);
-  try {
-    const result = await cloudFunction(requestData);
-    console.log(`🤝${functionName} result:`, JSON.stringify(result.data, null, 2));
-  } catch (e: any) {
-    // console.error(e.message);
-    // console.error(JSON.stringify(e));
-    throw new LendrBaseError(`Something went wrong calling the cloud function ${functionName}: ${JSON.stringify(e, null, 2)}`);
-  }
-}
-
 export async function acceptHandoff(relationId: string, loanId: string) {
   await callCloudFunction("acceptHandoff", {relationId, loanId});
 }
@@ -258,6 +146,71 @@ export async function requestReturn(relationId: string, loanId: string) {
   throw new NotImplementedError();
 }
 
+
+export function getLiveChatConversationsList(
+  setChats: Dispatch<SetStateAction<ChatViewListItem[]>>,
+  setIsLoaded: Dispatch<SetStateAction<boolean>>,
+  authUser: User,
+  lendrUser: LendrUser
+): Unsubscribe {
+  const relationIds = lendrUser.relations.map((id) =>
+    getRelationId(authUser.uid, id)
+  );
+  if (!relationIds || relationIds.length === 0) return () => {}; // TODO double check early exit behavior
+  const relationsQuery = query(
+    collection(db, "relations"),
+    where(documentId(), "in", relationIds)
+  );
+
+  const unsubscribe = onSnapshot(relationsQuery, async (snapshot) => {
+    const docDataList: ChatViewListItem[] = [];
+    const lastMessagePromises: Promise<any>[] = [];
+    snapshot.forEach(async (relationDocument) => {
+      if (!relationDocument || !relationDocument.exists())
+        throw new NotFoundError(`🤝Relation not found ⁉️`);
+
+      // Extract the data from the document
+      const relationDocumentData: Relation =
+        relationDocument.data() as Relation;
+
+      // Get the info of the other user to be displayed in the chats list
+      const otherUser = getOtherUserInRelation(relationDocumentData, authUser);
+
+      // Get the most recent message for each relation
+      const lastMessageQuery = query(
+        collection(relationDocument.ref, "messages"),
+        orderBy("createdAt", "desc"),
+        limit(1)
+      );
+      lastMessagePromises.push(getDocs(lastMessageQuery));
+
+      // Add the (incomplete) relation to the list
+      docDataList.push({
+        id: relationDocument.id,
+        otherUser: otherUser,
+        ...relationDocumentData,
+      } as ChatViewListItem);
+    });
+
+    // Tack on the data for the last message of each relation
+    Promise.all(lastMessagePromises).then((lastMessages) => {
+      for (let i = 0; i < docDataList.length; i++) {
+        docDataList[i].lastMessage = lastMessages[i].docs[0]?.data();
+      }
+      // It appears that although we are properly setting the list here with newly hydrated
+      // objects, JS thinks the list is unchanged. So we must also set loading state:
+      setChats(docDataList);
+      setIsLoaded((b) => !b);
+    });
+
+    // Don't use this yet because it will screw up the loop in the Promise.all() call.
+    // docDataList.sort((a, b) => a.createdAt.seconds - b.createdAt.seconds)
+
+    setChats(docDataList);
+  });
+
+  return unsubscribe;
+}
 
 /**
  * Gets the messages for a relation and calls the setMessages function with the messages.

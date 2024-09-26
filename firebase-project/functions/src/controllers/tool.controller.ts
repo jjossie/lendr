@@ -9,10 +9,11 @@ export async function hydrateTool(toolId: string) {
     throw new NotFoundError(`Tool with id ${toolId} does not exist`);
   }
 
+  
   const toolDoc = doc.data() as Tool;
 
   return {
-    name: toolDoc.name,
+    name: toolDoc.name.trim(),
     imageUrl: toolDoc.imageUrls[0],
     rate: toolDoc.rate,
     id: toolId,
