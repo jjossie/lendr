@@ -5,7 +5,6 @@ import {LendrBaseError} from "../errors";
 
 import {useEffect, useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { log } from "console";
 
 const MAX_CACHE_AGE = 30 * 60 * 1000;
 
