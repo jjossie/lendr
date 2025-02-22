@@ -3,6 +3,8 @@ import {Geopoint} from "geofire-common";
 import {Timestamp} from "firebase-admin/firestore";
 import {LendrUserPreview} from "./lendrUser.model";
 
+// TODO import zod
+
 export interface Tool {
 
   id?: string; // Added after retrieving from firestore

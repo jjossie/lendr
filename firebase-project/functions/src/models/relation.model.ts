@@ -2,6 +2,8 @@ import {Timestamp} from "firebase-admin/firestore";
 import {LendrUser} from "./lendrUser.model";
 import {Tool} from "./tool.model";
 
+// TODO import zod
+
 export interface Relation {
   id?: string // Added after retrieving from firestore
   users: LendrUser[];

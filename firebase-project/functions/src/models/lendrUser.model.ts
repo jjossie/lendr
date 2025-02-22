@@ -1,5 +1,6 @@
 import {Timestamp} from "firebase-admin/firestore";
 
+// TODO import zod
 
 export interface LendrUser {
   createdAt: Timestamp | string,
