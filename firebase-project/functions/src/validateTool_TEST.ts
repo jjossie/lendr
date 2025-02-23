@@ -4,7 +4,7 @@ import {DocumentData, getFirestore} from "firebase-admin/firestore";
 import {getCityNameFromGeopoint, getGeohashedLocation} from "./utils/location";
 import {Geopoint} from "geofire-common";
 import {Tool, ToolAdminForm} from "./models/tool.model";
-import { LendrUser, LendrUserPreview } from "./models/lendrUser.model";
+import { LendrUserInput, LendrUserPreview } from "./models/lendrUser.model";
 
 /**
  * @deprecated This TEST function is behind the PROD version.
@@ -51,7 +51,7 @@ export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async
   if (!lenderSnap.exists) {
     logger.error("Lender does not exist: ", rawDoc.lenderUid);
   }
-  const lender = lenderSnap.data() as LendrUser;
+  const lender = lenderSnap.data() as LendrUserInput;
   const lenderDisplayName = `${lender.firstName} ${lender.lastName}`;
 
   logger.info("Found Lender: ", lenderDisplayName);
@@ -70,7 +70,7 @@ export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async
   if (!holderSnap.exists) {
     logger.error("Holder does not exist: ", rawDoc.holderUid);
   }
-  const holder = holderSnap.data() as LendrUser;
+  const holder = holderSnap.data() as LendrUserInput;
   const holderDisplayName = `${holder.firstName} ${holder.lastName}`;
 
   logger.info("Found Holder: ", holderDisplayName);

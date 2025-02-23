@@ -1,24 +1,23 @@
 import {Timestamp} from "firebase-admin/firestore";
-import {LendrUser} from "./lendrUser.model";
+import {LendrUserValidated} from "./lendrUser.model";
 import {Tool} from "./tool.model";
 
-// TODO import zod
 
 export interface Relation {
   id?: string // Added after retrieving from firestore
-  users: LendrUser[];
+  users: LendrUserValidated[];
   createdAt: Timestamp;
   lastMessage?: ChatMessage; // Hydrated after retrieval
-  otherUser?: LendrUser; // Hydrated after retrieval
+  otherUser?: LendrUserValidated; // Hydrated after retrieval
   // Need to figure out how to include subcollection data. Or don't do it at all?
 }
 
 export interface ChatViewListItem {
   id: string // Added after retrieving from firestore
-  users?: LendrUser[];
+  users?: LendrUserValidated[];
   createdAt: Timestamp;
   lastMessage?: ChatMessage; // Hydrated after retrieval
-  otherUser: LendrUser;
+  otherUser: LendrUserValidated;
 }
 
 export type LoanStatus = "inquired" | "loanRequested" | "loaned" | "returnRequested" | "returned" | "canceled";

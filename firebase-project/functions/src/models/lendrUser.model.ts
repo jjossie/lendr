@@ -1,8 +1,27 @@
 import {Timestamp} from "firebase-admin/firestore";
+import { z, ZodSchema } from "zod";
+import { documentIdSchema } from "./utils.model";
 
-// TODO import zod
 
-export interface LendrUser {
+
+export const lendrUserSchema: ZodSchema = z.object({
+  createdAt: z.instanceof(Timestamp).or(z.string().datetime()),
+  firstName: z.string().nonempty(),
+  lastName: z.string().nonempty(),
+  displayName: z.string().nonempty().optional(),
+  relations: z.array(documentIdSchema),
+  expoPushTokens:z.array(z.string().startsWith("ExponentPushToken[").endsWith("]")),
+  uid: z.string(),
+  providerData: z.any().optional(),
+  photoURL: z.string().url().optional(),
+  email: z.string().email().optional(),
+});
+
+
+
+export type LendrUserValidated = z.infer<typeof lendrUserSchema>;
+
+export interface LendrUserInput {
   createdAt: Timestamp | string,
   firstName: string,
   lastName: string,
