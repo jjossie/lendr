@@ -31,7 +31,10 @@ export default {
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.joeljossie.lendr",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
