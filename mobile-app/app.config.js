@@ -31,7 +31,10 @@ export default {
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.joeljossie.lendr",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -76,5 +79,12 @@ export default {
         "projectId": "84d39ce3-20d9-4fb5-9735-870749bc53ac"
       }
     },
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "typescript"
+        ]
+      }
+    }
   }
 }

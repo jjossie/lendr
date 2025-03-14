@@ -1,4 +1,4 @@
-import "expo-dev-client";
+// import "expo-dev-client";
 
 import {app} from "./src/config/firebase";
 
