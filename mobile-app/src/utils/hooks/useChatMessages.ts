@@ -1,4 +1,4 @@
-import {IChatMessage, ILoan, IRelation} from "../../models/Relation";
+import {ChatMessage, Loan, Relation} from "../../models/relation";
 import {useEffect, useState} from "react";
 import {useAuthentication} from "./useAuthentication";
 import {getLiveLoans, getLiveMessages, getOtherUserInRelation, getRelationById} from "../../controllers/relation";
@@ -7,9 +7,9 @@ export function useChatMessages(relationId: string) {
   console.log("🛠️useChatMessages() - Hook Called");
 
   // State
-  const [messages, setMessages] = useState<IChatMessage[]>([]);
-  const [relation, setRelation] = useState<IRelation>();
-  const [loans, setLoans] = useState<ILoan[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [relation, setRelation] = useState<Relation>();
+  const [loans, setLoans] = useState<Loan[]>([]);
   const {authUser, user} = useAuthentication();
 
   // Effects

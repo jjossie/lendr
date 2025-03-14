@@ -1,20 +1,23 @@
 import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import {logger} from "firebase-functions";
-import {getFirestore} from "firebase-admin/firestore";
-import {getCityNameFromGeopoint, getGeohashedLocation} from "./models/Location";
+import {DocumentData, getFirestore} from "firebase-admin/firestore";
+import {getCityNameFromGeopoint, getGeohashedLocation} from "./utils/location";
 import {Geopoint} from "geofire-common";
-import {ITool, IToolAdminForm} from "./models/Tool";
+import {Tool, ToolAdminForm} from "./models/tool.model";
+import { LendrUser, LendrUserPreview } from "./models/lendrUser.model";
 
-
+/**
+ * @deprecated This TEST function is behind the PROD version.
+ */
 export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async (event) => {
   logger.info("Validating new tool: ", event.data.id);
   const db = getFirestore();
   /**
    * Validation
    */
-  const rawDoc = event.data.data() as IToolAdminForm;
+  const rawDoc = event.data.data() as ToolAdminForm;
   // @ts-ignore
-  let hydroDoc: ITool = {...rawDoc};
+  let hydroDoc: Tool = {...rawDoc};
   // @ts-ignore
   delete hydroDoc.geopoint;
 
@@ -45,16 +48,17 @@ export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async
 
   // Check lenderUid and hydrate lender object accordingly
   const lenderSnap = await db.collection("users").doc(rawDoc.lenderUid).get();
-  const lender = lenderSnap.data();
-  const lenderDisplayName = `${lender.firstName} ${lender.lastName}`;
-
-  if (!lender.exists) {
+  if (!lenderSnap.exists) {
     logger.error("Lender does not exist: ", rawDoc.lenderUid);
   }
+  const lender = lenderSnap.data() as LendrUser;
+  const lenderDisplayName = `${lender.firstName} ${lender.lastName}`;
+
   logger.info("Found Lender: ", lenderDisplayName);
-  const hydroLender = {
+  const hydroLender: LendrUserPreview = {
     uid: rawDoc.lenderUid,
-    displayName: lenderDisplayName, // TODO: Add picture
+    displayName: lenderDisplayName, 
+    photoURL: lender.photoURL,
   };
   hydroDoc.lender = hydroLender;
 
@@ -63,16 +67,17 @@ export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async
     hydroDoc.holder = hydroLender;
   }
   const holderSnap = await db.collection("users").doc(rawDoc.holderUid).get();
-  const holder = holderSnap.data();
-  const holderDisplayName = `${holder.firstName} ${holder.lastName}`;
-
-  if (!holder.exists) {
+  if (!holderSnap.exists) {
     logger.error("Holder does not exist: ", rawDoc.holderUid);
   }
+  const holder = holderSnap.data() as LendrUser;
+  const holderDisplayName = `${holder.firstName} ${holder.lastName}`;
+
   logger.info("Found Holder: ", holderDisplayName);
   hydroDoc.holder = {
     uid: rawDoc.holderUid,
     displayName: holderDisplayName,
+    photoURL: holder.photoURL,
   };
 
   // Check location geopoint and hydrate geohash and city accordingly

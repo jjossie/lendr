@@ -15,22 +15,45 @@ import {
 // SplashScreen.preventAutoHideAsync();
 
 const newColorTheme = {
-  brand: {
-    900: "#8287af",
-    800: "#7c83db",
-    700: "#b3bef6",
-  },
   primary: {
-    500: "#2e5339",
-    300: "#5c7953"
+    50: '#e9f8ed',
+    100: '#cce5d3',
+    200: '#add2b8',
+    300: '#8dbf9c',
+    400: '#6eac80',
+    500: '#559466',
+    600: '#417350',
+    700: '#2d5238',
+    800: '#193121',
+    900: '#011206',
+  },
+  brand: {
+    50: '#ebf7e9',
+    100: '#d2e1ce',
+    200: '#b8ccb1',
+    300: '#9cb694',
+    400: '#81a277',
+    500: '#68885d',
+    600: '#506a48',
+    700: '#394c32',
+    800: '#212e1c',
+    900: '#071100',
   },
   secondary: {
-    500: "#db504a",
-    300: "#ff6f59",
+    50: '#ffe6e6',
+    100: '#f7bfbd',
+    200: '#ec9794',
+    300: '#e26e69',
+    400: '#d94640',
+    500: '#bf2c26',
+    600: '#96221d',
+    700: '#6b1714',
+    800: '#430c0a',
+    900: '#1d0100',
   },
-  lendrLight: {
+  ivory: {
     100: "#f5fbef",
-  }
+  },
 };
 const newFontTheme = {
   Epilogue: {
@@ -78,6 +101,36 @@ const theme = extendTheme({
     heading: "Epilogue",
     body: "Epilogue",
   },
+  components: {
+    Button: {
+      // Can simply pass default props to change default behaviour of components.
+      baseStyle: {
+        rounded: 'md',
+      },
+      defaultProps: {
+        fontWeight: "bold"
+      }
+    },
+    Heading: {
+      baseStyle: {
+        fontWeight: "bold",
+        fontSize: "4xl",
+        paddingTop: 0,
+        paddingBottom: 4,
+        paddingHorizontal: 4
+      },
+      defaultProps: {
+        fontSize: "4xl",
+
+      }
+    }
+    // Box: {
+    //   baseStyle: {
+    //     // bgColor: "light.100",
+    //   }
+    // }
+
+  }
 });
 
 const colorModeManager: StorageManager = {

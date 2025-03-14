@@ -1,21 +1,20 @@
 import {initializeApp} from 'firebase/app';
-import {getAuth, initializeAuth} from 'firebase/auth';
+import {getAuth, initializeAuth, getReactNativePersistence} from 'firebase/auth';
 import {getFirestore} from 'firebase/firestore';
 import Constants from "expo-constants";
 // import Geocoder from 'react-native-geocoding';
-import {getReactNativePersistence} from "firebase/auth/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {getFunctions} from "firebase/functions";
 
 
 const firebaseConfig = {
-  apiKey: Constants.manifest?.extra?.firebaseApiKey,
-  authDomain: Constants.manifest?.extra?.firebaseAuthDomain,
-  projectId: Constants.manifest?.extra?.firebaseProjectId,
-  storageBucket: Constants.manifest?.extra?.firebaseStorageBucket,
-  messagingSenderId: Constants.manifest?.extra?.firebaseMessagingSenderId,
-  appId: Constants.manifest?.extra?.firebaseAppId,
-  measurementId: Constants.manifest?.extra?.firebaseMeasurementId,
+  apiKey: Constants.expoConfig?.extra?.firebaseApiKey,
+  authDomain: Constants.expoConfig?.extra?.firebaseAuthDomain,
+  projectId: Constants.expoConfig?.extra?.firebaseProjectId,
+  storageBucket: Constants.expoConfig?.extra?.firebaseStorageBucket,
+  messagingSenderId: Constants.expoConfig?.extra?.firebaseMessagingSenderId,
+  appId: Constants.expoConfig?.extra?.firebaseAppId,
+  measurementId: Constants.expoConfig?.extra?.firebaseMeasurementId,
 };
 
 export const app = initializeApp(firebaseConfig);
@@ -26,4 +25,4 @@ export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const functions = getFunctions(app);
 
-// Geocoder.init(Constants.manifest?.extra?.firebaseApiKey);
+// Geocoder.init(Constants.expoConfig?.extra?.firebaseApiKey);

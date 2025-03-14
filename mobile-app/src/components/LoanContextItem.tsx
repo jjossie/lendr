@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Button, Column, Row, Text, theme} from 'native-base';
-import {ILoan, IRelation} from "../models/Relation";
+import {Loan, Relation} from "../models/relation";
 import Card from "./Card";
 import {Image} from "react-native";
 import {acceptHandoff, startHandoff} from "../controllers/relation";
@@ -10,8 +10,8 @@ import {Timestamp} from "firebase/firestore";
 import AvailabilityChip from "./AvailabilityChip";
 
 export interface LoanContextItemProps {
-  loan: ILoan;
-  relation: IRelation;
+  loan: Loan;
+  relation: Relation;
   verbose?: boolean;
 }
 
@@ -30,14 +30,14 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation, verbos
   const [isLoading, setIsLoading] = useState(false);
 
   if (!loan.tool) {
-    console.log("❇️< LoanContextItem > No tool attached");
+    console.log("🌀< LoanContextItem > No tool attached");
     return (<></>);
   }
 
 
   console.log(`❇️${loan.tool.name} - Loan Status:`, loan.status);
-  // console.log("❇️Loan:", JSON.stringify(loan, null, 2));
-  // console.log("❇️Relation:", JSON.stringify(relation, null, 2));
+  // console.log("🌀Loan:", JSON.stringify(loan, null, 2));
+  // console.log("🌀Relation:", JSON.stringify(relation, null, 2));
 
 
   // Derived state
@@ -68,18 +68,21 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation, verbos
   let statusMessage = "";
   if (loan.status === "inquired" && loan.inquiryDate?.seconds) {
     statusMessage = isLender
-        ? `${relation.otherUser?.displayName} expressed interest on ${dateFromTimestamp(loan.inquiryDate)}`
+        ? `${relation.otherUser?.firstName ?? relation.otherUser?.displayName} expressed interest on ${dateFromTimestamp(loan.inquiryDate)}`
         : `Inquired ${dateFromTimestamp(loan.inquiryDate)}`;
   }
   if (loan.status === "loaned" && isLender && loan.loanDate?.seconds) {
-    statusMessage = `Loaned to ${relation.otherUser?.displayName} on ${dateFromTimestamp(loan.loanDate)}`;
+    statusMessage = `Loaned to ${relation.otherUser?.firstName ?? relation.otherUser?.displayName} on ${dateFromTimestamp(loan.loanDate)}`;
   }
-  if ((loan.status === "loanRequested" && isBorrower) ||
-      (loan.status === "returnRequested" && isLender))
+  if ((loan.status === "loanRequested" && isLender) ||
+      (loan.status === "returnRequested" && isBorrower)){
+
     statusMessage = `Waiting for ${relation.otherUser?.firstName ?? relation.otherUser?.displayName} to accept`;
+    statusMessage += loan.status === "returnRequested" ? " return" : " loan";
+  }
   if (loan.status === "loaned" && loan.loanDate?.seconds) {
     statusMessage = isLender
-        ? `Loaned to ${relation.otherUser?.displayName} on ${dateFromTimestamp(loan.loanDate)}`
+        ? `Loaned to ${relation.otherUser?.firstName ?? relation.otherUser?.displayName} on ${dateFromTimestamp(loan.loanDate)}`
         : `Borrowing since ${dateFromTimestamp(loan.loanDate)}`;
   }
 
@@ -92,11 +95,9 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation, verbos
   return (
       <Card onPress={() => {
         if (!loan.tool) return;
-        navigation.getParent()?.navigate("SearchBrowse", { // TODO fix this, it navigates to searchBrowse but not ToolDetail
-          screen: "ToolDetail",
-          params: {
-            toolId: loan.tool.id,
-          },
+        // @ts-ignore
+        navigation.navigate("ToolDetail", {
+          toolId: loan.tool.id,
         });
       }}>
         <Row w="100%"
@@ -107,13 +108,13 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation, verbos
             <Column alignItems={"flex-start"} justifyContent={"space-between"} p={4} w="60%" h="100%">
               {verbose // Verbose will take up two lines, otherwise just one
                   ? <>
-                  <Text fontSize={"lg"}>{loan.tool.name}{"\n"}
-                    <Text fontSize={"xl"}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}</Text>
+                    <Text fontSize={"lg"}>{loan.tool.name}{"\n"}
+                      <Text fontSize={"xl"}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}</Text>
                   </>
                   :
                   <Text fontSize="lg">{loan.tool.name} - <Text fontSize={"lg"}
-                                                            bold={true}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}
-              </Text>}
+                                                               bold={true}>${loan.tool.rate.price}</Text>/{loan.tool.rate.timeUnit}
+                  </Text>}
 
               {verbose && <AvailabilityChip showAvailable={false} user={lender}/>}
 

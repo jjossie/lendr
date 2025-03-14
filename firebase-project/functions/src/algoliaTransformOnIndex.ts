@@ -1,7 +1,7 @@
 import {CallableRequest, onCall} from 'firebase-functions/v2/https';
 import * as logger from "firebase-functions/logger";
 import {getFirestore} from 'firebase-admin/firestore';
-import {ITool, IToolForm} from "./models/Tool";
+import {Tool, ToolForm} from "./models/tool.model";
 
 export const algoliaTransformOnIndex = onCall(async (request: CallableRequest<any>) => {
   logger.info("Algolia ft Joel is Indexing");
@@ -10,7 +10,7 @@ export const algoliaTransformOnIndex = onCall(async (request: CallableRequest<an
   // noinspection TypeScriptValidateJSTypes
   const doc = await getFirestore().doc(request.data?.path).get();
 
-  const tool = doc.data() as ITool & IToolForm;
+  const tool = doc.data() as Tool & ToolForm;
   logger.info("Tool found for indexing: ", tool);
 
   // First of all, just don't send it if it's deleted
@@ -64,13 +64,6 @@ export const algoliaTransformOnIndex = onCall(async (request: CallableRequest<an
     logger.info("Tool has city, attaching city name to record");
     record.city = tool.location.city;
   }
-
-  // Attach the relative distance if possible
-  // if (tool.location?.distance) {
-  //   logger.info("Tool has distance, attaching distance to record");
-  //   record.distance = tool.location.distance;
-  // } // TODO this is not really possible, since distance is relative to the current user,
-       // which is not possible to know during indexing.
 
 
   return record;

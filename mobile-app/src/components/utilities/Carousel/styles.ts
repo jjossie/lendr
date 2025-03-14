@@ -7,17 +7,17 @@ export const styles = StyleSheet.create({
   },
   container: {
     width: '100%',
-    backgroundColor: '#fbfbfb',
-    borderColor: '#ebebeb',
-    borderWidth: 1,
-    borderRadius: 8,
-    shadowColor: '#fcfcfc',
-    shadowOpacity: 1,
-    marginTop: 10,
-    shadowOffset: {
-      width: 0,
-      height: 5
-    },
+    // backgroundColor: '#fbfbfb',
+    // borderColor: '#ebebeb',
+    // borderWidth: 1,
+    // borderRadius: 8,
+    // shadowColor: '#fcfcfc',
+    // shadowOpacity: 1,
+    // marginTop: 10,
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 5
+    // },
   },
   scrollView: {
     display: 'flex',
@@ -32,7 +32,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     flexDirection: 'row',
     paddingHorizontal: 10,
-    paddingTop: 5,
+    // paddingTop: 5,
   },
   bullet: {
     paddingHorizontal: 5,

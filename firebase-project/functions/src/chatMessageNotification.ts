@@ -1,8 +1,8 @@
 // The Cloud Functions for Firebase SDK to create Cloud Functions and triggers.
 import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import * as logger from "firebase-functions/logger";
-import {IChatMessage} from "./models/Relation";
-import {getUserFromUid} from "./controllers/users";
+import {ChatMessage} from "./models/relation.model";
+import {getUserFromUid} from "./controllers/users.controller";
 import {sendExpoNotifications} from "./utils/notifications";
 
 /**
@@ -19,7 +19,7 @@ export const chatMessageNotification = onDocumentCreated(
       logger.info(event);
 
       // Get the recipient of the message.
-      const message: IChatMessage = event.data.data() as IChatMessage;
+      const message: ChatMessage = event.data.data() as ChatMessage;
       const receiver = await getUserFromUid(message.receiverUid);
       const sender = await getUserFromUid(message.senderUid);
 

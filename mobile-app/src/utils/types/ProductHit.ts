@@ -1,10 +1,11 @@
 //
 // Code courtesy of:
-// https://github.com/algolia/doc-code-samples/tree/master/react-instantsearch-hooks-native/getting-started/src  P.S.
+// https://github.com/algolia/doc-code-samples/tree/master/react-instantsearch-hooks-native/getting-started/src  
+// P.S.
 // I'm scared
 
 import {Hit as AlgoliaHit} from '@algolia/client-search';
-import {TimeUnit} from "../../models/Tool";
+import {TimeUnit} from "../../models/tool";
 
 // export type ProductHit = AlgoliaHit<{
 //   brand: string;

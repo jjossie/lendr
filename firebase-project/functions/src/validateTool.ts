@@ -1,9 +1,10 @@
 import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import {logger} from "firebase-functions";
 import {getFirestore} from "firebase-admin/firestore";
-import {getCityNameFromGeopoint, getGeohashedLocation} from "./models/Location";
+import {getCityNameFromGeopoint, getGeohashedLocation} from "./utils/location";
 import {Geopoint} from "geofire-common";
-import {ITool, IToolAdminForm} from "./models/Tool";
+import {Tool, ToolAdminForm} from "./models/tool.model";
+import { getHydratedUserPreview, getUserFromUid } from "./controllers/users.controller";
 
 
 export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) => {
@@ -12,9 +13,9 @@ export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) =
   /**
    * Validation
    */
-  const rawDoc = event.data.data() as IToolAdminForm;
+  const rawDoc = event.data.data() as ToolAdminForm;
   // @ts-ignore
-  let hydroDoc: ITool = {...rawDoc};
+  let hydroDoc: Tool = {...rawDoc};
   // @ts-ignore
   delete hydroDoc.geopoint;
 
@@ -43,51 +44,30 @@ export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) =
    * Hydration
    */
 
+  // Hydrate Lender/Holder user previews
+  try {
+    // Check lenderUid and hydrate lender object accordingly
+    const hydroLender = await getHydratedUserPreview(rawDoc.lenderUid);
+    hydroDoc.lender = hydroLender;
 
-  // Check lenderUid and hydrate lender object accordingly
-  const lenderSnap = await db.collection("users").doc(rawDoc.lenderUid).get();
-  const lender = lenderSnap.data();
-  const lenderDisplayName = `${lender.firstName} ${lender.lastName}`;
 
-  if (!lenderSnap.exists) {
-    logger.error("Lender does not exist: ", rawDoc.lenderUid);
-    // Delete the document if the lender does not exist
+    // Check holderUid and hydrate holder object accordingly
+    if (!rawDoc.holderUid) // Just copy the lender if it wasn't included
+      rawDoc.holderUid = rawDoc.lenderUid;
+
+    if (rawDoc.holderUid === rawDoc.lenderUid) {
+      logger.info("Using lender info as holder info")
+      hydroDoc.holder = hydroLender;
+    } else {
+      const hydroHolder = await getHydratedUserPreview(rawDoc.holderUid);
+      hydroDoc.holder = hydroHolder;
+    }
+  } catch (error) {
+    logger.error("🔥 Failed to Validate Tool. Likely Failed to hydrate user object for lender or holder. Deleting incomplete tool.",
+                 error);
     await event.data.ref.delete();
     return;
   }
-
-  logger.info("Found Lender: ", lenderDisplayName);
-  const hydroLender = {
-    uid: rawDoc.lenderUid,
-    displayName: lenderDisplayName, // TODO: Add picture
-  };
-  hydroDoc.lender = hydroLender;
-
-
-  // Check holderUid and hydrate holder object accordingly
-  if (!rawDoc.holderUid) // Just copy the lender if it wasn't included
-    rawDoc.holderUid = rawDoc.lenderUid;
-
-  if (rawDoc.holderUid === rawDoc.lenderUid) {
-    hydroDoc.holder = hydroLender;
-  }
-  const holderSnap = await db.collection("users").doc(rawDoc.holderUid).get();
-  const holder = holderSnap.data();
-
-  if (!holderSnap.exists) {
-    logger.error("Holder does not exist: ", rawDoc.holderUid);
-    // Delete the document if the holder does not exist
-    await event.data.ref.delete();
-    return;
-  }
-
-  logger.info("Found Holder: ", rawDoc.holderUid);
-  const holderDisplayName = `${holder.firstName} ${holder.lastName}`;
-  logger.info("Holder DisplayName: ", holderDisplayName);
-  hydroDoc.holder = {
-    uid: rawDoc.holderUid,
-    displayName: holderDisplayName,
-  };
 
   // Check location geopoint and hydrate geohash and city accordingly
   if (rawDoc.geopoint[0] && rawDoc.geopoint[1]) {

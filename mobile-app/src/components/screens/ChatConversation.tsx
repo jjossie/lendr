@@ -3,19 +3,28 @@ import {Box, ChevronRightIcon, Column, IconButton, Input, KeyboardAvoidingView, 
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {useChatMessages} from "../../utils/hooks/useChatMessages";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
-import ChatMessage from "../ChatMessage";
+import ChatSingleMessage from "../ChatMessage";
 import {getOtherUserInRelation, sendChatMessage} from "../../controllers/relation";
 import {LendrBaseError} from "../../utils/errors";
 import {Platform, ScrollView} from "react-native";
 import LoanContext from "../LoanContext";
+// import { ParamListBase } from '@react-navigation/native';
 
+// export interface ChatConversationProps extends ParamListBase {
+//   chatConversationPropception?: {
+//     title?: string;
+//   }
+// }
 
 const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
 
   // Content State
-  const [messageText, setMessageText] = useState<string>("");
+  const [messageText, setMessageText] = useState<string>(route.params?.draftMessage ?? "");
+  const [screenTitle, setScreenTitle] = useState<string>(route.params?.title ?? "");
   const {messages, relation, loans} = useChatMessages(route.params?.relationId);
   const {user} = useAuthentication();
+  
+  console.log("🌀 ChatConversation screen title: ", screenTitle);
 
   // UI State
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -40,7 +49,7 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
   };
 
   const scrollToBottom = () => {
-    setTimeout((e) => {
+    setTimeout(() => {
       if (scrollViewRef && scrollViewRef.current) {
         scrollViewRef.current.scrollToEnd({animated: true});
       }
@@ -51,6 +60,11 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
   useEffect(() => {
     scrollToBottom();
   }, [scrollViewRef]);
+
+  useEffect(() => {
+    if (relation && user)
+      navigation.setOptions({title: getOtherUserInRelation(relation, user).displayName})
+  }, [relation])
 
   // State Guards
   if (!user || !relation) return null;
@@ -79,7 +93,7 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
               onContentSizeChange={scrollToBottom}
           >
             {messages.map((message, index) => (
-                <ChatMessage message={message} relation={relation} key={index}/>
+                <ChatSingleMessage message={message} relation={relation} key={index}/>
             ))
             }
           </ScrollView>

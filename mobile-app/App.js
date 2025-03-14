@@ -1,10 +1,9 @@
-import "expo-dev-client";
+// import "expo-dev-client";
 
 import {app} from "./src/config/firebase";
 
 import {CustomNativeBaseProvider} from "./src/components/CustomNativeBaseProvider";
 import {LogBox} from "react-native";
-
 
 import {useEffect, useState} from "react";
 import AuthStack from "./src/components/navigation/AuthStack";
@@ -13,7 +12,11 @@ import {NavigationContainer} from "@react-navigation/native";
 import MainTabNavigator from "./src/components/navigation/MainTabNavigator";
 import "./src/config/algolia";
 import "./src/config/googlesignin";
+// import * as Linking from 'expo-linking';
+// import {Center, Text} from "native-base";
 
+
+// const prefix = Linking.createURL('/');
 
 // For now will disable on-screen warning with:
 LogBox.ignoreLogs([
@@ -26,7 +29,9 @@ LogBox.ignoreLogs([
 export default function App() {
   // "Initializing" state var might be necessary later, but doesn't seem essential rn
   const [initializing, setInitializing] = useState(false);
-
+  // const linking = {
+  //   prefixes: [prefix],
+  // };
 
   useEffect(() => {
     if (!app) {
@@ -42,6 +47,7 @@ export default function App() {
   return (
     <CustomNativeBaseProvider>
       <NavigationContainer>
+      {/*<NavigationContainer linking={linking} fallback={<Center><Text>Loading...</Text></Center>}>*/}
         {authUser
           ? <MainTabNavigator/>
           : <AuthStack/>

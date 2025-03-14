@@ -1,16 +1,16 @@
 import React from 'react';
 import {Box, Card, Row, Text, theme} from 'native-base';
 import {useAuthentication} from "../utils/hooks/useAuthentication";
-import {IChatMessage, IRelation} from "../models/Relation";
+import {ChatMessage, Relation} from "../models/relation";
 import AvatarImage from "./AvatarImage";
 
 export interface ChatMessageProps {
-  message: IChatMessage,
-  relation: IRelation,
+  message: ChatMessage,
+  relation: Relation,
   // index: number
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({message, relation}) => {
+const ChatSingleMessage: React.FC<ChatMessageProps> = ({message, relation}) => {
   const {user} = useAuthentication()
   if (!user || !relation.otherUser) return null;
 
@@ -42,4 +42,4 @@ const ChatMessage: React.FC<ChatMessageProps> = ({message, relation}) => {
   );
 };
 
-export default ChatMessage;
+export default ChatSingleMessage;
