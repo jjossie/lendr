@@ -79,5 +79,12 @@ export default {
         "projectId": "84d39ce3-20d9-4fb5-9735-870749bc53ac"
       }
     },
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "typescript"
+        ]
+      }
+    }
   }
 }
