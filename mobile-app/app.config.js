@@ -64,6 +64,12 @@ export default {
           "photosPermission": "Lendr accesses your photo library to let you upload photos of your tools for lending.",
           "cameraPermission": "Lendr accesses your camera to let you take photos of your tools for lending."
         }
+      ],
+      [
+        "expo-location",
+        {
+           "locationAlwaysAndWhenInUsePermission": "Allow Lendr to use your location. Source: trust me bro"
+        }
       ]
     ],
 
