@@ -70,7 +70,10 @@ export function useLocation() {
   };
 }
 
+let requestCount = 0;
+
 export async function getDeviceLocation() {
+  const requestId = requestCount++;
   // Courtesy of ChatGPT
   let { status } = await requestForegroundPermissionsAsync();
   if (status !== 'granted')
@@ -83,8 +86,9 @@ export async function getDeviceLocation() {
     if (!location || !city)
       throw new LendrBaseError("IDEK man its undefined for sum reason")
     return {location, city};
-  } catch (e) {
-    console.log("🗣️ ERRRROR", JSON.stringify(e, null, 2));
+  } catch (unknownError) {
+    console.log("🗣️ ERRRROR", JSON.stringify(unknownError, null, 2));
+    console.log("🗣️ But it's unknown: ", unknownError);
     throw new LendrBaseError("getCurrentPositionAsync() probably failed")
   } 
 }

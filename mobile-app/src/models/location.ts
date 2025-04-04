@@ -1,5 +1,6 @@
 import {distanceBetween, geohashForLocation, Geopoint} from "geofire-common";
-import {NotImplementedError} from "../utils/errors";
+import {LendrBaseError, NotImplementedError, ObjectValidationError} from "../utils/errors";
+import { GeocodeService } from "../services/geocode.service";
 
 export const KM_TO_MILE = 0.621371;
 
@@ -137,6 +138,12 @@ interface ILocationApi {
   postalcode?: string,
 }
 
+/**
+ * @deprecated Transitioning to using the GeocodeService.reverseGeocode method
+ * @param lat 
+ * @param lon 
+ * @returns 
+ */
 async function reverseGeocode(lat: number, lon: number): Promise<{
   "address": {
     "country": string,
@@ -161,14 +168,22 @@ async function reverseGeocode(lat: number, lon: number): Promise<{
 }
 > {
   requestCount++;
-  console.log(`📍Sending a Free Geocoder Request - ${requestCount} requests so far`);
   const url = `https://geocode.maps.co/reverse?lat=${lat}&lon=${lon}`;
+  const response = await fetch(url);
+
+  // Read the response body as text first
+  const rawResponse = await response.text();
+
   try {
-    const response = await fetch(url);
-    console.log("📍 Fetch Response: ", JSON.stringify(response, null, 2))
-    return response.json();
+    // Attempt to parse the raw response as JSON
+    const responseJson = JSON.parse(rawResponse);
+    console.log(`📍Reverse Geocoding response: ${JSON.stringify(responseJson)}`);
+    return responseJson;
   } catch (e) {
-    console.log("📍🗣️ FAILED TO FETCH GEOCODER, ", JSON.stringify(e, null, 2));
+    if (e instanceof SyntaxError) {
+      console.error("Failed to parse JSON. Raw response:", rawResponse);
+      throw new ObjectValidationError(`SyntaxError: Failed to parse JSON. Raw response: ${rawResponse}`);
+    }
     throw e;
   }
 }
@@ -210,8 +225,10 @@ export async function getGeopointFromCityName(city: string, state?: string): Pro
  * @returns {Promise<string>}
  */
 export async function getCityNameFromGeopoint(geopoint: Geopoint): Promise<string> {
-  // TODO: Cache this kind of thing. Might be a good way to reduce requests
-  const response = await reverseGeocode(geopoint[0], geopoint[1]);
+  
+  const geocodeService = GeocodeService.getInstance();
+  
+  const response = await geocodeService.reverseGeocode(geopoint[0], geopoint[1]);
   // console.log("📍reverse geocoding response: ", JSON.stringify(response, null, 2));
   const {neighbourhood, city, town, county, state, country} = response.address;
 
