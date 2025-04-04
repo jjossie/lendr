@@ -1,5 +1,7 @@
 import { ILocationApi } from "../models/location";
 import { ObjectValidationError } from "../utils/errors";
+import Constants from "expo-constants";
+
 
 type ReverseGeocodeResponse = {
     address: {
@@ -28,6 +30,8 @@ type ReverseGeocodeResponse = {
     private cache: Map<string, ReverseGeocodeResponse>;
     private ongoingRequests: Map<string, Promise<ReverseGeocodeResponse>>;
     private requestCount: number;
+
+    private static apiKey: String = Constants.expoConfig?.extra?.geocoderApiKey;
 
 
     private static _instance: GeocodeService;
@@ -85,7 +89,7 @@ type ReverseGeocodeResponse = {
   
     private async makeReverseGeocodeRequest(lat: number, lon: number): Promise<ReverseGeocodeResponse> {
       this.requestCount++;
-      const url = `https://geocode.maps.co/reverse?lat=${lat}&lon=${lon}`;
+      const url = `https://geocode.maps.co/reverse?lat=${lat}&lon=${lon}&api_key=${GeocodeService.apiKey}`;
       console.log(`📍Sending request #${this.requestCount} to ${url}`);
   
       const response = await fetch(url);
@@ -142,7 +146,7 @@ type ReverseGeocodeResponse = {
     
         console.log(`📍Sending geocode request #${this.requestCount} to ${url}`);
     
-        const response = await fetch(url);
+        const response = await fetch(`${url}api_key=${GeocodeService.apiKey}`);
         const rawResponse = await response.text();
     
         try {
