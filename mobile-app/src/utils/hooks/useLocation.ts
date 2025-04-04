@@ -6,7 +6,7 @@ import {LendrBaseError} from "../errors";
 import {useEffect, useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const MAX_CACHE_AGE = 30 * 60 * 1000;
+const MAX_CACHE_AGE = 5 * 60 * 1000;
 
 
 function isCacheFresh(timestamp: string | null): boolean {
@@ -14,8 +14,8 @@ function isCacheFresh(timestamp: string | null): boolean {
   // EDIT: I think it's actually not. assuming date.now() is actually universal
   
   if (!timestamp) return false;
-  const diff = +timestamp - Date.now();
-  return diff > MAX_CACHE_AGE;
+  const cacheAge = Date.now() - +timestamp;
+  return cacheAge < MAX_CACHE_AGE;
 }
 
 
