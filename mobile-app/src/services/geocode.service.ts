@@ -1,6 +1,7 @@
+import { ILocationApi } from "../models/location";
 import { ObjectValidationError } from "../utils/errors";
 
-type GeocodeResponse = {
+type ReverseGeocodeResponse = {
     address: {
       country: string;
       country_code: string;
@@ -24,8 +25,8 @@ type GeocodeResponse = {
   };
   
   export class GeocodeService {
-    private cache: Map<string, GeocodeResponse>;
-    private ongoingRequests: Map<string, Promise<GeocodeResponse>>;
+    private cache: Map<string, ReverseGeocodeResponse>;
+    private ongoingRequests: Map<string, Promise<ReverseGeocodeResponse>>;
     private requestCount: number;
 
 
@@ -45,12 +46,16 @@ type GeocodeResponse = {
       this.requestCount = 0;
     }
   
-    private getCacheKey(lat: number, lon: number): string {
+    private getLatLonCacheKey(lat: number, lon: number): string {
       return `${lat},${lon}`;
     }
+
+    private getGeocodeCacheKey(location: ILocationApi): string {
+        return JSON.stringify(location);
+      }
   
-    async reverseGeocode(lat: number, lon: number): Promise<GeocodeResponse> {
-      const cacheKey = this.getCacheKey(lat, lon);
+    async reverseGeocode(lat: number, lon: number): Promise<ReverseGeocodeResponse> {
+      const cacheKey = this.getLatLonCacheKey(lat, lon);
   
       // Check if the response is already cached
       if (this.cache.has(cacheKey)) {
@@ -65,7 +70,7 @@ type GeocodeResponse = {
       }
   
       // Create a new request and store it in the ongoingRequests map
-      const requestPromise = this.makeRequest(lat, lon);
+      const requestPromise = this.makeReverseGeocodeRequest(lat, lon);
       this.ongoingRequests.set(cacheKey, requestPromise);
   
       try {
@@ -78,7 +83,7 @@ type GeocodeResponse = {
       }
     }
   
-    private async makeRequest(lat: number, lon: number): Promise<GeocodeResponse> {
+    private async makeReverseGeocodeRequest(lat: number, lon: number): Promise<ReverseGeocodeResponse> {
       this.requestCount++;
       const url = `https://geocode.maps.co/reverse?lat=${lat}&lon=${lon}`;
       console.log(`📍Sending request #${this.requestCount} to ${url}`);
@@ -95,4 +100,58 @@ type GeocodeResponse = {
         throw new ObjectValidationError(`SyntaxError: Failed to parse JSON. Raw response: ${rawResponse}`);
       }
     }
+
+    async geocode(location: ILocationApi): Promise<ReverseGeocodeResponse> {
+        const cacheKey = this.getGeocodeCacheKey(location);
+    
+        // Check if the response is already cached
+        if (this.cache.has(cacheKey)) {
+          console.log(`📍Cache hit for geocode: ${cacheKey}`);
+          return this.cache.get(cacheKey)!;
+        }
+    
+        // Check if a request is already in progress for this location
+        if (this.ongoingRequests.has(cacheKey)) {
+          console.log(`📍Request already in progress for geocode: ${cacheKey}`);
+          return this.ongoingRequests.get(cacheKey)!;
+        }
+    
+        // Create a new request and store it in the ongoingRequests map
+        const requestPromise = this.makeGeocodeRequest(location);
+        this.ongoingRequests.set(cacheKey, requestPromise);
+    
+        try {
+          const response = await requestPromise;
+          this.cache.set(cacheKey, response); // Cache the response
+          return response;
+        } finally {
+          // Remove the request from ongoingRequests once it completes
+          this.ongoingRequests.delete(cacheKey);
+        }
+      }
+    
+      private async makeGeocodeRequest(location: ILocationApi): Promise<ReverseGeocodeResponse> {
+        this.requestCount++;
+        let url = "https://geocode.maps.co/search?";
+        if (location.street) url += `street=${encodeURIComponent(location.street)}&`;
+        if (location.city) url += `city=${encodeURIComponent(location.city)}&`;
+        if (location.county) url += `county=${encodeURIComponent(location.county)}&`;
+        if (location.state) url += `state=${encodeURIComponent(location.state)}&`;
+        if (location.country) url += `country=${encodeURIComponent(location.country)}&`;
+        if (location.postalcode) url += `postalcode=${encodeURIComponent(location.postalcode)}&`;
+    
+        console.log(`📍Sending geocode request #${this.requestCount} to ${url}`);
+    
+        const response = await fetch(url);
+        const rawResponse = await response.text();
+    
+        try {
+          const responseJson = JSON.parse(rawResponse);
+          console.log(`📍Geocode response: ${JSON.stringify(responseJson)}`);
+          return responseJson;
+        } catch (e) {
+          console.error("Failed to parse JSON. Raw response:", rawResponse);
+          throw new ObjectValidationError(`SyntaxError: Failed to parse JSON. Raw response: ${rawResponse}`);
+        }
+      }
   }

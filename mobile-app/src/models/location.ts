@@ -1,5 +1,5 @@
 import {distanceBetween, geohashForLocation, Geopoint} from "geofire-common";
-import {LendrBaseError, NotImplementedError, ObjectValidationError} from "../utils/errors";
+import {NotImplementedError} from "../utils/errors";
 import { GeocodeService } from "../services/geocode.service";
 
 export const KM_TO_MILE = 0.621371;
@@ -120,16 +120,13 @@ export function metersFromMiles(miles: number): number {
   return miles / KM_TO_MILE * 1000;
 }
 
-let requestCount = 0;
-
-
 export function getRandomCityGeopoint() {
   // Get a random location from the IDAHO_LOCATIONS array
   const randomCityIndex = Math.floor(Math.random() * IDAHO_LOCATIONS.length);
   return IDAHO_LOCATIONS[randomCityIndex];
 }
 
-interface ILocationApi {
+export interface ILocationApi {
   street?: string,
   city?: string,
   county?: string,
@@ -138,70 +135,7 @@ interface ILocationApi {
   postalcode?: string,
 }
 
-/**
- * @deprecated Transitioning to using the GeocodeService.reverseGeocode method
- * @param lat 
- * @param lon 
- * @returns 
- */
-async function reverseGeocode(lat: number, lon: number): Promise<{
-  "address": {
-    "country": string,
-    "country_code": string,
-    "county": string,
-    "postcode": string,
-    "road": string,
-    "state": string,
-    "town"?: string,
-    "city"?: string,
-    "neighbourhood"?: string,
-  },
-  "boundingbox": [string, string, string, string],
-  "display_name": string,
-  "lat": string,
-  "licence": string,
-  "lon": string,
-  "osm_id": number,
-  "osm_type": string,
-  "place_id": number,
-  "powered_by": string,
-}
-> {
-  requestCount++;
-  const url = `https://geocode.maps.co/reverse?lat=${lat}&lon=${lon}`;
-  const response = await fetch(url);
 
-  // Read the response body as text first
-  const rawResponse = await response.text();
-
-  try {
-    // Attempt to parse the raw response as JSON
-    const responseJson = JSON.parse(rawResponse);
-    console.log(`📍Reverse Geocoding response: ${JSON.stringify(responseJson)}`);
-    return responseJson;
-  } catch (e) {
-    if (e instanceof SyntaxError) {
-      console.error("Failed to parse JSON. Raw response:", rawResponse);
-      throw new ObjectValidationError(`SyntaxError: Failed to parse JSON. Raw response: ${rawResponse}`);
-    }
-    throw e;
-  }
-}
-
-async function geocode(location: ILocationApi) {
-  let url = "https://geocode.maps.co/search?";
-  if (location.street) url += `street=${location.street}&`;
-  if (location.city) url += `city=${location.city}&`;
-  if (location.county) url += `county=${location.county}&`;
-  if (location.state) url += `state=${location.state}&`;
-  if (location.country) url += `country=${location.country}&`;
-  if (location.postalcode) url += `postalcode=${location.postalcode}&`;
-
-  requestCount++;
-  console.log(`📍Sending a Free Geocoder Request - ${requestCount} requests so far`);
-  const response = await fetch(url);
-  return response.json();
-}
 
 /**
  * Given a city name, find the geopoint. Include the state preferably
@@ -210,13 +144,15 @@ async function geocode(location: ILocationApi) {
  * @returns {Promise<Geopoint>}
  */
 export async function getGeopointFromCityName(city: string, state?: string): Promise<Geopoint> {
+  const geocodeService = GeocodeService.getInstance();
+  
   // Given a city name, find the geopoint
   let options: any = {city: city};
   if (state)
     options.state = state;
-  const response = await geocode(options);
+  const response = await geocodeService.geocode(options);
   // console.log("📍geocoding response: ", JSON.stringify(response));
-  return [response.lat, response.lon];
+  return [Number.parseFloat(response.lat), Number.parseFloat(response.lon)]
 }
 
 /**
@@ -255,6 +191,13 @@ export function getStateAbbreviation(state: string) {
   return stateAbbreviations[state] || state;
 }
 
+
+
+//
+// Deprecated methods
+//
+
+
 /**
  * @deprecated this uses reactNativeGeocoding
  * @param {Geopoint} geopoint
@@ -288,5 +231,79 @@ export async function getGeopointFromCityNameRNG(cityName: string): Promise<Geop
   // const result = response.results[0];
   // const geopoint = result.geometry.location;
   // return [geopoint.lat, geopoint.lng];
+  throw new NotImplementedError();
+}
+
+
+/**
+ * @deprecated Transitioning to using the GeocodeService.geocode method
+ * @param location 
+ * @returns 
+ */
+async function geocode(location: ILocationApi) {
+  // let url = "https://geocode.maps.co/search?";
+  // if (location.street) url += `street=${location.street}&`;
+  // if (location.city) url += `city=${location.city}&`;
+  // if (location.county) url += `county=${location.county}&`;
+  // if (location.state) url += `state=${location.state}&`;
+  // if (location.country) url += `country=${location.country}&`;
+  // if (location.postalcode) url += `postalcode=${location.postalcode}&`;
+
+  // requestCount++;
+  // console.log(`📍Sending a Free Geocoder Request - ${requestCount} requests so far`);
+  // const response = await fetch(url);
+  // return response.json();
+  throw new NotImplementedError();
+}
+
+
+/**
+ * @deprecated Transitioning to using the GeocodeService.reverseGeocode method
+ * @param lat 
+ * @param lon 
+ * @returns 
+ */
+async function reverseGeocode(lat: number, lon: number): Promise<{
+  "address": {
+    "country": string,
+    "country_code": string,
+    "county": string,
+    "postcode": string,
+    "road": string,
+    "state": string,
+    "town"?: string,
+    "city"?: string,
+    "neighbourhood"?: string,
+  },
+  "boundingbox": [string, string, string, string],
+  "display_name": string,
+  "lat": string,
+  "licence": string,
+  "lon": string,
+  "osm_id": number,
+  "osm_type": string,
+  "place_id": number,
+  "powered_by": string,
+}
+> {
+  // requestCount++;
+  // const url = `https://geocode.maps.co/reverse?lat=${lat}&lon=${lon}`;
+  // const response = await fetch(url);
+
+  // // Read the response body as text first
+  // const rawResponse = await response.text();
+
+  // try {
+  //   // Attempt to parse the raw response as JSON
+  //   const responseJson = JSON.parse(rawResponse);
+  //   console.log(`📍Reverse Geocoding response: ${JSON.stringify(responseJson)}`);
+  //   return responseJson;
+  // } catch (e) {
+  //   if (e instanceof SyntaxError) {
+  //     console.error("Failed to parse JSON. Raw response:", rawResponse);
+  //     throw new ObjectValidationError(`SyntaxError: Failed to parse JSON. Raw response: ${rawResponse}`);
+  //   }
+  //   throw e;
+  // }
   throw new NotImplementedError();
 }
