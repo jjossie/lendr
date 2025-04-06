@@ -4,7 +4,7 @@ import { documentIdSchema } from "./utils.model";
 
 
 
-export const lendrUserSchema: ZodSchema = z.object({
+export const lendrUserSchema = z.object({
   createdAt: z.instanceof(Timestamp).or(z.string().datetime()),
   firstName: z.string().nonempty(),
   lastName: z.string().nonempty(),

@@ -1,9 +1,11 @@
-// TODO import zod
+import { z } from "zod";
 
-export interface Location {
-  latitude: number;
-  longitude: number;
-  geohash: string; // Added after retrieving from firestore
-  city?: string; // Added (asynchronously) after retrieving from firestore
-  relativeDistance?: number; // Added after retrieving from firestore
-}
+export const locationSchema = z.object({
+  latitude: z.number(),
+  longitude: z.number(),
+  geohash: z.string(),
+  city: z.string().optional(),
+  relativeDistance: z.number().optional(),
+});
+
+export type Location = z.infer<typeof locationSchema>;
