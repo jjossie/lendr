@@ -64,6 +64,12 @@ export default {
           "photosPermission": "Lendr accesses your photo library to let you upload photos of your tools for lending.",
           "cameraPermission": "Lendr accesses your camera to let you take photos of your tools for lending."
         }
+      ],
+      [
+        "expo-location",
+        {
+           "locationAlwaysAndWhenInUsePermission": "Allow Lendr to use your location. Source: trust me bro"
+        }
       ]
     ],
 
@@ -75,6 +81,7 @@ export default {
       firebaseMessagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
       firebaseAppId: process.env.FIREBASE_APP_ID,
       firebaseMeasurementId: process.env.FIREBASE_MEASUREMENT_ID,
+      geocoderApiKey: process.env.GEOCODER_API_KEY,
       "eas": {
         "projectId": "84d39ce3-20d9-4fb5-9735-870749bc53ac"
       }
