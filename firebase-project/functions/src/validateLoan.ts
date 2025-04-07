@@ -7,11 +7,13 @@ import {HttpsError} from "firebase-functions/v2/https";
 export const validateLoan = onDocumentCreated("/relations/{relationId}/loans/{loanId}", async (event) => {
   logger.debug(`🔥Validating new loan: ${event.params.relationId}/loans/${event.params.loanId}`);
 
-  const rawLoanDoc = event.data.data();
+  const rawLoanDoc = event.data?.data();
+
+  // TODO zod validate
   let hydroLoanDoc = {...rawLoanDoc};
 
   // Basic Validation
-  if (!rawLoanDoc.toolId) {
+  if (!rawLoanDoc?.toolId) {
     throw new HttpsError("invalid-argument", "Tool ID is required");
   }
 
@@ -26,7 +28,7 @@ export const validateLoan = onDocumentCreated("/relations/{relationId}/loans/{lo
 
   // Write the validated, hydrated loan to Firestore
   try {
-    await event.data.ref.set(hydroLoanDoc, {merge: false});
+    await event.data?.ref.set(hydroLoanDoc, {merge: false});
     logger.debug("🔥Successfully hydrated & validated loan for tool ", hydroLoanDoc.tool.name,
         "With ID: ", event.params.loanId,
         "From Relation ID: ", event.params.relationId);

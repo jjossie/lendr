@@ -7,9 +7,7 @@ import { lendrUserSchema } from "./models/lendrUser.model";
 export const validateRelation = onDocumentCreated(
   "/relations/{relationId}",
   async (event) => {
-    const rawDoc = event.data.data();
-
-    const parsedRelation = relationSchema.safeParse(rawDoc);
+    const parsedRelation = relationSchema.safeParse(event.data?.data());
 
     if (!parsedRelation.success) {
       throw new ObjectValidationError("Invalid relation data", parsedRelation.error);
@@ -26,15 +24,14 @@ export const validateRelation = onDocumentCreated(
       );
     }
 
-
     // Hydrate users
     // The frontend has sent two user objects in an array, plus a timestamp. We need to verify the users are 
     // legit, and determine whether we want to store the full user data alongside the relation, or just a preview. 
 
     // These will (NOT) throw an error if the user doesn't exist
     const retrievedUsers = await Promise.all([
-        getUserFromUid(rawDoc.users[0].uid),
-        getUserFromUid(rawDoc.users[1].uid),
+        getUserFromUid(parsedRelationDoc.users[0].uid),
+        getUserFromUid(parsedRelationDoc.users[1].uid),
       ]);
     
     // this is a bit redundant but we're doing it anyway for now

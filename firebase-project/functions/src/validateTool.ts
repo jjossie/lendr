@@ -5,10 +5,11 @@ import {getCityNameFromGeopoint, getGeohashedLocation} from "./utils/location";
 import {Geopoint} from "geofire-common";
 import {Tool, ToolForm, toolFormSchema} from "./models/tool.model";
 import { getHydratedUserPreview } from "./controllers/users.controller";
-import { ObjectValidationError } from "./utils/errors";
+import { LendrBaseError, ObjectValidationError } from "./utils/errors";
 
 
 export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) => {
+  if (!event.data) return new LendrBaseError("No data in event");
   logger.info("Validating new tool: ", event.data.id);
   const db = getFirestore();
   /**
@@ -18,14 +19,10 @@ export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) =
   if (!toolFormParsed.success) throw new ObjectValidationError("Invalid Tool Form Input", toolFormParsed.error);
   const toolForm = toolFormParsed.data as ToolForm;
 
-  // TODO figure out why zod validated schemas are coming back with all optional props
-  // @ts-ignore
   let hydroDoc: Tool = {...toolForm};
-  // delete hydroDoc.geopoint;
-  // Don't forget to delete the geopoint
+  // TODO do we need to delete the geopoint?
 
   logger.info("Hydrating newly created tool: ", toolForm.name);
-
 
   /**
    * Hydration
