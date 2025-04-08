@@ -3,13 +3,14 @@ import {getFirestore} from "firebase-admin/firestore";
 import {Tool} from "./models/tool.model";
 import {getLoan, setLoanStatus} from "./controllers/relation.controller";
 import { getRelationId } from "./utils/relation";
-import {Loan} from "./models/relation.model";
 import {logger} from "firebase-functions";
 import {getUserFromUid} from "./controllers/users.controller";
 import {LendrUserPreview} from "./models/lendrUser.model";
 import {firestore} from "firebase-admin";
 import {sendExpoNotifications} from "./utils/notifications";
 import Firestore = firestore.Firestore;
+import { Loan } from "./models/loan.model";
+import { NotFoundError } from "./utils/errors";
 
 async function getToolByIdFromCallable(db: Firestore, toolId: string) {
   // Get the tool from the database
@@ -78,7 +79,7 @@ export const acceptHandoff = onCall(async (req) => {
   }
 
   const currentUserIsLender = (req.auth.uid === loan.lenderUid);
-  const otherUserId = [loan.lenderUid, loan.borrowerUid].filter(id => id !== req.auth.uid)[0];
+  const otherUserId = [loan.lenderUid, loan.borrowerUid].filter(id => id !== req.auth?.uid)[0];
   logger.debug(`🔥Current user (${currentUserIsLender ? "lender" : "borrower"}) accepting handoff from [${otherUserId}] (${currentUserIsLender ? "borrower" : "lender"})`)
   // const currentUser = await getUserFromUid(req.auth.uid);
   // const otherUser = await getUserFromUid(otherUserId);
@@ -126,6 +127,9 @@ export const acceptHandoff = onCall(async (req) => {
 
   // Update the tool's holder to the current user
   const currentUser = await getUserFromUid(req.auth.uid);
+  if (!currentUser) {
+    throw new NotFoundError("Current user not found");
+  }
 
   let holder: LendrUserPreview = {
     uid: req.auth.uid,
@@ -204,6 +208,9 @@ export const startHandoff = onCall(async (req) => {
   // Notify the borrower they get to use the tool! // TODO fix, might be other way around
   const borrower = await getUserFromUid(loan.borrowerUid);
   const lender = await getUserFromUid(loan.lenderUid);
+  if (!borrower || !lender) {
+    throw new NotFoundError(`User not found: Borrower UID ${loan.borrowerUid}: ${borrower}; Lender UID ${loan.lenderUid}: ${lender}`);
+  }
   await sendExpoNotifications(
       borrower.expoPushTokens,
       "Tool Available!",
@@ -217,6 +224,10 @@ export const startHandoff = onCall(async (req) => {
  * @type {Function<any, Promise<void>>}
  */
 export const requestReturn = onCall(async (req) => {
+  if (!req.auth || !req.auth.uid) {
+    throw new HttpsError("unauthenticated", "User not logged in 🫥");
+  }
+
   // Get the tool ID from the query string
   const toolId = req.data.toolId;
 

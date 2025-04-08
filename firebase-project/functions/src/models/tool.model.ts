@@ -50,6 +50,7 @@ export const toolFormSchema = z.object({
 }).required();
 
 export type ToolForm = z.infer<typeof toolFormSchema>;
+export type ToolDummyForm = Omit<ToolForm, "createdAt" | "modifiedAt" | "location">;
 
 export interface Tool {
 

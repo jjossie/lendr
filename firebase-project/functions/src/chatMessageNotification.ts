@@ -1,10 +1,10 @@
 // The Cloud Functions for Firebase SDK to create Cloud Functions and triggers.
 import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import * as logger from "firebase-functions/logger";
-import {ChatMessage} from "./models/relation.model";
 import {getUserFromUid} from "./controllers/users.controller";
 import {sendExpoNotifications} from "./utils/notifications";
 import { NotFoundError } from "./utils/errors";
+import { ChatMessage } from "./models/chat.model";
 
 /**
  * Triggered when a new message is added to a relation, which happens on every chat message send.

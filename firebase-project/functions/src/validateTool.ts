@@ -9,7 +9,7 @@ import { LendrBaseError, ObjectValidationError } from "./utils/errors";
 
 
 export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) => {
-  if (!event.data) return new LendrBaseError("No data in event");
+  if (!event.data) throw new LendrBaseError("No data in event");
   logger.info("Validating new tool: ", event.data.id);
   const db = getFirestore();
   /**

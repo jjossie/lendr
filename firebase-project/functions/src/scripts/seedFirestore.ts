@@ -1,5 +1,5 @@
 // Initialize Firebase Admin App
-import {ToolAdminForm, ToolForm} from "../models/tool.model";
+import {ToolDummyForm, ToolForm} from "../models/tool.model";
 import {getRandomCityGeopoint} from "../utils/location";
 
 let admin = require("firebase-admin");
@@ -17,7 +17,7 @@ const dummyUsersToCreate = [
   {displayName: "Michael Hawk", email: "joemomma@gmail.com", password: "amogus"},
 ];
 
-const dummyToolsToCreate: ToolAdminForm[] = [
+const dummyToolsToCreate: ToolDummyForm[] = [
   {
     lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
     geopoint: [43.82382353401531, -111.7776913516126],
@@ -133,15 +133,18 @@ const dummyToolsToCreate: ToolAdminForm[] = [
     description: 'It sawz all’s',
   },
   {
-    preferences: {localPickup: true, delivery: false, useOnSite: true},
+    preferences: { localPickup: true, delivery: false, useOnSite: true },
     visibility: 'published',
-    rate: {price: 33, timeUnit: 'day'},
+    rate: { price: 33, timeUnit: 'day' },
     name: 'Compound Miter Saw',
     description: 'This right here is the best miter saw ya ever done seen. It’ll take your fingers right off. OSHA’s worst nightmare. ',
     brand: 'Ryobi ',
     imageUrls: [
       'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FPAxTxRtAwmXbhEx2eM4h%2Fimg_0?alt=media&token=76ea2150-123a-432b-8bca-632425327b1a',
     ],
+    geopoint: [43.81475092650235, -111.78434231199525],
+    lenderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
+    holderUid: '6DdLnZ6jtMP8VT8OCqr1EXAasd02',
   },
   {
     visibility: 'published',
@@ -169,6 +172,7 @@ const dummyToolsToCreate: ToolAdminForm[] = [
     description: 'Not the networking kind! I have a bunch of bits too just bring them back not broken pls thx 🙏 ',
     geopoint: [43.82375337287918, -111.77766401200654],
     holderUid: '1AWMpyyzTfXnDMGOu4R360qdmSL2',
+    brand: 'DeWalt',
   },
   {
     preferences: {localPickup: false, delivery: false, useOnSite: true},
@@ -182,6 +186,7 @@ const dummyToolsToCreate: ToolAdminForm[] = [
     imageUrls: [
       'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FbyZLfyg35nV7tq151iY0%2Fimg_0?alt=media&token=23a10dff-7eb0-42d9-8459-b560e3592893',
     ],
+    brand: 'DeWalt',
   },
   {
     preferences: {localPickup: true, delivery: true, useOnSite: true},
@@ -195,8 +200,10 @@ const dummyToolsToCreate: ToolAdminForm[] = [
     description: 'I was in electrical the whole time I swear',
     geopoint: [43.82379471208456, -111.77769799205268],
     holderUid: '8vmY84LGS9hyfT3zZAqFZwakvQg1',
+    brand: 'DeWalt',
   },
   {
+    brand: 'DeWalt',
     imageUrls: [
       'https://firebasestorage.googleapis.com/v0/b/lendr-3e47b.appspot.com/o/toolImages%2FvbHWSA5HJe9jjWezn6OS%2Fimg_0?alt=media&token=a3f6f5ab-4b4f-4018-8bb6-6df8f8a22d07',
     ],
@@ -210,6 +217,7 @@ const dummyToolsToCreate: ToolAdminForm[] = [
     description: 'Mia’a',
   },
   {
+    brand: 'DeWalt',
     preferences: {localPickup: true, delivery: false, useOnSite: false},
     visibility: 'published',
     rate: {price: 30, timeUnit: 'week'},
@@ -245,6 +253,7 @@ const generateTools = async (toolsToCreate: ToolForm[]) => {
 
 // Main
 
+// @ts-ignore
 generateTools(dummyToolsToCreate)
     .then(count => console.log(`Generated ${count} Tools Successfully`))
     .catch((e) => {
