@@ -2,7 +2,7 @@ import {Timestamp} from "firebase-admin/firestore";
 import {lendrUserSchema, LendrUserValidated} from "./lendrUser.model";
 import {Tool} from "./tool.model";
 import { z } from "zod";
-import { LoanValidated } from "./loan.model";
+import { LoanInputValidated } from "./loan.model";
 import { ChatMessage, chatMessageSchema, ChatReactionValidated } from "./chat.model";
 
 // export interface Relation {

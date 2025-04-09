@@ -1,6 +1,6 @@
 import { Timestamp } from "firebase-admin/firestore";
 import { z } from "zod";
-import { Tool } from "./tool.model";
+import { Tool, toolPreviewSchema, toolSchema } from "./tool.model";
 
 const loanStatusSchema = z.enum(["inquired", "loanRequested", "loaned", "returnRequested", "returned", "canceled"]);
 export type LoanStatus = "inquired" | "loanRequested" | "loaned" | "returnRequested" | "returned" | "canceled";
@@ -23,11 +23,18 @@ export interface Loan {
 }
 
 
-export const loanSchema = z.object({
-  id: z.string().optional(),
+export const loanInputSchema = z.object({
   toolId: z.string(),
-  tool: z.any().optional(),
   inquiryDate: z.instanceof(Timestamp).optional(),
+  lenderUid: z.string(),
+  borrowerUid: z.string(),
+});
+
+export const loanHydratedSchema = z.object({
+  id: z.string(),
+  toolId: z.string(),
+  tool: toolPreviewSchema, // TODO create toolPreviewSchema
+  inquiryDate: z.instanceof(Timestamp),
   loanDate: z.instanceof(Timestamp).optional(),
   returnDate: z.instanceof(Timestamp).optional(),
   status: loanStatusSchema,
@@ -36,5 +43,6 @@ export const loanSchema = z.object({
 });
 
 
-export type LoanValidated = z.infer<typeof loanSchema>;
+export type LoanInputValidated = z.infer<typeof loanInputSchema>;
 export type LoanStatusValidated = z.infer<typeof loanStatusSchema>;
+export type LoanHydratedValidated = z.infer<typeof loanHydratedSchema>;

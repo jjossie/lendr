@@ -49,8 +49,17 @@ export const toolFormSchema = z.object({
   location: locationSchema.optional()
 }).required();
 
+export const toolPreviewSchema = z.object({
+  id: z.string().nonempty(),
+  name: z.string().nonempty(),
+  imageUrl: z.string().url(),
+  rate: toolRateSchema,
+});
+
 export type ToolForm = z.infer<typeof toolFormSchema>;
 export type ToolDummyForm = Omit<ToolForm, "createdAt" | "modifiedAt" | "location">;
+export type ToolValidated = z.infer<typeof toolSchema>;
+export type ToolPreviewValidated = z.infer<typeof toolPreviewSchema>;
 
 export interface Tool {
 
