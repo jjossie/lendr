@@ -1,8 +1,7 @@
 import {FieldValue, getFirestore, Timestamp} from "firebase-admin/firestore";
 import {LendrUserInput, LendrUserPreview, lendrUserSchema, LendrUserValidated} from "../models/lendrUser.model";
-import {auth} from "firebase-admin";
-import UserRecord = auth.UserRecord;
 import { LendrBaseError, NotFoundError, ObjectValidationError } from "../utils/errors";
+import { AuthUserRecord } from "firebase-functions/identity";
 
 export async function getUserFromUid(uid: string): Promise<LendrUserValidated | undefined> {
   const db = getFirestore();
@@ -14,7 +13,7 @@ export async function getUserFromUid(uid: string): Promise<LendrUserValidated | 
   });
 }
 
-export async function createUser(userRecord: UserRecord) {
+export async function createUser(userRecord: AuthUserRecord) {
   const db = getFirestore();
 
   if (!userRecord.displayName) {
