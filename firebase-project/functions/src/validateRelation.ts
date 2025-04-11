@@ -2,7 +2,7 @@ import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { ObjectValidationError } from "./utils/errors";
 import { addRelationToUser, getUserFromUid } from "./controllers/users.controller";
 import { relationSchema } from "./models/relation.model";
-import { lendrUserSchema } from "./models/lendrUser.model";
+import { lendrUserModelSchema } from "./models/lendrUser.model";
 
 export const validateRelation = onDocumentCreated(
   "/relations/{relationId}",
@@ -36,7 +36,7 @@ export const validateRelation = onDocumentCreated(
     
     // this is a bit redundant but we're doing it anyway for now
     const [user0, user1] = retrievedUsers.map(user => {
-      const parsed = lendrUserSchema.safeParse(user);
+      const parsed = lendrUserModelSchema.safeParse(user);
       if (!parsed.success) throw new ObjectValidationError("Invalid user data (retrieved from UID in relation)", parsed.error);
       return parsed.data;
     });

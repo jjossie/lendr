@@ -73,10 +73,10 @@ export interface Tool {
   holderUid: string;
   lender?: LendrUserPreview, // Hydrated by validateTool
   holder?: LendrUserPreview, // Hydrated by validateTool
-  createdAt: Timestamp;
+  createdAt?: Timestamp; // Temporarily optional
   /** @deprecated */
   deletedAt?: any; // Only for firestore use
-  modifiedAt: Timestamp;
+  modifiedAt?: Timestamp; // Temporarily optional
   rate: {
     price: number;
     timeUnit: TimeUnit

@@ -18,3 +18,4 @@ export {validateLoan} from "./validateLoan";
 export {validateTool_TEST} from "./validateTool_TEST";
 export {acceptHandoff, startHandoff} from "./handoff"; // TODO add requestReturn
 export {onUserCreate} from "./authentication";
+export {validateUser} from "./validateUser";

@@ -4,7 +4,7 @@ import * as logger from "firebase-functions/logger";
 import {getUserFromUid} from "./controllers/users.controller";
 import {sendExpoNotifications} from "./utils/notifications";
 import { NotFoundError } from "./utils/errors";
-import { chatMessageInputSchema, ChatMessageInputValidated, ChatMessageStoredValidated } from "./models/chat.model";
+import { chatMessageInputSchema, ChatMessageInputValidated, ChatMessageModelValidated } from "./models/chat.model";
 import { HttpsError } from "firebase-functions/https";
 import { FieldValue } from "firebase-admin/firestore";
 
@@ -40,7 +40,7 @@ export const chatMessageNotification = onDocumentCreated(
       }
 
       // Attach necessary data to the message.
-      const messageHydrated: ChatMessageStoredValidated = {
+      const messageHydrated: ChatMessageModelValidated = {
         ...message,
         createdAt: FieldValue.serverTimestamp(),
       }

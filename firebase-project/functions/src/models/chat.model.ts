@@ -15,7 +15,7 @@ import { timestampSchema } from "./common.model";
     media: z.any().optional(),
   });
 
-  export const chatMessageStoredSchema = z.object({
+  export const chatMessageModelSchema = z.object({
     text: z.string(),
     senderUid: z.string(),
     receiverUid: z.string(),
@@ -26,7 +26,7 @@ import { timestampSchema } from "./common.model";
   });
 
 export type ChatReactionValidated = z.infer<typeof chatReactionSchema>;
-export type ChatMessageStoredValidated = z.infer<typeof chatMessageStoredSchema>;
+export type ChatMessageModelValidated = z.infer<typeof chatMessageModelSchema>;
 export type ChatMessageInputValidated = z.infer<typeof chatMessageInputSchema>;
 
 

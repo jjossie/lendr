@@ -1,26 +1,43 @@
 import {Timestamp} from "firebase-admin/firestore";
-import { z, ZodSchema } from "zod";
+import { z } from "zod";
 import { documentIdSchema } from "./utils.model";
 import { timestampSchema } from "./common.model";
 
 
+export const lendrUserInputSchema = z.object({
+  firstName: z.string().nonempty(),
+  lastName: z.string().nonempty(),
+  displayName: z.string().nonempty(),
+  relations: z.array(documentIdSchema),
+  expoPushTokens:z.array(z.string().startsWith("ExponentPushToken[").endsWith("]")),
+  uid: z.string().nonempty(),
+  providerData: z.any().optional(),
+  photoURL: z.string().url().optional(),
+  email: z.string().email().optional(),
+});
 
-export const lendrUserSchema = z.object({
+export const lendrUserModelSchema = z.object({
   createdAt: timestampSchema,
   firstName: z.string().nonempty(),
   lastName: z.string().nonempty(),
   displayName: z.string().nonempty().optional(),
   relations: z.array(documentIdSchema),
   expoPushTokens:z.array(z.string().startsWith("ExponentPushToken[").endsWith("]")),
-  uid: z.string(),
+  uid: z.string().nonempty(),
   providerData: z.any().optional(),
   photoURL: z.string().url().optional(),
   email: z.string().email().optional(),
 });
 
 
+export const lendrUserPreviewSchema = lendrUserModelSchema.omit({
+  relations: true,
+  expoPushTokens: true,
+  createdAt: true,
+});
 
-export type LendrUserValidated = z.infer<typeof lendrUserSchema>;
+export type LendrUserInputValidated = z.infer<typeof lendrUserInputSchema>;
+export type LendrUserModelValidated = z.infer<typeof lendrUserModelSchema>;
 
 export interface LendrUserInput {
   createdAt: Timestamp | string,

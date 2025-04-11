@@ -1,13 +1,13 @@
 import {FieldValue, getFirestore, Timestamp} from "firebase-admin/firestore";
-import {LendrUserInput, LendrUserPreview, lendrUserSchema, LendrUserValidated} from "../models/lendrUser.model";
+import {LendrUserInput, LendrUserPreview, lendrUserInputSchema, LendrUserInputValidated, lendrUserModelSchema, LendrUserModelValidated} from "../models/lendrUser.model";
 import { LendrBaseError, NotFoundError, ObjectValidationError } from "../utils/errors";
 import { AuthUserRecord } from "firebase-functions/identity";
 
-export async function getUserFromUid(uid: string): Promise<LendrUserValidated | undefined> {
+export async function getUserFromUid(uid: string): Promise<LendrUserModelValidated | undefined> {
   const db = getFirestore();
   const docSnap = await db.doc("users/" + uid).get();
   if (!docSnap.exists) return undefined;
-  return lendrUserSchema.parse({
+  return lendrUserModelSchema.parse({
     uid: docSnap.id,
     ...docSnap.data(),
   });
@@ -21,8 +21,8 @@ export async function createUser(userRecord: AuthUserRecord) {
   }
 
   const userRef = db.doc("users/" + userRecord.uid);
-  const lendrUser: LendrUserInput = {
-    createdAt: FieldValue.serverTimestamp() as Timestamp,
+  const validatedLendrUserInput = lendrUserInputSchema.parse({
+    createdAt: FieldValue.serverTimestamp(),
     firstName: userRecord.displayName.split(" ")[0],
     lastName: userRecord.displayName.split(" ")[1],
     uid: userRecord.uid,
@@ -32,10 +32,9 @@ export async function createUser(userRecord: AuthUserRecord) {
     relations: [],
     expoPushTokens: [],
     providerData: userRecord.providerData
-  };
-  const validatedLendrUser = lendrUserSchema.parse(lendrUser);
+  });
   // TODO: merge: true or false could have implications for users that delete and recreate their accounts
-  await userRef.set(validatedLendrUser);
+  await userRef.set(validatedLendrUserInput);
 }
 
 export async function addRelationToUser(uid: string, relationId: string) {
