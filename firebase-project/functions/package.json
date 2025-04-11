@@ -13,7 +13,7 @@
 		"seed": "yarn tsc && node lib/scripts/seedFirestore.js"
 	},
 	"engines": {
-		"node": "18"
+		"node": "20"
 	},
 	"main": "lib/index.js",
 	"dependencies": {

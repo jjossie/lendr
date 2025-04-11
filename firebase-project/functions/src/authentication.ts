@@ -1,15 +1,10 @@
 import {logger} from "firebase-functions";
 import {createUser, getUserFromUid} from "./controllers/users.controller";
-import { LendrUserInput, LendrUserValidated } from "./models/lendrUser.model";
-import { beforeUserCreated, HttpsError } from "firebase-functions/v2/identity";
+import { LendrUserValidated } from "./models/lendrUser.model";
+import { HttpsError, user } from "firebase-functions/v1/auth";
 
-const functions = require("firebase-functions");
-
-
-export const onUserCreate = beforeUserCreated(async (event) => {
+export const onUserCreate = user().onCreate(async (user) => {
   // TODO authProfileRefactoring
-
-  const user = event.data;
 
   if (!user) {
     logger.error("🔥onUserCreate: event.data is undefined")
@@ -29,7 +24,7 @@ export const onUserCreate = beforeUserCreated(async (event) => {
   await createUser(user);
 });
 
-export const onUserDelete = functions.auth.user().onDelete(async (user) => {
+export const onUserDelete = user().onDelete(async (user) => {
   logger.debug(`🔥onUserDelete: user ${user.uid} was deleted from Auth`);
   // await deleteUser(user.uid);
   // TODO delete all the references to the user in the database? Or just leave them there? and mark the Lendr User as deleted?
