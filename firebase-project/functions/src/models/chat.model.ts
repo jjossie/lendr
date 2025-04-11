@@ -23,7 +23,16 @@ export interface ChatMessage {
   });
   
   export const chatMessageSchema = z.object({
-    id: z.string().optional(),
+    text: z.string(),
+    senderUid: z.string(),
+    receiverUid: z.string(),
+    createdAt: z.instanceof(Timestamp),
+    replyingToId: z.string().optional(),
+    reaction: chatReactionSchema.optional(),
+    media: z.any().optional(),
+  });
+
+  export const chatMessageStoredSchema = z.object({
     text: z.string(),
     senderUid: z.string(),
     receiverUid: z.string(),
@@ -34,4 +43,7 @@ export interface ChatMessage {
   });
 
 export type ChatReactionValidated = z.infer<typeof chatReactionSchema>;
+export type ChatMessageStoredValidated = z.infer<typeof chatMessageStoredSchema>;
 export type ChatMessageValidated = z.infer<typeof chatMessageSchema>;
+
+

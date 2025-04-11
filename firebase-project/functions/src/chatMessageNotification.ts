@@ -4,7 +4,8 @@ import * as logger from "firebase-functions/logger";
 import {getUserFromUid} from "./controllers/users.controller";
 import {sendExpoNotifications} from "./utils/notifications";
 import { NotFoundError } from "./utils/errors";
-import { ChatMessage } from "./models/chat.model";
+import { ChatMessage, chatMessageSchema, ChatMessageValidated } from "./models/chat.model";
+import { HttpsError } from "firebase-functions/https";
 
 /**
  * Triggered when a new message is added to a relation, which happens on every chat message send.
@@ -15,14 +16,19 @@ export const chatMessageNotification = onDocumentCreated(
     "/relations/{relationId}/messages/{messageId}",
     async (event) => {
 
-      // TODO Zod validation
-
       // When a new message is added to a relation, send a notification to the recipient.
       logger.info(`ChatMessageNotification running in response to new doc: "relations/${event.params.relationId}/messages/${event.params.messageId}"`);
       logger.info(event);
 
+      // Parse and validate the message data.
+      const messageParsed = chatMessageSchema.safeParse(event.data?.data());
+      if (!messageParsed.success) {
+        logger.error("ChatMessageNotification: message schema validation failed", messageParsed.error);
+        throw new HttpsError("invalid-argument", "ChatMessageNotification: message schema validation failed");
+      }
+      const message: ChatMessageValidated = messageParsed.data;
+
       // Get the recipient of the message.
-      const message: ChatMessage = event.data?.data() as ChatMessage;
       const receiver = await getUserFromUid(message.receiverUid);
       const sender = await getUserFromUid(message.senderUid);
 
@@ -35,7 +41,7 @@ export const chatMessageNotification = onDocumentCreated(
       const pushTokens = receiver.expoPushTokens;
       const title = `${sender.firstName} ${sender.lastName}`;
       const body = message.text; // TODO only show the first several words
-      const data = {withSome: 'data'};  // TODO link to the chat in-app
+      const data = {withSome: 'data'};  // TODO deep link to the chat in-app
       await sendExpoNotifications(pushTokens, title, body, data);
 
       return {
