@@ -1,11 +1,12 @@
 import {Timestamp} from "firebase-admin/firestore";
 import { z, ZodSchema } from "zod";
 import { documentIdSchema } from "./utils.model";
+import { timestampSchema } from "./common.model";
 
 
 
 export const lendrUserSchema = z.object({
-  createdAt: z.instanceof(Timestamp).or(z.string().datetime()),
+  createdAt: timestampSchema,
   firstName: z.string().nonempty(),
   lastName: z.string().nonempty(),
   displayName: z.string().nonempty().optional(),

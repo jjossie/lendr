@@ -4,8 +4,9 @@ import * as logger from "firebase-functions/logger";
 import {getUserFromUid} from "./controllers/users.controller";
 import {sendExpoNotifications} from "./utils/notifications";
 import { NotFoundError } from "./utils/errors";
-import { ChatMessage, chatMessageSchema, ChatMessageValidated } from "./models/chat.model";
+import { chatMessageInputSchema, ChatMessageInputValidated, ChatMessageStoredValidated } from "./models/chat.model";
 import { HttpsError } from "firebase-functions/https";
+import { FieldValue } from "firebase-admin/firestore";
 
 /**
  * Triggered when a new message is added to a relation, which happens on every chat message send.
@@ -21,12 +22,12 @@ export const chatMessageNotification = onDocumentCreated(
       logger.info(event);
 
       // Parse and validate the message data.
-      const messageParsed = chatMessageSchema.safeParse(event.data?.data());
+      const messageParsed = chatMessageInputSchema.safeParse(event.data?.data());
       if (!messageParsed.success) {
         logger.error("ChatMessageNotification: message schema validation failed", messageParsed.error);
         throw new HttpsError("invalid-argument", "ChatMessageNotification: message schema validation failed");
       }
-      const message: ChatMessageValidated = messageParsed.data;
+      const message: ChatMessageInputValidated = messageParsed.data;
 
       // Get the recipient of the message.
       const receiver = await getUserFromUid(message.receiverUid);
@@ -38,6 +39,14 @@ export const chatMessageNotification = onDocumentCreated(
         );
       }
 
+      // Attach necessary data to the message.
+      const messageHydrated: ChatMessageStoredValidated = {
+        ...message,
+        createdAt: FieldValue.serverTimestamp(),
+      }
+      event.data?.ref.set(messageHydrated, {merge: false});
+
+      // Send the notification to the recipient.
       const pushTokens = receiver.expoPushTokens;
       const title = `${sender.firstName} ${sender.lastName}`;
       const body = message.text; // TODO only show the first several words

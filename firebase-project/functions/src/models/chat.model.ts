@@ -1,32 +1,15 @@
-import { Timestamp } from "firebase-admin/firestore";
 import { z } from "zod";
+import { timestampSchema } from "./common.model";
 
-export interface ChatMessage {
-    id?: string;
-    text: string;
-    senderUid: string;
-    receiverUid: string;
-    createdAt: Timestamp;
-    replyingToId?: string;
-    reaction?: ChatReaction;
-    media?: any;
-  }
-  
-  export interface ChatReaction {
-    emoji: string;
-    userRef: string;
-  }
-  
   export const chatReactionSchema = z.object({
     emoji: z.string(),
     userRef: z.string(),
   });
   
-  export const chatMessageSchema = z.object({
+  export const chatMessageInputSchema = z.object({
     text: z.string(),
     senderUid: z.string(),
     receiverUid: z.string(),
-    createdAt: z.instanceof(Timestamp),
     replyingToId: z.string().optional(),
     reaction: chatReactionSchema.optional(),
     media: z.any().optional(),
@@ -36,7 +19,7 @@ export interface ChatMessage {
     text: z.string(),
     senderUid: z.string(),
     receiverUid: z.string(),
-    createdAt: z.instanceof(Timestamp),
+    createdAt: timestampSchema,
     replyingToId: z.string().optional(),
     reaction: chatReactionSchema.optional(),
     media: z.any().optional(),
@@ -44,6 +27,6 @@ export interface ChatMessage {
 
 export type ChatReactionValidated = z.infer<typeof chatReactionSchema>;
 export type ChatMessageStoredValidated = z.infer<typeof chatMessageStoredSchema>;
-export type ChatMessageValidated = z.infer<typeof chatMessageSchema>;
+export type ChatMessageInputValidated = z.infer<typeof chatMessageInputSchema>;
 
 

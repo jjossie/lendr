@@ -2,6 +2,7 @@ import {Location, locationSchema} from "./location.model";
 import {Timestamp} from "firebase-admin/firestore";
 import {LendrUserPreview} from "./lendrUser.model";
 import { z } from "zod";
+import { timestampSchema } from "./common.model";
 
 export const exchangePreferencesSchema = z.object({
   delivery: z.boolean(),
@@ -24,9 +25,9 @@ export const toolSchema = z.object({
   holderUid: z.string().nonempty(),
   lender: z.any().optional(),
   holder: z.any().optional(),
-  createdAt: z.instanceof(Timestamp),
+  createdAt: timestampSchema,
   deletedAt: z.any().optional(),
-  modifiedAt: z.instanceof(Timestamp),
+  modifiedAt: timestampSchema,
   rate: toolRateSchema,
   preferences: exchangePreferencesSchema,
   location: locationSchema,
@@ -44,8 +45,8 @@ export const toolFormSchema = z.object({
   visibility: z.enum(["draft", "published"]),
   lenderUid: z.string().nonempty(),
   holderUid: z.string().nonempty(),
-  createdAt: z.instanceof(Timestamp).optional(),
-  modifiedAt: z.instanceof(Timestamp).optional(),
+  createdAt: timestampSchema.optional(),
+  modifiedAt: timestampSchema.optional(),
   location: locationSchema.optional()
 }).required();
 
