@@ -23,14 +23,15 @@ export const validateUser = onDocumentCreated("/users/{userId}", async (event) =
   // Optionally, you can modify or enrich the document here if needed
   const validatedUser: LendrUserInputValidated = parsedUser.data;
 
-  const enrichedUserData = lendrUserModelSchema.safeParse({
+  const enrichedUser = lendrUserModelSchema.safeParse({
     ...validatedUser,
+    displayName: validatedUser.displayName || `${validatedUser.firstName} ${validatedUser.lastName}`,
     createdAt: FieldValue.serverTimestamp(),
   })
 
   // Write the validated user document back to Firestore
   try {
-    await event.data.ref.set(enrichedUserData, { merge: false });
+    await event.data.ref.set(enrichedUser, { merge: false });
     logger.info("User document successfully validated and saved: ", event.params.userId);
   } catch (error) {
     logger.error("Error saving validated user document: ", event.params.userId, error);

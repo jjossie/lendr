@@ -31,10 +31,10 @@ export const loanInputSchema = z.object({
   borrowerUid: z.string(),
 });
 
-export const loanHydratedSchema = z.object({
+export const loanModelSchema = z.object({
   id: z.string(),
   toolId: z.string(),
-  tool: toolPreviewSchema, // TODO create toolPreviewSchema
+  tool: toolPreviewSchema,
   inquiryDate: timestampSchema,
   loanDate: timestampSchema.optional(),
   returnDate: timestampSchema.optional(),
@@ -44,6 +44,6 @@ export const loanHydratedSchema = z.object({
 });
 
 
-export type LoanInputValidated = z.infer<typeof loanInputSchema>;
 export type LoanStatusValidated = z.infer<typeof loanStatusSchema>;
-export type LoanHydratedValidated = z.infer<typeof loanHydratedSchema>;
+export type LoanInputValidated = z.infer<typeof loanInputSchema>;
+export type LoanModelValidated = z.infer<typeof loanModelSchema>;

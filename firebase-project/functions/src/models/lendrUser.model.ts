@@ -1,7 +1,6 @@
 import {Timestamp} from "firebase-admin/firestore";
 import { z } from "zod";
-import { documentIdSchema } from "./utils.model";
-import { timestampSchema } from "./common.model";
+import { documentIdSchema, timestampSchema } from "./common.model";
 
 
 export const lendrUserInputSchema = z.object({
@@ -20,7 +19,7 @@ export const lendrUserModelSchema = z.object({
   createdAt: timestampSchema,
   firstName: z.string().nonempty(),
   lastName: z.string().nonempty(),
-  displayName: z.string().nonempty().optional(),
+  displayName: z.string().nonempty(),
   relations: z.array(documentIdSchema),
   expoPushTokens:z.array(z.string().startsWith("ExponentPushToken[").endsWith("]")),
   uid: z.string().nonempty(),

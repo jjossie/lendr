@@ -3,7 +3,7 @@ import {hydrateTool} from "./controllers/tool.controller";
 import {logger} from "firebase-functions";
 import {FieldValue, Timestamp} from "firebase-admin/firestore";
 import {HttpsError} from "firebase-functions/v2/https";
-import { LoanHydratedValidated, loanInputSchema, LoanStatusValidated } from "./models/loan.model";
+import { LoanModelValidated, loanInputSchema, LoanStatusValidated } from "./models/loan.model";
 import { ToolPreviewValidated } from "./models/tool.model";
 
 export const validateLoan = onDocumentCreated("/relations/{relationId}/loans/{loanId}", async (event) => {
@@ -23,7 +23,7 @@ export const validateLoan = onDocumentCreated("/relations/{relationId}/loans/{lo
   // Get a tool preview
   const toolPreview = await hydrateTool(loanInput.toolId) as ToolPreviewValidated;
 
-  const hydroLoanDoc: LoanHydratedValidated = {
+  const hydroLoanDoc: LoanModelValidated = {
     ...loanInput,
     id: event.params.loanId,
     tool: toolPreview,

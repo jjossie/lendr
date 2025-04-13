@@ -9,3 +9,17 @@ export const timestampSchema = z.any().refine(
       message: "Must be a Firestore Timestamp or FieldValue.serverTimestamp()",
     }
   );
+
+
+export const documentIdSchema = z.string().length(28);
+export const locationSchema = z.object({
+  latitude: z.number(),
+  longitude: z.number(),
+  geohash: z.string(),
+  city: z.string().optional(),
+  relativeDistance: z.number().optional(),
+});
+
+
+export type DocumentIdValidated = z.infer<typeof documentIdSchema>;
+export type LocationValidated = z.infer<typeof locationSchema>;
