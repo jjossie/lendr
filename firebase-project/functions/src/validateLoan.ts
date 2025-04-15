@@ -1,32 +1,39 @@
 import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import {hydrateTool} from "./controllers/tool.controller";
 import {logger} from "firebase-functions";
-import {FieldValue} from "firebase-admin/firestore";
+import {FieldValue, Timestamp} from "firebase-admin/firestore";
 import {HttpsError} from "firebase-functions/v2/https";
+import { LoanModelValidated, loanInputSchema, LoanStatusValidated } from "./models/loan.model";
+import { ToolPreviewValidated } from "./models/tool.model";
 
 export const validateLoan = onDocumentCreated("/relations/{relationId}/loans/{loanId}", async (event) => {
-  logger.debug(`🔥Validating new loan: ${event.params.relationId}/loans/${event.params.loanId}`);
+  logger.debug(`🔥 Validating new loan: /relations/${event.params.relationId}/loans/${event.params.loanId}`);
 
-  const rawLoanDoc = event.data.data();
-  let hydroLoanDoc = {...rawLoanDoc};
-
-  // Basic Validation
-  if (!rawLoanDoc.toolId) {
-    throw new HttpsError("invalid-argument", "Tool ID is required");
+  const parsedLoan = loanInputSchema.safeParse(event.data?.data());
+  if (!parsedLoan.success) {
+    throw new HttpsError("invalid-argument", "Invalid loan data", parsedLoan.error);
   }
+  const loanInput = parsedLoan.data
 
-  // Attach proper inquiry date
-  hydroLoanDoc.inquiryDate = FieldValue.serverTimestamp();
 
-  // Set the status
-  hydroLoanDoc.status = "inquired";
+  // Hydrate the loan
 
-  // Hydrate the tool
-  hydroLoanDoc.tool = await hydrateTool(rawLoanDoc.toolId);
+  const inquiryDate = FieldValue.serverTimestamp() as Timestamp;
+  const status: LoanStatusValidated = "inquired";
+  // Get a tool preview
+  const toolPreview = await hydrateTool(loanInput.toolId) as ToolPreviewValidated;
+
+  const hydroLoanDoc: LoanModelValidated = {
+    ...loanInput,
+    id: event.params.loanId,
+    tool: toolPreview,
+    inquiryDate: inquiryDate,
+    status: status,
+  }
 
   // Write the validated, hydrated loan to Firestore
   try {
-    await event.data.ref.set(hydroLoanDoc, {merge: false});
+    await event.data?.ref.set(hydroLoanDoc, {merge: false});
     logger.debug("🔥Successfully hydrated & validated loan for tool ", hydroLoanDoc.tool.name,
         "With ID: ", event.params.loanId,
         "From Relation ID: ", event.params.relationId);

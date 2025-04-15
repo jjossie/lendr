@@ -3,42 +3,26 @@ import {logger} from "firebase-functions";
 import {getFirestore} from "firebase-admin/firestore";
 import {getCityNameFromGeopoint, getGeohashedLocation} from "./utils/location";
 import {Geopoint} from "geofire-common";
-import {Tool, ToolAdminForm} from "./models/tool.model";
-import { getHydratedUserPreview, getUserFromUid } from "./controllers/users.controller";
+import {Tool, ToolForm, toolFormSchema} from "./models/tool.model";
+import { getHydratedUserPreview } from "./controllers/users.controller";
+import { LendrBaseError, ObjectValidationError } from "./utils/errors";
 
 
 export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) => {
+  if (!event.data) throw new LendrBaseError("No data in event");
   logger.info("Validating new tool: ", event.data.id);
   const db = getFirestore();
   /**
    * Validation
    */
-  const rawDoc = event.data.data() as ToolAdminForm;
-  // @ts-ignore
-  let hydroDoc: Tool = {...rawDoc};
-  // @ts-ignore
-  delete hydroDoc.geopoint;
+  const toolFormParsed = toolFormSchema.safeParse(event.data.data());
+  if (!toolFormParsed.success) throw new ObjectValidationError("Invalid Tool Form Input", toolFormParsed.error);
+  const toolForm = toolFormParsed.data as ToolForm;
 
-  // Ensure all required fields are populated: [name, description, lenderUid, imageUrls[0], preferences, rate,
-  // location.latitude, location.longitude]
-  if (!rawDoc.name
-      || !rawDoc.description
-      || !rawDoc.lenderUid
-      || !rawDoc.imageUrls[0]
-      || !rawDoc.preferences
-      || !rawDoc.rate
-      || !rawDoc.geopoint[0]
-      || !rawDoc.geopoint[1]) {
-    logger.error("Missing required fields on newly created tool: ", rawDoc);
-  }
+  let hydroDoc: Tool = {...toolForm};
+  // TODO do we need to delete the geopoint?
 
-  logger.info("Hydrating newly created tool: ", rawDoc.name);
-
-  // Trim strings for whitespace
-  hydroDoc.name = rawDoc.name.trim();
-  hydroDoc.description = rawDoc.description.trim();
-  if (typeof rawDoc.brand === "string")
-    hydroDoc.brand = rawDoc.brand.trim();
+  logger.info("Hydrating newly created tool: ", toolForm.name);
 
   /**
    * Hydration
@@ -47,19 +31,19 @@ export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) =
   // Hydrate Lender/Holder user previews
   try {
     // Check lenderUid and hydrate lender object accordingly
-    const hydroLender = await getHydratedUserPreview(rawDoc.lenderUid);
+    const hydroLender = await getHydratedUserPreview(toolForm.lenderUid);
     hydroDoc.lender = hydroLender;
 
 
     // Check holderUid and hydrate holder object accordingly
-    if (!rawDoc.holderUid) // Just copy the lender if it wasn't included
-      rawDoc.holderUid = rawDoc.lenderUid;
+    if (!toolForm.holderUid) // Just copy the lender if it wasn't included
+      toolForm.holderUid = toolForm.lenderUid;
 
-    if (rawDoc.holderUid === rawDoc.lenderUid) {
+    if (toolForm.holderUid === toolForm.lenderUid) {
       logger.info("Using lender info as holder info")
       hydroDoc.holder = hydroLender;
     } else {
-      const hydroHolder = await getHydratedUserPreview(rawDoc.holderUid);
+      const hydroHolder = await getHydratedUserPreview(toolForm.holderUid);
       hydroDoc.holder = hydroHolder;
     }
   } catch (error) {
@@ -70,13 +54,13 @@ export const validateTool = onDocumentCreated("/tools/{toolId}", async (event) =
   }
 
   // Check location geopoint and hydrate geohash and city accordingly
-  if (rawDoc.geopoint[0] && rawDoc.geopoint[1]) {
-    const geopoint: Geopoint = [rawDoc.geopoint[0], rawDoc.geopoint[1]];
+  if (toolForm.geopoint[0] && toolForm.geopoint[1]) {
+    const geopoint: Geopoint = [toolForm.geopoint[0], toolForm.geopoint[1]];
     const {geohash} = getGeohashedLocation(geopoint);
     const city = await getCityNameFromGeopoint(geopoint);
     hydroDoc.location = {
-      latitude: rawDoc.geopoint[0],
-      longitude: rawDoc.geopoint[1],
+      latitude: toolForm.geopoint[0],
+      longitude: toolForm.geopoint[1],
       geohash,
       city,
     };

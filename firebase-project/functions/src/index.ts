@@ -16,5 +16,6 @@ export {validateTool} from "./validateTool";
 export {validateRelation} from "./validateRelation";
 export {validateLoan} from "./validateLoan";
 export {validateTool_TEST} from "./validateTool_TEST";
-export {acceptHandoff, startHandoff} from "./handoff";
+export {acceptHandoff, startHandoff} from "./handoff"; // TODO add requestReturn
 export {onUserCreate} from "./authentication";
+export {validateUser} from "./validateUser";

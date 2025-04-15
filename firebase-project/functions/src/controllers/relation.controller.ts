@@ -1,7 +1,7 @@
 import {NotFoundError} from "../utils/errors";
-import {Loan, LoanStatus} from "../models/relation.model";
 import {logger} from "firebase-functions";
 import {FieldValue} from "firebase-admin/firestore";
+import { LoanStatus, Loan } from "../models/loan.model";
 
 
 export async function getLoan(db: FirebaseFirestore.Firestore, relationId: string, loanId: string): Promise<Loan> {

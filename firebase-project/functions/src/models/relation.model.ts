@@ -1,56 +1,27 @@
-import {Timestamp} from "firebase-admin/firestore";
-import {LendrUser} from "./lendrUser.model";
-import {Tool} from "./tool.model";
+import { lendrUserPreviewSchema } from "./lendrUser.model";
+import { z } from "zod";
+import { chatMessageInputSchema } from "./chat.model";
+import { timestampSchema } from "./common.model";
 
-// TODO import zod
 
-export interface Relation {
-  id?: string // Added after retrieving from firestore
-  users: LendrUser[];
-  createdAt: Timestamp;
-  lastMessage?: ChatMessage; // Hydrated after retrieval
-  otherUser?: LendrUser; // Hydrated after retrieval
-  // Need to figure out how to include subcollection data. Or don't do it at all?
-}
+export const relationSchema = z.object({
+  id: z.string().optional(),
+  users: z.array(lendrUserPreviewSchema).length(2),
+  createdAt: timestampSchema,
+  lastMessage: chatMessageInputSchema.optional(),
+  otherUser: z.any().optional(),
+});
 
-export interface ChatViewListItem {
-  id: string // Added after retrieving from firestore
-  users?: LendrUser[];
-  createdAt: Timestamp;
-  lastMessage?: ChatMessage; // Hydrated after retrieval
-  otherUser: LendrUser;
-}
+export const chatViewListItemSchema = z.object({
+  id: z.string(),
+  users: z.array(z.any()).optional(),
+  createdAt: timestampSchema,
+  lastMessage: chatMessageInputSchema.optional(),
+  otherUser: z.any(),
+});
 
-export type LoanStatus = "inquired" | "loanRequested" | "loaned" | "returnRequested" | "returned" | "canceled";
 
-/**
- * For now, this is using references instead of embedding documents. Should
- * probably change that in the future.
- */
-export interface Loan {
-  id?: string;
-  toolId: string;
-  tool?: Tool;
-  inquiryDate?: Timestamp;
-  loanDate?: Timestamp;
-  returnDate?: Timestamp;
-  status: LoanStatus;
-  lenderUid: string;
-  borrowerUid: string;
-}
-
-export interface ChatMessage {
-  id?: string;
-  text: string;
-  senderUid: string;
-  receiverUid: string;
-  createdAt: Timestamp;
-  replyingToId?: string;
-  reaction?: ChatReaction;
-  media?: any;
-}
-
-export interface ChatReaction {
-  emoji: string;
-  userRef: string;
-}
+// Validated Types
+export type RelationValidated = z.infer<typeof relationSchema>;
+export type ChatMessageValidated = z.infer<typeof chatMessageInputSchema>;
+export type ChatViewListItemValidated = z.infer<typeof chatViewListItemSchema>;

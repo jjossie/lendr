@@ -1,10 +1,10 @@
-import Expo from "expo-server-sdk";
+import Expo, { ExpoPushMessage, ExpoPushTicket } from "expo-server-sdk";
 import {logger} from "firebase-functions";
 
 export async function sendExpoNotifications(pushTokens: string[], title: string, body: string, data: any) {
-  const notifications = [];
   // Create a notification for each push token. These push tokens are retrieved
   // from the actual user doc, not the hydrated version stored with the relation.
+  const notifications: ExpoPushMessage[] = [];
   for (const pushToken of pushTokens) {
     if (!Expo.isExpoPushToken(pushToken)) {
       logger.error(`Push token ${pushToken} is not a valid Expo push token`);
@@ -25,7 +25,7 @@ export async function sendExpoNotifications(pushTokens: string[], title: string,
   let expo = new Expo();
 
   let chunks = expo.chunkPushNotifications(notifications);
-  let tickets = [];
+  let tickets: ExpoPushTicket[] = [];
   // Send the chunks to the Expo push notification service. There are
   // different strategies you could use. A simple one is to send one chunk at a
   // time, which nicely spreads the load out over time:

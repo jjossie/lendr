@@ -3,19 +3,19 @@ import {logger} from "firebase-functions";
 import {DocumentData, getFirestore} from "firebase-admin/firestore";
 import {getCityNameFromGeopoint, getGeohashedLocation} from "./utils/location";
 import {Geopoint} from "geofire-common";
-import {Tool, ToolAdminForm} from "./models/tool.model";
-import { LendrUser, LendrUserPreview } from "./models/lendrUser.model";
+import {Tool, ToolForm} from "./models/tool.model";
+import { LendrUserInput, LendrUserPreview } from "./models/lendrUser.model";
 
 /**
  * @deprecated This TEST function is behind the PROD version.
  */
 export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async (event) => {
-  logger.info("Validating new tool: ", event.data.id);
+  logger.info("Validating new tool: ", event.data?.id);
   const db = getFirestore();
   /**
    * Validation
    */
-  const rawDoc = event.data.data() as ToolAdminForm;
+  const rawDoc = event.data?.data() as ToolForm;
   // @ts-ignore
   let hydroDoc: Tool = {...rawDoc};
   // @ts-ignore
@@ -51,7 +51,7 @@ export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async
   if (!lenderSnap.exists) {
     logger.error("Lender does not exist: ", rawDoc.lenderUid);
   }
-  const lender = lenderSnap.data() as LendrUser;
+  const lender = lenderSnap.data() as LendrUserInput;
   const lenderDisplayName = `${lender.firstName} ${lender.lastName}`;
 
   logger.info("Found Lender: ", lenderDisplayName);
@@ -70,7 +70,7 @@ export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async
   if (!holderSnap.exists) {
     logger.error("Holder does not exist: ", rawDoc.holderUid);
   }
-  const holder = holderSnap.data() as LendrUser;
+  const holder = holderSnap.data() as LendrUserInput;
   const holderDisplayName = `${holder.firstName} ${holder.lastName}`;
 
   logger.info("Found Holder: ", holderDisplayName);
@@ -97,7 +97,7 @@ export const validateTool_TEST = onDocumentCreated("/test_tools/{toolId}", async
   // Write the validated, hydrated tool to Firestore
 
   try {
-    await event.data.ref.set(hydroDoc, {merge: false});
+    await event.data?.ref.set(hydroDoc, {merge: false});
     logger.info("Successfully hydrated & validated tool ", hydroDoc.name,
         "With ID: ", event.params.toolId);
   } catch (e) {
