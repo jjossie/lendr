@@ -23,3 +23,12 @@ export const locationSchema = z.object({
 
 export type DocumentIdValidated = z.infer<typeof documentIdSchema>;
 export type LocationValidated = z.infer<typeof locationSchema>;
+
+
+export type Location = {
+  latitude: number;
+  longitude: number;
+  geohash: string;
+  city?: string;
+  relativeDistance?: number;
+}

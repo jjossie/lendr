@@ -1,7 +1,7 @@
 import {Timestamp} from "firebase-admin/firestore";
 import {LendrUserPreview} from "./lendrUser.model";
 import { z } from "zod";
-import { locationSchema, timestampSchema } from "./common.model";
+import { locationSchema, timestampSchema, Location} from "./common.model";
 
 export const exchangePreferencesSchema = z.object({
   delivery: z.boolean(),
