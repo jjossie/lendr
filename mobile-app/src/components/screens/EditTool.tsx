@@ -135,45 +135,67 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     })();
   }, [retryCount, geopoint, toolId]); // Retry whenever retryCount changes
 
+
+  // Handle back navigation listeners
   useEffect(() => {
-    console.log("🌀useEffect:toolId:", toolId);
+    console.log("🌀useEffect: handling back nav listeners");
+
+    const handleSaveOrDeleteOnBack = () => {
+      console.log("🌀BeforeRemove");
+      // deleteDraftIfUnedited();
+  
+      const formIsTouched = name !== DEFAULT_NAME ||
+        description !== DEFAULT_DESCRIPTION ||
+        price !== DEFAULT_PRICE ||
+        timeUnit !== DEFAULT_TIME_UNIT ||
+        preferences !== DEFAULT_PREFERENCES ||
+        imageUrls.length > 0 ||
+        brand !== DEFAULT_BRAND;
+      if (
+        !isEditing &&
+        toolId
+      ) {
+        if (!formIsTouched) {
+          // Delete the untouched draft tool
+          console.log("🌀Deleting untouched draft tool")
+          deleteTool(toolId).then(() => {
+            console.log("🌀Deleted untouched draft tool");
+          });
+        } else {
+          // Save the touched draft tool
+          console.log("🌀Saving draft tool before navigating back");
+          handleSaveTool(false); // Save as draft
+        }
+      } else {
+        console.log("🌀 Tool already existed before, discarding any edits until I fix that behavior lol");
+        
+      }
+    }
+
     if (unsubOnBlur) unsubOnBlur();
     if (unsubBeforeRemove) unsubBeforeRemove();
+  
     const unsubB = navigation.addListener("blur", (e) => {
-      console.log("🌀Blur", e.type);
-      deleteDraftIfUnedited();
+      console.log("🌀Blur event triggered:", e.type);
+      handleSaveOrDeleteOnBack();
     });
-    setUnsubOnBlur(unsubB);
+  
     const unsubBR = navigation.addListener("beforeRemove", (e) => {
-      console.log("🌀BeforeRemove", e.type);
-      deleteDraftIfUnedited();
+      console.log("🌀BeforeRemove event triggered:", e.type);
+      handleSaveOrDeleteOnBack();
     });
-    setUnsubBeforeRemove(unsubBR);
-  }, [toolId]);
-
+  
+    setUnsubOnBlur(() => unsubB);
+    setUnsubBeforeRemove(() => unsubBR);
+  
+    return () => {
+      console.log("🌀Cleaning up navigation listeners");
+      unsubB();
+      unsubBR();
+    };
+  }, [navigation, name, description, price, timeUnit, preferences, imageUrls, brand, toolId, isEditing]);
 
   // Callbacks
-  const deleteDraftIfUnedited = () => {
-    // Delete the tool if the draft tool is unchanged
-    console.log("🌀Attempting to delete draft");
-    if (
-        !isEditing &&
-        name == DEFAULT_NAME &&
-        description == DEFAULT_DESCRIPTION &&
-        price == DEFAULT_PRICE &&
-        timeUnit == DEFAULT_TIME_UNIT &&
-        preferences == DEFAULT_PREFERENCES &&
-        imageUrls.length == 0 &&
-        brand == DEFAULT_BRAND
-        && toolId
-    ) {
-      // Delete the tool
-      deleteTool(toolId).then(() => {
-        console.log("🌀Deleted draft tool");
-      });
-    }
-  };
-
   const handleSaveTool = useCallback(async (publish: boolean = false) => {
     setIsLoading(true);
     setIsError(false);
@@ -294,7 +316,6 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     }
   };
 
-
   return (
       <ScrollView bg={theme.colors.white} onScroll={() => Keyboard.dismiss()} scrollEventThrottle={2} paddingTop={10}>
         <ToolImagePicker
@@ -333,15 +354,15 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
           <FormControl isRequired>
             <FormControl.Label>Description</FormControl.Label>
             <TextArea
-                onChangeText={value => {
-                  setDescription(value);
-                }}
-                autoCompleteType={undefined}
-                h={20}
-                placeholder={`Tell us about the ${name}`}
-                size="lg"
-                value={description}
-                variant="filled"/>
+            onChangeText={value => {
+              setDescription(value);
+            } }
+            autoCompleteType={undefined}
+            h={20}
+            placeholder={`Tell us about the ${name}`}
+            size="lg"
+            value={description}
+            variant="filled" tvParallaxProperties={undefined} onTextInput={undefined}/>
           </FormControl>
 
           {/* Rate */}

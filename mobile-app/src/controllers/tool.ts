@@ -90,13 +90,13 @@ export async function createTool(toolForm: ToolForm, toolId: string) {
 export async function editTool(toolId: string, toolForm: ToolForm) {
   console.log(`🪛Editing tool ${toolId}`);
   // Validate Fields
-  if (!(
-      toolForm.description &&
+  if (toolForm.visibility == "published" && 
+    !(toolForm.description &&
       toolForm.name &&
       toolForm.rate.price &&
       toolForm.rate.timeUnit &&
-      toolForm.preferences
-  ))
+      toolForm.preferences)
+  )
     throw new ObjectValidationError("Missing properties on newTool", toolForm);
 
   const auth = getAuth();
