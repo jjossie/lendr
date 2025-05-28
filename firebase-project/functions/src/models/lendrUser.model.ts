@@ -7,8 +7,7 @@ export const lendrUserInputSchema = z.object({
   firstName: z.string().nonempty(),
   lastName: z.string().nonempty(),
   displayName: z.string().nonempty(),
-  relations: z.array(documentIdSchema),
-  expoPushTokens:z.array(z.string().startsWith("ExponentPushToken[").endsWith("]")),
+  // relations and expoPushTokens are excluded as they are server-managed or not set at creation.
   uid: z.string().nonempty(),
   providerData: z.any().optional(),
   photoURL: z.string().url().optional(),
@@ -16,16 +15,17 @@ export const lendrUserInputSchema = z.object({
 });
 
 export const lendrUserModelSchema = z.object({
-  createdAt: timestampSchema,
-  firstName: z.string().nonempty(),
-  lastName: z.string().nonempty(),
-  displayName: z.string().nonempty(),
-  relations: z.array(documentIdSchema),
-  expoPushTokens:z.array(z.string().startsWith("ExponentPushToken[").endsWith("]")),
-  uid: z.string().nonempty(),
-  providerData: z.any().optional(),
+  createdAt: timestampSchema.optional(), // Server-set
+  modifiedAt: timestampSchema.optional(), // Server-set on update
+  firstName: z.string().nonempty().optional(),
+  lastName: z.string().nonempty().optional(),
+  displayName: z.string().nonempty(), // Essential display name
+  relations: z.array(documentIdSchema).optional(), // Managed by other processes
+  expoPushTokens:z.array(z.string().startsWith("ExponentPushToken[").endsWith("]")).optional(), // Managed by other processes
+  uid: z.string().nonempty(), // Firebase Auth UID, primary identifier
+  providerData: z.any().optional(), // Data from auth provider
   photoURL: z.string().url().optional(),
-  email: z.string().email().optional(),
+  email: z.string().email().optional(), // User's email
 });
 
 
@@ -33,6 +33,7 @@ export const lendrUserPreviewSchema = lendrUserModelSchema.omit({
   relations: true,
   expoPushTokens: true,
   createdAt: true,
+  modifiedAt: true, // Ensure modifiedAt is also not part of the preview
 });
 
 export type LendrUserInputValidated = z.infer<typeof lendrUserInputSchema>;

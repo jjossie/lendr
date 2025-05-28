@@ -1,5 +1,5 @@
 import {Timestamp} from "firebase-admin/firestore";
-import {LendrUserPreview} from "./lendrUser.model";
+import {LendrUserPreview, lendrUserPreviewSchema} from "./lendrUser.model";
 import { z } from "zod";
 import { locationSchema, timestampSchema, Location} from "./common.model";
 
@@ -14,7 +14,8 @@ const toolRateSchema = z.object({
   timeUnit: z.enum(["hour", "day", "week"]),
 });
 
-export const toolSchema = z.object({
+// Schema for Tool data as it is STORED IN FIRESTORE (data at rest)
+export const toolModelSchema = z.object({
   id: z.string().optional(),
   name: z.string().nonempty(),
   brand: z.string().optional(),
@@ -22,32 +23,31 @@ export const toolSchema = z.object({
   imageUrls: z.array(z.string()),
   lenderUid: z.string().nonempty(),
   holderUid: z.string().nonempty(),
-  lender: z.any().optional(),
-  holder: z.any().optional(),
-  createdAt: timestampSchema,
+  lender: lendrUserPreviewSchema.optional(),
+  holder: lendrUserPreviewSchema.optional(),
+  createdAt: timestampSchema.optional(),
   deletedAt: z.any().optional(),
-  modifiedAt: timestampSchema,
+  modifiedAt: timestampSchema.optional(),
   rate: toolRateSchema,
   preferences: exchangePreferencesSchema,
-  location: locationSchema,
+  location: locationSchema.optional(),
   visibility: z.enum(["draft", "published"]),
 });
 
-export const toolFormSchema = z.object({
+// Schema for data input when CREATING a new Tool
+export const toolInputSchema = z.object({
   name: z.string().nonempty().trim(),
   brand: z.string().trim().optional(),
   description: z.string().trim(),
-  imageUrls: z.array(z.string()).nonempty(),
+  imageUrls: z.array(z.string()).nonempty(), // Must have at least one image on creation
   rate: toolRateSchema,
   preferences: exchangePreferencesSchema,
-  geopoint: z.array(z.number().min(-180).max(180)).length(2), // TODO verify range
+  geopoint: z.array(z.number().min(-180).max(180)).length(2), // [latitude, longitude] for server-side location processing
   visibility: z.enum(["draft", "published"]),
   lenderUid: z.string().nonempty(),
-  holderUid: z.string().nonempty(),
-  createdAt: timestampSchema.optional(),
-  modifiedAt: timestampSchema.optional(),
-  location: locationSchema.optional()
-}).required();
+  holderUid: z.string().nonempty(), // Can be the same as lenderUid if self-held initially
+  // Server-generated fields like createdAt, modifiedAt, and the full 'location' object are excluded
+});
 
 export const toolPreviewSchema = z.object({
   id: z.string().nonempty(),
@@ -56,11 +56,12 @@ export const toolPreviewSchema = z.object({
   rate: toolRateSchema,
 });
 
-export type ToolForm = z.infer<typeof toolFormSchema>;
-export type ToolDummyForm = Omit<ToolForm, "createdAt" | "modifiedAt" | "location">;
-export type ToolValidated = z.infer<typeof toolSchema>;
+// Zod-inferred types
+export type ToolInput = z.infer<typeof toolInputSchema>;
+export type ToolModel = z.infer<typeof toolModelSchema>;
 export type ToolPreviewValidated = z.infer<typeof toolPreviewSchema>;
 
+// TypeScript Interface for the Tool object (matching ToolModel)
 export interface Tool {
 
   id?: string; // Added after retrieving from firestore

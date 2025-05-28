@@ -32,13 +32,13 @@ export const loanInputSchema = z.object({
 });
 
 export const loanModelSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   toolId: z.string(),
-  tool: toolPreviewSchema,
-  inquiryDate: timestampSchema,
+  tool: toolPreviewSchema.optional(),
+  inquiryDate: timestampSchema.optional(),
   loanDate: timestampSchema.optional(),
   returnDate: timestampSchema.optional(),
-  status: loanStatusSchema,
+  status: loanStatusSchema.optional(),
   lenderUid: z.string(),
   borrowerUid: z.string(),
 });
