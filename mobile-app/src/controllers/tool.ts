@@ -17,6 +17,7 @@ import {
 } from "firebase/firestore";
 import {db} from "../config/firebase";
 import {Tool, ToolForm} from "../models/tool";
+import {ToolModelSchema} from "../models/tool.zod";
 import {getAuth} from "firebase/auth";
 import {AuthError, NotFoundError, ObjectValidationError} from "../utils/errors";
 
@@ -134,9 +135,22 @@ export async function deleteTool(toolId: string) {
   if (!toolSnap.exists())
     throw new NotFoundError(`Tool with id ${toolId} not found 🤷‍`);
 
+  const docData = toolSnap.data();
+  if (!docData) {
+    // This case should ideally be covered by toolSnap.exists(), but good to be safe
+    throw new NotFoundError(`Tool data is undefined for id ${toolId} before deletion 🤷‍`);
+  }
+
+  const validationResult = ToolModelSchema.safeParse(docData);
+  if (!validationResult.success) {
+    console.error("Validation failed for tool scheduled for deletion:", toolId, validationResult.error.flatten());
+    // Depending on policy, we might still allow deletion or halt to investigate
+    throw new ObjectValidationError(`Tool data validation failed for id ${toolId} before deletion 😥`, validationResult.error);
+  }
+  const validatedToolData = validationResult.data;
+
   // Confirm this user owns it
-  const tool = toolSnap.data() as Tool;
-  if (tool.lenderUid != auth.currentUser.uid)
+  if (validatedToolData.lenderUid != auth.currentUser.uid)
     throw new AuthError("You are not authorized to delete this tool 🤨");
 
   return deleteDoc(toolRef);
@@ -149,10 +163,25 @@ export async function deleteTool(toolId: string) {
 export async function getAllTools(): Promise<Tool[]> {
   const querySnapshot = await getDocs(collection(db, "tools"));
   let tools: Tool[] = [];
-  querySnapshot.forEach(doc => tools.push({
-    id: doc.id,
-    ...doc.data(),
-  } as Tool));
+  querySnapshot.forEach(doc => {
+    const docData = doc.data();
+    if (!docData) {
+      console.warn(`Document data is undefined for doc id ${doc.id} in getAllTools, skipping.`);
+      return; // Skip this document
+    }
+
+    const validationResult = ToolModelSchema.safeParse(docData);
+    if (!validationResult.success) {
+      console.error("Validation failed for tool in getAllTools:", doc.id, validationResult.error.flatten());
+      // Skipping the tool, as this is a list operation.
+      return; 
+    }
+    // Ensure the final object matches the Tool interface, including 'id'
+    tools.push({
+      id: doc.id, // ID from the document snapshot
+      ...validationResult.data, // Spread the validated data
+    } as Tool); //TODO: Remove 'as Tool' by ensuring validatedToolData + id is Tool
+  });
   return tools;
 }
 
@@ -164,27 +193,40 @@ export async function getToolById(toolId: string, userGeopoint?: Geopoint): Prom
   if (!toolDocSnap.exists())
     throw new NotFoundError(`Tool with id ${toolId} does not exist in database 🫢`);
 
-  const toolData = toolDocSnap.data() as Tool;
+  const docData = toolDocSnap.data();
+  if (!docData) {
+    // This case should ideally be covered by toolDocSnap.exists(), but good to be safe
+    throw new NotFoundError(`Tool data is undefined for id ${toolId} 🤷‍`);
+  }
 
-  const lenderSnap = await getDoc(doc(db, "users", toolData.lenderUid));
+  const validationResult = ToolModelSchema.safeParse(docData);
+
+  if (!validationResult.success) {
+    console.error("Validation failed for tool:", toolId, validationResult.error);
+    throw new ObjectValidationError(`Tool data validation failed for id ${toolId} 😥`, validationResult.error);
+  }
+
+  const validatedToolData = validationResult.data;
+
+  const lenderSnap = await getDoc(doc(db, "users", validatedToolData.lenderUid));
 
   if (!lenderSnap.exists())
-    throw new NotFoundError(`Lender with id ${toolData.lenderUid} not found ⁉️`);
+    throw new NotFoundError(`Lender with id ${validatedToolData.lenderUid} not found ⁉️`);
 
-  const geopoint: Geopoint = [toolData.location.latitude, toolData.location.longitude];
-  let result: Tool = {
-    id: toolDocSnap.id,
-    lender: lenderSnap.data(),
-    ...toolData,
-  } as Tool;
+  const geopoint: Geopoint = [validatedToolData.location.latitude, validatedToolData.location.longitude];
+  let resultTool: Tool = { // Ensure this matches the Tool interface, including id
+    id: toolDocSnap.id, // id comes from the document snapshot, not from validatedToolData initially
+    ...validatedToolData, // Spread validated data
+    lender: lenderSnap.data(), // Populate lender data
+  };
 
-  // if (!result.location.city)
-  if (!result.location.city || result.location.city.split(",").length < 2)
-    result.location.city = await getCityNameFromGeopoint(geopoint);
+  // if (!resultTool.location.city)
+  if (!resultTool.location.city || resultTool.location.city.split(",").length < 2)
+    resultTool.location.city = await getCityNameFromGeopoint(geopoint);
 
   if (userGeopoint)
-    result.location.relativeDistance = distanceBetweenMi(userGeopoint, geopoint);
-  return result;
+    resultTool.location.relativeDistance = distanceBetweenMi(userGeopoint, geopoint);
+  return resultTool;
 }
 
 
@@ -215,17 +257,32 @@ export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
   const tools: Tool[] = [];
   snapshots.forEach(snapshot => {
     snapshot.forEach(document => {
-      const toolData = document.data() as Tool;
+      const docData = document.data();
+      if (!docData) {
+        console.warn("Document data is undefined for a document in snapshot, skipping.");
+        return; 
+      }
+
+      const validationResult = ToolModelSchema.safeParse(docData);
+
+      if (!validationResult.success) {
+        console.error("Validation failed for tool:", document.id, validationResult.error.flatten());
+        console.warn(`Skipping tool with id ${document.id} due to validation error.`);
+        return; 
+      }
+
+      const validatedToolData = validationResult.data;
+      
       // Get geopoint from tool data
-      const geopoint: Geopoint = [toolData.location.latitude, toolData.location.longitude];
+      const geopoint: Geopoint = [validatedToolData.location.latitude, validatedToolData.location.longitude];
       // Check if geopoint is within radius
       if (distanceBetweenMi(center, geopoint) < radiusMi) {
         // Populate tool fields
         const tool: Tool = {
-          id: document.id,
-          ...toolData,
-          location: {
-            ...toolData.location,
+          id: document.id, 
+          ...validatedToolData, 
+          location: { 
+            ...validatedToolData.location,
             relativeDistance: distanceBetweenMi(geopoint, center),
           },
         };
