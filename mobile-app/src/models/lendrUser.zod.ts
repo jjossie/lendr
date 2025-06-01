@@ -30,4 +30,4 @@ export const LendrUserSchema = z.object({
 
 // Infer TypeScript types from Zod schemas
 export type LendrUserPreview = z.infer<typeof LendrUserPreviewSchema>;
-export type LendrUser = z.infer<typeof LendrUserSchema>;
+export type LendrUserValidated = z.infer<typeof LendrUserSchema>;

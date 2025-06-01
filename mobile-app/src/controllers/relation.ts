@@ -23,11 +23,12 @@ import {auth, db} from "../config/firebase";
 import {User} from "firebase/auth";
 import {AuthError, LendrBaseError, NotFoundError, NotImplementedError, ObjectValidationError} from "../utils/errors";
 import {ChatMessage, ChatViewListItem, Loan, Relation} from "../models/relation";
-import { RelationSchema, ChatMessageSchema, LoanSchema } from "../models/relation.zod";
+import { RelationSchema, ChatMessageSchema, LoanSchema, RelationValidated } from "../models/relation.zod";
 import {getUserFromAuth, getUserFromUid} from "./auth";
 import {LendrUser} from "../models/lendrUser";
 import {Dispatch, SetStateAction} from "react";
 import { callCloudFunction } from "../utils/firebase.utils";
+import { LendrUserPreview } from "../models/lendrUser.zod";
 
 // Constants
 const MESSAGE_LOAD_LIMIT = 20;
@@ -94,7 +95,7 @@ export async function createRelation(otherUserId: string, toolId: string): Promi
   return relationId;
 }
 
-export async function getRelationById(relationId: string): Promise<Relation> {
+export async function getRelationById(relationId: string): Promise<RelationValidated> {
   const relationsCollection = collection(db, "relations");
   const relationDocRef = doc(relationsCollection, relationId);
   const relationDoc = await getDoc(relationDocRef);
@@ -118,8 +119,10 @@ export async function getRelationById(relationId: string): Promise<Relation> {
   return { id: relationId, ...validationResult.data };
 }
 
-export function getOtherUserInRelation(relation: Relation, user: LendrUser | User): LendrUser {
-  return relation.users.filter((chatUser) => chatUser.uid != user.uid)[0];
+export function getOtherUserInRelation(relation: Relation | RelationValidated, user: LendrUser | User): LendrUserPreview {
+  // This assumes relation.users is always an array of two users, which is enforced by the schema.
+  // Might need to be adjusted based on types and schema changes.
+  return relation.users.filter((chatUser) => chatUser.uid != user.uid)[0] as LendrUserPreview;
 }
 
 export async function sendChatMessage(receiverUid: string,
@@ -177,14 +180,13 @@ export function getLiveChatConversationsList(
 
   const unsubscribe = onSnapshot(relationsQuery, async (snapshot) => {
     const docDataList: ChatViewListItem[] = [];
-    const lastMessagePromises: Promise<any>[] = [];
-    const validRelationsData: { relation: Relation; otherUser: LendrUser; id: string }[] = [];
+    const validRelationsData: { relation: RelationValidated; otherUser: LendrUserPreview; id: string }[] = [];
     const lastMessagePromises: Promise<QuerySnapshot<DocumentData>>[] = [];
 
     snapshot.forEach(async (relationDocument) => {
       if (!relationDocument || !relationDocument.exists()) {
         // This case might be redundant if Firestore snapshot never includes non-existent docs in a live listener
-        console.warn(`Relation document ${relationDocument.id} does not exist or has no data, skipping.`);
+        console.warn(`Relation document ${relationDocument} does not exist or has no data, skipping.`);
         return;
       }
 

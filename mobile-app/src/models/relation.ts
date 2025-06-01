@@ -1,6 +1,7 @@
 import {Timestamp} from "firebase/firestore";
 import {LendrUser} from "./lendrUser";
 import {ToolPreview} from "./tool";
+import { LendrUserPreview } from "./lendrUser.zod";
 
 export interface Relation {
   id?: string // Added after retrieving from firestore
@@ -19,10 +20,9 @@ export interface RelationHydrated extends Relation {
 
 export interface ChatViewListItem {
   id: string // Added after retrieving from firestore
-  users?: LendrUser[];
   createdAt: Timestamp;
   lastMessage?: ChatMessage; // Hydrated after retrieval
-  otherUser: LendrUser;
+  otherUser: LendrUserPreview;
 }
 
 
