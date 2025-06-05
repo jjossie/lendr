@@ -21,10 +21,10 @@ export const LendrUserSchema = z.object({
   firstName: z.string().nonempty(), // Aligned with Firebase backend schema
   lastName: z.string().nonempty(),  // Aligned with Firebase backend schema
   photoURL: z.string().url().optional(),
-  expoPushTokens: z.array(z.string().startsWith("ExponentPushToken[").endsWith("]")).optional(),
+  expoPushTokens: z.array(z.string().startsWith("ExponentPushToken[").endsWith("]")),
   createdAt: z.instanceof(Timestamp),
   modifiedAt: z.instanceof(Timestamp).optional(),
-  relations: z.array(z.string()).optional(), // Array of UIDs
+  relations: z.array(z.string()), // Array of UIDs
   providerData: z.any().optional(), // To store provider-specific data e.g. from Firebase Auth
 });
 

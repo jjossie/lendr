@@ -2,7 +2,7 @@ import {createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, sig
 import {arrayRemove, arrayUnion, doc, getDoc, setDoc, Timestamp, updateDoc} from "firebase/firestore";
 import {db} from "../config/firebase";
 import {LendrUser} from "../models/lendrUser"; // This is the TypeScript interface
-import { LendrUserSchema } from "../models/lendrUser.zod"; // Zod schema for validation
+import { LendrUserPreview, LendrUserPreviewSchema, LendrUserSchema, LendrUserValidated } from "../models/lendrUser.zod"; // Zod schema for validation
 import { ObjectValidationError } from "../utils/errors"; // For error handling
 import {registerForPushNotificationsAsync} from "../config/device/notifications";
 
@@ -141,7 +141,7 @@ export async function getUserFromAuth(authUser: User): Promise<LendrUser | undef
   return validationResult.data;
 }
 
-export async function getUserFromUid(uid: string): Promise<LendrUser | undefined> {
+export async function getUserFromUid(uid: string): Promise<LendrUserValidated | undefined> {
   const userDocRef = doc(db, "users", uid);
   const docSnap = await getDoc(userDocRef);
 
@@ -162,5 +162,15 @@ export async function getUserFromUid(uid: string): Promise<LendrUser | undefined
     throw new ObjectValidationError(`User data validation failed for uid ${uid}`, validationResult.error);
   }
   // LendrUserSchema includes uid, so direct return of data is fine.
+  return validationResult.data;
+}
+
+export async function getUserPreviewFromUid(uid: string): Promise<LendrUserPreview | undefined> {
+  const user = await getUserFromUid(uid);
+  const validationResult = LendrUserPreviewSchema.safeParse(user);
+  if (!validationResult.success) {
+    console.error("Validation failed for user data (getUserPreviewFromUid):", uid, validationResult.error.flatten());
+    throw new ObjectValidationError(`User data validation failed for uid ${uid}`, validationResult.error);
+  } 
   return validationResult.data;
 }

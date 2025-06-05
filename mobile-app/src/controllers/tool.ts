@@ -16,13 +16,14 @@ import {
   where,
 } from "firebase/firestore";
 import {db} from "../config/firebase";
-import {Tool, ToolForm} from "../models/tool";
-import {ToolModelSchema} from "../models/tool.zod";
+import {Tool, ToolForm, ToolHydrated} from "../models/tool";
+import {ToolModelSchema, ToolValidated} from "../models/tool.zod";
 import {getAuth} from "firebase/auth";
 import {AuthError, NotFoundError, ObjectValidationError} from "../utils/errors";
 
 import {Geopoint} from "geofire-common";
 import {distanceBetweenMi, getCityNameFromGeopoint, getGeohashedLocation, metersFromMiles} from "../models/location";
+import { getUserFromUid, getUserPreviewFromUid } from "./auth";
 
 const geofire = require("geofire-common");
 
@@ -186,7 +187,7 @@ export async function getAllTools(): Promise<Tool[]> {
 }
 
 
-export async function getToolById(toolId: string, userGeopoint?: Geopoint): Promise<Tool | undefined> {
+export async function getToolById(toolId: string, userGeopoint?: Geopoint): Promise<ToolHydrated | undefined> {
   const toolDocRef = doc(db, "tools", toolId);
   const toolDocSnap = await getDoc(toolDocRef);
 
@@ -207,30 +208,45 @@ export async function getToolById(toolId: string, userGeopoint?: Geopoint): Prom
   }
 
   const validatedToolData = validationResult.data;
-
-  const lenderSnap = await getDoc(doc(db, "users", validatedToolData.lenderUid));
-
-  if (!lenderSnap.exists())
-    throw new NotFoundError(`Lender with id ${validatedToolData.lenderUid} not found ⁉️`);
-
-  const geopoint: Geopoint = [validatedToolData.location.latitude, validatedToolData.location.longitude];
-  let resultTool: Tool = { // Ensure this matches the Tool interface, including id
-    id: toolDocSnap.id, // id comes from the document snapshot, not from validatedToolData initially
-    ...validatedToolData, // Spread validated data
-    lender: lenderSnap.data(), // Populate lender data
-  };
-
-  // if (!resultTool.location.city)
-  if (!resultTool.location.city || resultTool.location.city.split(",").length < 2)
-    resultTool.location.city = await getCityNameFromGeopoint(geopoint);
-
-  if (userGeopoint)
-    resultTool.location.relativeDistance = distanceBetweenMi(userGeopoint, geopoint);
-  return resultTool;
+  
+  return hydrateTool(validatedToolData, toolDocSnap.id, userGeopoint);
 }
 
 
-export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
+async function hydrateTool(validatedToolData: ToolValidated, toolId: string, userGeopoint: Geopoint | undefined): Promise<ToolHydrated> {
+  const geopoint: Geopoint = [validatedToolData.location.latitude, validatedToolData.location.longitude];
+  let resultTool: Tool = {
+    id: toolId, // id comes from the document snapshot, not from validatedToolData initially
+    ...validatedToolData, // Spread validated data
+  };
+
+  // Add lender if not present
+  if (!validatedToolData.lender) {
+    const lender = await getUserPreviewFromUid(validatedToolData.lenderUid);
+    if (!lender)
+      throw new NotFoundError(`Lender with id ${validatedToolData.lenderUid} not found ⁉️`);
+    resultTool.lender = lender;
+  }
+
+  // Add holder if not present
+  if (!validatedToolData.holder) {
+    const holder = await getUserPreviewFromUid(validatedToolData.holderUid);
+    if (!holder)
+      throw new NotFoundError(`Holder with id ${validatedToolData.holderUid} not found ⁉️`);
+    resultTool.holder = holder;
+  }
+
+  // Add city if not present
+  if (!resultTool.location.city || resultTool.location.city.split(",").length < 2)
+    resultTool.location.city = await getCityNameFromGeopoint(geopoint);
+
+  // Add relativeDistance
+  if (userGeopoint)
+    resultTool.location.relativeDistance = distanceBetweenMi(userGeopoint, geopoint);
+  return resultTool as ToolHydrated;
+}
+
+export async function getToolsWithinRadius(radiusMi: number, center: Geopoint): Promise<ToolHydrated[] | undefined> {
 
   if (!radiusMi || !center)
     return undefined;
@@ -254,7 +270,7 @@ export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
 
 
   const snapshots = await Promise.all(promises);
-  const tools: Tool[] = [];
+  const hydratedToolPromises: Promise<ToolHydrated>[] = [];
   snapshots.forEach(snapshot => {
     snapshot.forEach(document => {
       const docData = document.data();
@@ -278,19 +294,13 @@ export async function getToolsWithinRadius(radiusMi: number, center: Geopoint) {
       // Check if geopoint is within radius
       if (distanceBetweenMi(center, geopoint) < radiusMi) {
         // Populate tool fields
-        const tool: Tool = {
-          id: document.id, 
-          ...validatedToolData, 
-          location: { 
-            ...validatedToolData.location,
-            relativeDistance: distanceBetweenMi(geopoint, center),
-          },
-        };
-        tools.push(tool);
+        const tool = hydrateTool(validatedToolData, document.id, center);
+        hydratedToolPromises.push(tool);
       }
     });
   });
-  return tools;
+  const hydratedTools: ToolHydrated[] = await Promise.all(hydratedToolPromises);
+  return hydratedTools;
 }
 
 

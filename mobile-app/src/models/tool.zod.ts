@@ -15,19 +15,12 @@ const ExchangePreferencesSchema = z.object({
   useOnSite: z.boolean(),
 });
 
-// Schema for the 'geopoint' object within 'location'
-const GeopointSchema = z.object({
-  latitude: z.number(),
-  longitude: z.number(),
-});
-
 // Schema for the 'location' object
 const LendrLocationSchema = z.object({
-  address: z.string(),
-  city: z.string(),
-  state: z.string(),
-  zipCode: z.string(),
-  geopoint: GeopointSchema.optional(), 
+  city: z.string().optional(),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  geohash: z.string().length(10)
 });
 
 // LendrUserPreviewSchema is now defined in lendrUser.zod.ts and imported above.
@@ -39,7 +32,7 @@ export const ToolModelSchema = z.object({
   name: z.string().nonempty(),
   brand: z.string().optional(),
   description: z.string(),
-  imageUrls: z.array(z.string()),
+  imageUrls: z.array(z.string().url()),
   lenderUid: z.string().nonempty(),
   holderUid: z.string().nonempty(),
   lender: LendrUserPreviewSchema.optional(), // Using the imported LendrUserPreviewSchema
@@ -53,4 +46,4 @@ export const ToolModelSchema = z.object({
   visibility: z.enum(["draft", "published"]),
 });
 
-export type Tool = z.infer<typeof ToolModelSchema>;
+export type ToolValidated = z.infer<typeof ToolModelSchema>;
