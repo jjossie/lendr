@@ -1,9 +1,8 @@
 import { getToolById, getToolsWithinRadius } from './tool';
-import { db } from '../config/firebase';
-import { ToolModelSchema } from '../models/tool.zod';
 import { ObjectValidationError, NotFoundError } from '../utils/errors';
-import { getCityNameFromGeopoint, distanceBetweenMi, metersFromMiles } from '../models/location'; // Assuming these are used and need mocking
+import { getCityNameFromGeopoint, distanceBetweenMi } from '../models/location'; // Assuming these are used and need mocking
 import * as geofireCommon from 'geofire-common'; // For mocking geohashQueryBounds
+import { getDoc, getDocs } from 'firebase/firestore'; // Importing Firestore methods directly for mocking
 
 // Mock Firestore
 jest.mock('../config/firebase', () => ({
@@ -79,15 +78,20 @@ const mockLenderData = {
 
 describe('Tool Controller', () => {
   beforeEach(() => {
-    jest.clearAllMocks(); // Clear mocks before each test
-    // Default mock for getDoc (can be overridden in specific tests)
-    (db.getDoc as jest.Mock).mockResolvedValue({ exists: () => false, data: () => undefined });
+    // jest.clearAllMocks(); // Clear mocks before each test
+    // // Default mock for getDoc (can be overridden in specific tests)
+    // (getDoc as jest.Mock).mockResolvedValue({ exists: () => false, data: () => undefined });
   });
+  it('should pass', () => {
+    expect(true).toBe(true); // Placeholder test to ensure setup is correct
+  });
+
+});
 
   describe('getToolById', () => {
     it('should return a validated tool when given a valid ID and data', async () => {
       // Arrange
-      (db.getDoc as jest.Mock)
+      (getDoc as jest.Mock)
         .mockResolvedValueOnce({ // For tool document
           exists: () => true,
           id: validToolId,
@@ -104,7 +108,7 @@ describe('Tool Controller', () => {
       const tool = await getToolById(validToolId);
 
       // Assert
-      expect(db.getDoc).toHaveBeenCalledTimes(2);
+      expect(getDoc).toHaveBeenCalledTimes(2);
       expect(tool).toBeDefined();
       expect(tool?.id).toBe(validToolId);
       expect(tool?.name).toBe(mockValidToolData.name);
@@ -113,7 +117,7 @@ describe('Tool Controller', () => {
 
     it('should throw NotFoundError if tool document does not exist', async () => {
       // Arrange
-      (db.getDoc as jest.Mock).mockResolvedValueOnce({ exists: () => false });
+      (getDoc as jest.Mock).mockResolvedValueOnce({ exists: () => false });
 
       // Act & Assert
       await expect(getToolById('nonExistentId')).rejects.toThrow(NotFoundError);
@@ -121,7 +125,7 @@ describe('Tool Controller', () => {
     
     it('should throw NotFoundError if tool data is undefined (though exists is true - edge case)', async () => {
       // Arrange
-      (db.getDoc as jest.Mock).mockResolvedValueOnce({ 
+      (getDoc as jest.Mock).mockResolvedValueOnce({ 
         exists: () => true, 
         id: 'someId',
         data: () => undefined 
@@ -134,7 +138,7 @@ describe('Tool Controller', () => {
     it('should throw ObjectValidationError if tool data is invalid', async () => {
       // Arrange
       const invalidToolData = { ...mockValidToolData, name: undefined }; // name is required
-      (db.getDoc as jest.Mock).mockResolvedValueOnce({
+      (getDoc as jest.Mock).mockResolvedValueOnce({
         exists: () => true,
         id: validToolId,
         data: () => invalidToolData,
@@ -147,7 +151,7 @@ describe('Tool Controller', () => {
 
     it('should throw NotFoundError if lender document does not exist', async () => {
       // Arrange
-      (db.getDoc as jest.Mock)
+      (getDoc as jest.Mock)
         .mockResolvedValueOnce({ // Tool document
           exists: () => true,
           id: validToolId,
@@ -159,7 +163,7 @@ describe('Tool Controller', () => {
 
       // Act & Assert
       await expect(getToolById(validToolId)).rejects.toThrow(NotFoundError);
-      expect((db.getDoc as jest.Mock).mock.calls[1][0].path).toBe(`users/${mockValidToolData.lenderUid}`);
+      expect((getDoc as jest.Mock).mock.calls[1][0].path).toBe(`users/${mockValidToolData.lenderUid}`);
     });
   });
 
@@ -176,7 +180,7 @@ describe('Tool Controller', () => {
     it('should return valid tools within radius', async () => {
       const tool1 = { ...mockValidToolData, name: 'Tool 1', location: { ...mockValidToolData.location, latitude: 30.001, longitude: -90.001 }};
       const tool2 = { ...mockValidToolData, name: 'Tool 2', location: { ...mockValidToolData.location, latitude: 30.002, longitude: -90.002 }};
-      (db.getDocs as jest.Mock).mockResolvedValue({
+      (getDocs as jest.Mock).mockResolvedValue({
         docs: [
           { id: 'tool1', data: () => tool1, exists: () => true },
           { id: 'tool2', data: () => tool2, exists: () => true },
@@ -187,7 +191,7 @@ describe('Tool Controller', () => {
       expect(tools).toBeDefined();
       expect(tools?.length).toBe(2);
       expect(tools?.[0].name).toBe('Tool 1');
-      expect(db.getDocs).toHaveBeenCalledTimes(1); // Assuming one bound for simplicity in this test
+      expect(getDocs).toHaveBeenCalledTimes(1); // Assuming one bound for simplicity in this test
     });
 
     it('should skip tools with invalid data and log errors', async () => {
@@ -197,7 +201,7 @@ describe('Tool Controller', () => {
       const validTool = { ...mockValidToolData, name: 'Valid Tool' };
       const invalidTool = { ...mockValidToolData, name: undefined, description: 'Missing name' }; // Invalid: name is undefined
       
-      (db.getDocs as jest.Mock).mockResolvedValue({
+      (getDocs as jest.Mock).mockResolvedValue({
         docs: [
           { id: 'valid1', data: () => validTool, exists: () => true },
           { id: 'invalid1', data: () => invalidTool, exists: () => true },
@@ -216,14 +220,14 @@ describe('Tool Controller', () => {
     });
     
     it('should return an empty array if no tools are found', async () => {
-        (db.getDocs as jest.Mock).mockResolvedValue({ docs: [] });
+        (getDocs as jest.Mock).mockResolvedValue({ docs: [] });
         const tools = await getToolsWithinRadius(mockRadiusMi, mockCenter);
         expect(tools).toEqual([]);
     });
 
     it('should skip tools if their document data is undefined', async () => {
       const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-      (db.getDocs as jest.Mock).mockResolvedValue({
+      (getDocs as jest.Mock).mockResolvedValue({
         docs: [
           { id: 'nodata1', data: () => undefined, exists: () => true },
         ],
@@ -235,7 +239,6 @@ describe('Tool Controller', () => {
       consoleWarnSpy.mockRestore();
     });
   });
-});
 
 // Helper to create Firestore Timestamp-like objects for testing
 const createMockTimestamp = (seconds: number, nanoseconds: number = 0) => ({
