@@ -2,10 +2,12 @@ import { getToolById, getToolsWithinRadius } from './tool';
 import { ObjectValidationError, NotFoundError } from '../utils/errors';
 import { getCityNameFromGeopoint, distanceBetweenMi } from '../models/location'; // Assuming these are used and need mocking
 import * as geofireCommon from 'geofire-common'; // For mocking geohashQueryBounds
-import { getDoc, getDocs } from 'firebase/firestore'; // Importing Firestore methods directly for mocking
+import { getDoc, getDocs, getFirestore } from 'firebase/firestore'; // Importing Firestore methods directly for mocking
 
 // Mock Firestore
 jest.mock('../config/firebase', () => ({
+  app: {},
+  auth: {},
   db: {
     collection: jest.fn(),
     doc: jest.fn(),
@@ -13,6 +15,32 @@ jest.mock('../config/firebase', () => ({
     getDocs: jest.fn(), // Will be overridden by individual getDocs mocks
   },
 }));
+
+jest.mock('firebase/firestore', () => {
+  const ActualFirestore = jest.requireActual('firebase/firestore');
+  class MockTimestamp {
+    seconds: number;
+    nanoseconds: number;
+    constructor(seconds: number, nanoseconds: number = 0) {
+      this.seconds = seconds;
+      this.nanoseconds = nanoseconds;
+    }
+    toDate() {
+      return new Date(this.seconds * 1000 + this.nanoseconds / 1000000);
+    }
+  }
+  return {
+    ...ActualFirestore,
+    getDoc: jest.fn(),
+    getDocs: jest.fn(),
+    collection: jest.fn(),
+    doc: jest.fn(),
+    setDoc: jest.fn(),
+    deleteDoc: jest.fn(),
+    getFirestore: jest.fn(),
+    Timestamp: MockTimestamp, // <-- Add this line
+  };
+});
 
 // Mock location utilities
 jest.mock('../models/location', () => ({

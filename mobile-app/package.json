@@ -70,9 +70,12 @@
   "private": true,
   "packageManager": "yarn@4.8.1",
   "jest": {
-  "preset": "jest-expo",
-  "transformIgnorePatterns": [
-    "node_modules/(?!(firebase|@firebase|geofire-common|((jest-)?react-native)|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)"
-  ]
-}
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "node_modules/(?!(firebase|@firebase|geofire-common|((jest-)?react-native)|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)"
+    ],
+    "setupFiles": [
+      "./jest.setup.js"
+    ]
+  }
 }
