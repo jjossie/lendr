@@ -17,32 +17,6 @@ jest.mock("../config/firebase", () => ({
   },
 }));
 
-// (getDoc as jest.Mock) = jest.fn((docRef) => {
-//   // Use .path to determine which mock data to return
-//   if (docRef && typeof docRef.path === "string") {
-//     if (docRef.path.includes("tool")) {
-//       return Promise.resolve({
-//         exists: () => true,
-//         id: docRef.id || "mockToolId",
-//         data: () => mockValidToolData,
-//       });
-//     }
-//     if (docRef.path.includes("user")) {
-//       return Promise.resolve({
-//         exists: () => true,
-//         id: docRef.id || "mockUserId",
-//         data: () => mockLendrUserData,
-//       });
-//     }
-//   }
-//   // Default fallback
-//   return Promise.resolve({
-//     exists: () => false,
-//     id: docRef.id || "unknown",
-//     data: () => undefined,
-//   });
-// });
-
 (getDoc as jest.Mock).mockImplementation((docRef) => {
   // Use .path to determine which mock data to return
   if (docRef && typeof docRef.path === "string") {
@@ -205,6 +179,10 @@ describe("getToolById", () => {
       })
       .mockResolvedValueOnce({
         // Lender document - does not exist
+        exists: () => false,
+      })
+      .mockResolvedValueOnce({
+        // Holder document - does not exist
         exists: () => false,
       });
 

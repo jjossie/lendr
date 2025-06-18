@@ -10,7 +10,7 @@ jest.mock("firebase/firestore", () => {
     getDocs: jest.fn(),
     collection: jest.fn(),
     doc: jest.fn((db, path, id) => {
-      return {path, id};
+      return {path: `${path}/${id}`, id};
     }),
     setDoc: jest.fn(),
     deleteDoc: jest.fn(),
