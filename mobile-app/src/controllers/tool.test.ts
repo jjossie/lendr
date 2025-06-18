@@ -1,11 +1,9 @@
-
 import { getToolById, getToolsWithinRadius } from "./tool";
 import { ObjectValidationError, NotFoundError } from "../utils/errors";
 import { getCityNameFromGeopoint, distanceBetweenMi } from "../models/location"; // Assuming these are used and need mocking
 import * as geofireCommon from "geofire-common"; // For mocking geohashQueryBounds
 import { getDoc, getDocs, getFirestore } from "firebase/firestore"; // Importing Firestore methods directly for mocking
 import { mockTimestamp } from "../../__mocks__/utils.mock";
-
 
 // Mock Firestore
 jest.mock("../config/firebase", () => ({
@@ -14,10 +12,62 @@ jest.mock("../config/firebase", () => ({
   db: {
     collection: jest.fn(),
     doc: jest.fn(),
-    getDoc: jest.fn(), // Will be overridden by individual getDoc mocks
-    getDocs: jest.fn(), // Will be overridden by individual getDocs mocks
+    getDoc: jest.fn(),
+    getDocs: jest.fn(),
   },
 }));
+
+// (getDoc as jest.Mock) = jest.fn((docRef) => {
+//   // Use .path to determine which mock data to return
+//   if (docRef && typeof docRef.path === "string") {
+//     if (docRef.path.includes("tool")) {
+//       return Promise.resolve({
+//         exists: () => true,
+//         id: docRef.id || "mockToolId",
+//         data: () => mockValidToolData,
+//       });
+//     }
+//     if (docRef.path.includes("user")) {
+//       return Promise.resolve({
+//         exists: () => true,
+//         id: docRef.id || "mockUserId",
+//         data: () => mockLendrUserData,
+//       });
+//     }
+//   }
+//   // Default fallback
+//   return Promise.resolve({
+//     exists: () => false,
+//     id: docRef.id || "unknown",
+//     data: () => undefined,
+//   });
+// });
+
+(getDoc as jest.Mock).mockImplementation((docRef) => {
+  // Use .path to determine which mock data to return
+  if (docRef && typeof docRef.path === "string") {
+    if (docRef.path.includes("tool")) {
+      return Promise.resolve({
+        exists: () => true,
+        id: docRef.id || "mockToolId",
+        data: () => mockValidToolData,
+      });
+    }
+    if (docRef.path.includes("user")) {
+      return Promise.resolve({
+        exists: () => true,
+        id: docRef.id || "mockUserId",
+        data: () => mockLendrUserData,
+      });
+    }
+  }
+  // Default fallback
+  return Promise.resolve({
+    exists: () => false,
+    id: docRef.id || "unknown",
+    data: () => undefined,
+  });
+});
 
 // Mock location utilities
 jest.mock("../models/location", () => ({
@@ -40,7 +90,6 @@ jest.mock("geofire-common", () => ({
   geohashQueryBounds: jest.fn(),
   distanceBetween: jest.fn(), // if used directly by the controller
 }));
-
 
 // Shared mock data
 const validToolId = "validTool123";
@@ -69,9 +118,15 @@ const mockValidToolData = {
   // id is not part of the Firestore document data itself
 };
 
-const mockLenderData = {
+const mockLendrUserData = {
   uid: "lender123",
   displayName: "Test Lender",
+  firstName: "Test",
+  lastName: "Lender",
+  photoURL: "http://example.com/lender.png",
+  expoPushTokens: [],
+  createdAt: mockTimestamp(),
+  relations: []
   // other fields as per LendrUserPreviewSchema if needed by controller logic beyond validation
 };
 
@@ -89,30 +144,18 @@ describe("Tool Controller", () => {
 describe("getToolById", () => {
   it("should return a validated tool when given a valid ID and data", async () => {
     // Arrange
-    (getDoc as jest.Mock)
-      .mockResolvedValueOnce({
-        // For tool document
-        exists: () => true,
-        id: validToolId,
-        data: () => mockValidToolData,
-      })
-      .mockResolvedValueOnce({
-        // For lender document
-        exists: () => true,
-        id: mockValidToolData.lenderUid,
-        data: () => mockLenderData,
-      });
+
     (getCityNameFromGeopoint as jest.Mock).mockResolvedValue("Testville, TS");
 
     // Act
     const tool = await getToolById(validToolId);
 
     // Assert
-    expect(getDoc).toHaveBeenCalledTimes(2);
+    expect(getDoc).toHaveBeenCalledTimes(3);
     expect(tool).toBeDefined();
     expect(tool?.id).toBe(validToolId);
     expect(tool?.name).toBe(mockValidToolData.name);
-    expect(tool?.lender?.uid).toBe(mockLenderData.uid); // Check populated lender
+    expect(tool?.lender?.uid).toBe(mockLendrUserData.uid); // Check populated lender
   });
 
   it("should throw NotFoundError if tool document does not exist", async () => {
@@ -283,7 +326,6 @@ describe("getToolsWithinRadius", () => {
     consoleWarnSpy.mockRestore();
   });
 });
-
 
 // Example of more specific mock tool data for tests if needed:
 const sampleToolData1 = {
