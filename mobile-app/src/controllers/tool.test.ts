@@ -24,7 +24,7 @@ jest.mock("../config/firebase", () => ({
       return Promise.resolve({
         exists: () => true,
         id: docRef.id || "mockToolId",
-        data: () => mockValidToolDataMissingUserPreviews,
+        data: () => mockToolDataMissingUserPreviews,
       });
     }
     if (docRef.path.includes("user")) {
@@ -67,7 +67,7 @@ jest.mock("geofire-common", () => ({
 
 // Shared mock data
 const validToolId = "validTool123";
-const mockValidToolDataMissingUserPreviews = {
+const mockToolDataMissingUserPreviews = {
   name: "Test Tool",
   brand: "TestBrand",
   description: "A great tool for testing",
@@ -93,13 +93,13 @@ const mockValidToolDataMissingUserPreviews = {
 };
 
 const mockToolDataWithUserPreviews = {
-  ...mockValidToolDataMissingUserPreviews,
+  ...mockToolDataMissingUserPreviews,
   lender: {
     uid: "lender123",
     displayName: "Test Lender",
     firstName: "Test",
     lastName: "Lender",
-    photoURL: "http://example.com/lender.png", 
+    photoURL: "http://example.com/lender.png",
   }, // Mocked lender data
   holder: {
     uid: "holder123",
@@ -107,7 +107,7 @@ const mockToolDataWithUserPreviews = {
     firstName: "Test",
     lastName: "Holder",
     photoURL: "http://example.com/holder.png",
-  }
+  },
 };
 
 const mockLendrUserData = {
@@ -118,265 +118,266 @@ const mockLendrUserData = {
   photoURL: "http://example.com/lender.png",
   expoPushTokens: [],
   createdAt: mockTimestamp(),
-  relations: []
+  relations: [],
   // other fields as per LendrUserPreviewSchema if needed by controller logic beyond validation
 };
 
 describe("Tool Controller", () => {
   beforeEach(() => {
-    // jest.clearAllMocks(); // Clear mocks before each test
+    jest.clearAllMocks(); // Clear mocks before each test
     // // Default mock for getDoc (can be overridden in specific tests)
     // (getDoc as jest.Mock).mockResolvedValue({ exists: () => false, data: () => undefined });
   });
   it("should pass", () => {
     expect(true).toBe(true); // Placeholder test to ensure setup is correct
   });
-});
 
-describe("getToolById", () => {
-  
-  beforeEach(() => {
-    jest.clearAllMocks(); // Clear mocks before each test
-    (getCityNameFromGeopoint as jest.Mock).mockReset(); // Reset mock for getCityNameFromGeopoint
-  });
-
-  it("should return a hydrated, validated tool when given a valid ID and tool data without user previews", async () => {
-    // Arrange
-
-    (getCityNameFromGeopoint as jest.Mock).mockResolvedValue("Testville, TS");
-
-    // Act
-    const tool = await getToolById(validToolId);
-
-    // Assert
-    expect(getDoc).toHaveBeenCalledTimes(3);
-    expect(tool).toBeDefined();
-    expect(tool?.id).toBe(validToolId);
-    expect(tool?.name).toBe(mockValidToolDataMissingUserPreviews.name);
-    expect(tool?.lender?.uid).toBe(mockLendrUserData.uid); // Check populated lender
-  });
-
-
-  it("should return a validated tool when given a valid ID and tool data with user previews", async () => {
-    // Arrange
-    (getDoc as jest.Mock).mockResolvedValue({
-      exists: () => true,
-      id: validToolId,
-      data: () => mockToolDataWithUserPreviews
-    });
-    (getCityNameFromGeopoint as jest.Mock).mockResolvedValue("Testville, TS");
-
-    // Act
-    const tool = await getToolById(validToolId);
-
-    // Assert
-    expect(getDoc).toHaveBeenCalledTimes(1);
-    expect(tool).toBeDefined();
-    expect(tool?.id).toBe(validToolId);
-    expect(tool?.name).toBe(mockValidToolDataMissingUserPreviews.name);
-    expect(tool?.lender?.uid).toBe(mockLendrUserData.uid); // Check populated lender
-  });
-
-  it("should throw NotFoundError if tool document does not exist", async () => {
-    // Arrange
-    (getDoc as jest.Mock).mockResolvedValueOnce({ exists: () => false });
-
-    // Act & Assert
-    await expect(getToolById("nonExistentId")).rejects.toThrow(NotFoundError);
-  });
-
-  it("should throw NotFoundError if tool data is undefined (though exists is true - edge case)", async () => {
-    // Arrange
-    (getDoc as jest.Mock).mockResolvedValueOnce({
-      exists: () => true,
-      id: "someId",
-      data: () => undefined,
+  describe("getToolById", () => {
+    beforeEach(() => {
+      jest.clearAllMocks(); // Clear mocks before each test
+      (getCityNameFromGeopoint as jest.Mock).mockReset(); // Reset mock for getCityNameFromGeopoint
     });
 
-    // Act & Assert
-    await expect(getToolById("someId")).rejects.toThrow(NotFoundError);
-  });
+    it("should return a hydrated, validated tool when given a valid ID and tool data without user previews", async () => {
+      // Arrange
 
-  it("should throw ObjectValidationError if tool data is invalid", async () => {
-    // Arrange
-    const invalidToolData = { ...mockValidToolDataMissingUserPreviews, name: undefined }; // name is required
-    (getDoc as jest.Mock).mockResolvedValueOnce({
-      exists: () => true,
-      id: validToolId,
-      data: () => invalidToolData,
+      (getCityNameFromGeopoint as jest.Mock).mockResolvedValue("Testville, TS");
+
+      // Act
+      const tool = await getToolById(validToolId);
+
+      // Assert
+      expect(getDoc).toHaveBeenCalledTimes(3);
+      expect(tool).toBeDefined();
+      expect(tool?.id).toBe(validToolId);
+      expect(tool?.name).toBe(mockToolDataMissingUserPreviews.name);
+      expect(tool?.lender?.uid).toBe(mockLendrUserData.uid); // Check populated lender
     });
-    // No need to mock lender getDoc for this test as it should fail before that
 
-    // Act & Assert
-    await expect(getToolById(validToolId)).rejects.toThrow(
-      ObjectValidationError
-    );
-  });
-
-  it("should throw NotFoundError if lender document does not exist", async () => {
-    // Arrange
-    (getDoc as jest.Mock)
-      .mockResolvedValueOnce({
-        // Tool document
+    it("should return a validated tool when given a valid ID and tool data with user previews", async () => {
+      // Arrange
+      (getDoc as jest.Mock).mockResolvedValue({
         exists: () => true,
         id: validToolId,
-        data: () => mockValidToolDataMissingUserPreviews,
-      })
-      .mockResolvedValueOnce({
-        // Lender document - does not exist
-        exists: () => false,
-      })
-      .mockResolvedValueOnce({
-        // Holder document - does not exist
-        exists: () => false,
+        data: () => mockToolDataWithUserPreviews,
+      });
+      (getCityNameFromGeopoint as jest.Mock).mockResolvedValue("Testville, TS");
+
+      // Act
+      const tool = await getToolById(validToolId);
+
+      // Assert
+      expect(getDoc).toHaveBeenCalledTimes(1);
+      expect(tool).toBeDefined();
+      expect(tool?.id).toBe(validToolId);
+      expect(tool?.name).toBe(mockToolDataMissingUserPreviews.name);
+      expect(tool?.lender?.uid).toBe(mockLendrUserData.uid); // Check populated lender
+    });
+
+    it("should throw NotFoundError if tool document does not exist", async () => {
+      // Arrange
+      (getDoc as jest.Mock).mockResolvedValueOnce({ exists: () => false });
+
+      // Act & Assert
+      await expect(getToolById("nonExistentId")).rejects.toThrow(NotFoundError);
+    });
+
+    it("should throw NotFoundError if tool data is undefined (though exists is true - edge case)", async () => {
+      // Arrange
+      (getDoc as jest.Mock).mockResolvedValueOnce({
+        exists: () => true,
+        id: "someId",
+        data: () => undefined,
       });
 
-    // Act & Assert
-    await expect(getToolById(validToolId)).rejects.toThrow(NotFoundError);
-    expect((getDoc as jest.Mock).mock.calls[1][0].path).toBe(
-      `users/${mockValidToolDataMissingUserPreviews.lenderUid}`
-    );
+      // Act & Assert
+      await expect(getToolById("someId")).rejects.toThrow(NotFoundError);
+    });
+
+    it("should throw ObjectValidationError if tool data is invalid", async () => {
+      // Arrange
+      const invalidToolData = {
+        ...mockToolDataMissingUserPreviews,
+        name: undefined,
+      }; // name is required
+      (getDoc as jest.Mock).mockResolvedValueOnce({
+        exists: () => true,
+        id: validToolId,
+        data: () => invalidToolData,
+      });
+      // No need to mock lender getDoc for this test as it should fail before that
+
+      // Act & Assert
+      await expect(getToolById(validToolId)).rejects.toThrow(
+        ObjectValidationError
+      );
+    });
+
+    it("should throw NotFoundError if lender document does not exist", async () => {
+      // Arrange
+      (getDoc as jest.Mock)
+        .mockResolvedValueOnce({
+          // Tool document
+          exists: () => true,
+          id: validToolId,
+          data: () => mockToolDataMissingUserPreviews,
+        })
+        .mockResolvedValueOnce({
+          // Lender document - does not exist
+          exists: () => false,
+        })
+        .mockResolvedValueOnce({
+          // Holder document - does not exist
+          exists: () => false,
+        });
+
+      // Act & Assert
+      await expect(getToolById(validToolId)).rejects.toThrow(NotFoundError);
+      expect((getDoc as jest.Mock).mock.calls[1][0].path).toBe(
+        `users/${mockToolDataMissingUserPreviews.lenderUid}`
+      );
+    });
   });
-});
 
-// Placeholder for getToolsWithinRadius tests
-describe("getToolsWithinRadius", () => {
-  const mockCenter: [number, number] = [30.0, -90.0];
-  const mockRadiusMi = 10;
+  // Placeholder for getToolsWithinRadius tests
+  describe("getToolsWithinRadius", () => {
+    const mockCenter: [number, number] = [30.0, -90.0];
+    const mockRadiusMi = 10;
 
-  beforeEach(() => {
-    (geofireCommon.geohashQueryBounds as jest.Mock).mockReturnValue([
-      ["dpz8abc", "dpz8xyz"],
-    ]); // Mock bounds
-    (distanceBetweenMi as jest.Mock).mockReturnValue(mockRadiusMi / 2); // Assume all tools are within radius by default
-  });
+    beforeEach(() => {
+      (geofireCommon.geohashQueryBounds as jest.Mock).mockReturnValue([
+        ["dpz8abc", "dpz8xyz"],
+      ]); // Mock bounds
 
-  it("should return valid tools within radius", async () => {
-    const tool1 = {
-      ...mockValidToolDataMissingUserPreviews,
-      name: "Tool 1",
-      location: {
-        ...mockValidToolDataMissingUserPreviews.location,
-        latitude: 30.001,
-        longitude: -90.001,
-      },
-    };
-    const tool2 = {
-      ...mockValidToolDataMissingUserPreviews,
-      name: "Tool 2",
-      location: {
-        ...mockValidToolDataMissingUserPreviews.location,
-        latitude: 30.002,
-        longitude: -90.002,
-      },
-    };
-    (getDocs as jest.Mock).mockResolvedValue({
-      docs: [
+      (distanceBetweenMi as jest.Mock).mockReturnValue(mockRadiusMi / 2); // Assume all tools are within radius by default
+    });
+
+    it("should return valid tools within radius", async () => {
+      const tool1 = {
+        ...mockToolDataWithUserPreviews,
+        name: "Tool 1",
+        location: {
+          ...mockToolDataWithUserPreviews.location,
+          latitude: 30.001,
+          longitude: -90.001,
+        },
+      };
+      const tool2 = {
+        ...mockToolDataWithUserPreviews,
+        name: "Tool 2",
+        location: {
+          ...mockToolDataWithUserPreviews.location,
+          latitude: 30.002,
+          longitude: -90.002,
+        },
+      };
+      (getDocs as jest.Mock).mockResolvedValue([
         { id: "tool1", data: () => tool1, exists: () => true },
         { id: "tool2", data: () => tool2, exists: () => true },
-      ],
+      ]);
+
+      const tools = await getToolsWithinRadius(mockRadiusMi, mockCenter);
+      expect(tools).toBeDefined();
+      expect(tools?.length).toBe(2);
+      expect(tools?.[0].name).toBe("Tool 1");
+      expect(getDocs).toHaveBeenCalledTimes(1); // Assuming one bound for simplicity in this test
     });
 
-    const tools = await getToolsWithinRadius(mockRadiusMi, mockCenter);
-    expect(tools).toBeDefined();
-    expect(tools?.length).toBe(2);
-    expect(tools?.[0].name).toBe("Tool 1");
-    expect(getDocs).toHaveBeenCalledTimes(1); // Assuming one bound for simplicity in this test
-  });
+    it("should skip tools with invalid data and log errors", async () => {
+      const consoleErrorSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      const consoleWarnSpy = jest
+        .spyOn(console, "warn")
+        .mockImplementation(() => {});
 
-  it("should skip tools with invalid data and log errors", async () => {
-    const consoleErrorSpy = jest
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
-    const consoleWarnSpy = jest
-      .spyOn(console, "warn")
-      .mockImplementation(() => {});
+      const validTool = {
+        ...mockToolDataWithUserPreviews,
+        name: "Valid Tool",
+      };
+      const invalidTool = {
+        ...mockToolDataWithUserPreviews,
+        name: undefined,
+        description: "Missing name",
+      }; // Invalid: name is undefined
 
-    const validTool = { ...mockValidToolDataMissingUserPreviews, name: "Valid Tool" };
-    const invalidTool = {
-      ...mockValidToolDataMissingUserPreviews,
-      name: undefined,
-      description: "Missing name",
-    }; // Invalid: name is undefined
-
-    (getDocs as jest.Mock).mockResolvedValue({
-      docs: [
+      (getDocs as jest.Mock).mockResolvedValue([
         { id: "valid1", data: () => validTool, exists: () => true },
         { id: "invalid1", data: () => invalidTool, exists: () => true },
-      ],
+      ]);
+
+      const tools = await getToolsWithinRadius(mockRadiusMi, mockCenter);
+      expect(tools).toBeDefined();
+      expect(tools?.length).toBe(1);
+      expect(tools?.[0].name).toBe("Valid Tool");
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining("Validation failed for tool:"),
+        "invalid1",
+        expect.anything()
+      );
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "Skipping tool with id invalid1 due to validation error."
+        )
+      );
+
+      consoleErrorSpy.mockRestore();
+      consoleWarnSpy.mockRestore();
     });
 
-    const tools = await getToolsWithinRadius(mockRadiusMi, mockCenter);
-    expect(tools).toBeDefined();
-    expect(tools?.length).toBe(1);
-    expect(tools?.[0].name).toBe("Valid Tool");
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Validation failed for tool:"),
-      "invalid1",
-      expect.anything()
-    );
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      expect.stringContaining(
-        "Skipping tool with id invalid1 due to validation error."
-      )
-    );
-
-    consoleErrorSpy.mockRestore();
-    consoleWarnSpy.mockRestore();
-  });
-
-  it("should return an empty array if no tools are found", async () => {
-    (getDocs as jest.Mock).mockResolvedValue({ docs: [] });
-    const tools = await getToolsWithinRadius(mockRadiusMi, mockCenter);
-    expect(tools).toEqual([]);
-  });
-
-  it("should skip tools if their document data is undefined", async () => {
-    const consoleWarnSpy = jest
-      .spyOn(console, "warn")
-      .mockImplementation(() => {});
-    (getDocs as jest.Mock).mockResolvedValue({
-      docs: [{ id: "nodata1", data: () => undefined, exists: () => true }],
+    it("should return an empty array if no tools are found", async () => {
+      (getDocs as jest.Mock).mockResolvedValue([]);
+      const tools = await getToolsWithinRadius(mockRadiusMi, mockCenter);
+      expect(tools).toEqual([]);
     });
 
-    const tools = await getToolsWithinRadius(mockRadiusMi, mockCenter);
-    expect(tools).toEqual([]);
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      expect.stringContaining(
-        "Document data is undefined for a document in snapshot, skipping."
-      )
-    );
-    consoleWarnSpy.mockRestore();
+    it("should skip tools if their document data is undefined", async () => {
+      const consoleWarnSpy = jest
+        .spyOn(console, "warn")
+        .mockImplementation(() => {});
+      (getDocs as jest.Mock).mockResolvedValue([
+        { id: "nodata1", data: () => undefined, exists: () => true },
+      ]);
+
+      const tools = await getToolsWithinRadius(mockRadiusMi, mockCenter);
+      expect(tools).toEqual([]);
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "Document data is undefined for a document in snapshot, skipping."
+        )
+      );
+      consoleWarnSpy.mockRestore();
+    });
   });
+
+  // Example of more specific mock tool data for tests if needed:
+  const sampleToolData1 = {
+    name: "Hammer",
+    brand: "Stanley",
+    description: "A sturdy hammer.",
+    imageUrls: ["url1"],
+    lenderUid: "user1",
+    holderUid: "user1",
+    createdAt: mockTimestamp(new Date(1670000000)),
+    modifiedAt: mockTimestamp(new Date(1670000000)),
+    rate: { price: 5, timeUnit: "day" },
+    preferences: { delivery: false, localPickup: true, useOnSite: true },
+    location: {
+      address: "1 Main St",
+      city: "Anytown",
+      state: "AN",
+      zipCode: "10001",
+      geopoint: { latitude: 40.7128, longitude: -74.006 },
+      latitude: 40.7128,
+      longitude: -74.006,
+      geohash: "dr5reg",
+    },
+    visibility: "published",
+  };
+  const sampleToolDataInvalid = {
+    // Missing 'name', 'lenderUid', 'holderUid', 'createdAt', 'modifiedAt', 'rate', 'preferences', 'location', 'visibility'
+    brand: "Unknown",
+    description: "This tool data is incomplete.",
+    imageUrls: [],
+  };
 });
-
-// Example of more specific mock tool data for tests if needed:
-const sampleToolData1 = {
-  name: "Hammer",
-  brand: "Stanley",
-  description: "A sturdy hammer.",
-  imageUrls: ["url1"],
-  lenderUid: "user1",
-  holderUid: "user1",
-  createdAt: mockTimestamp(new Date(1670000000)),
-  modifiedAt: mockTimestamp(new Date(1670000000)),
-  rate: { price: 5, timeUnit: "day" },
-  preferences: { delivery: false, localPickup: true, useOnSite: true },
-  location: {
-    address: "1 Main St",
-    city: "Anytown",
-    state: "AN",
-    zipCode: "10001",
-    geopoint: { latitude: 40.7128, longitude: -74.006 },
-    latitude: 40.7128,
-    longitude: -74.006,
-    geohash: "dr5reg",
-  },
-  visibility: "published",
-};
-const sampleToolDataInvalid = {
-  // Missing 'name', 'lenderUid', 'holderUid', 'createdAt', 'modifiedAt', 'rate', 'preferences', 'location', 'visibility'
-  brand: "Unknown",
-  description: "This tool data is incomplete.",
-  imageUrls: [],
-};
