@@ -10,9 +10,13 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  test:
 
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: mobile-app
 
     strategy:
       matrix:
