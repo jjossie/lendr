@@ -1,12 +1,13 @@
 import React from 'react';
 import {Box, Card, Row, Text, theme} from 'native-base';
 import {useAuthentication} from "../utils/hooks/useAuthentication";
-import {ChatMessage, Relation} from "../models/relation";
+import {ChatMessage} from "../models/relation";
 import AvatarImage from "./AvatarImage";
+import { RelationHydrated } from '../models/relation.zod';
 
 export interface ChatMessageProps {
   message: ChatMessage,
-  relation: Relation,
+  relation: RelationHydrated,
   // index: number
 }
 
