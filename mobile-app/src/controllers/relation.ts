@@ -23,10 +23,12 @@ import {auth, db} from "../config/firebase";
 import {User} from "firebase/auth";
 import {AuthError, LendrBaseError, NotFoundError, NotImplementedError, ObjectValidationError} from "../utils/errors";
 import {ChatMessage, ChatViewListItem, Loan, Relation} from "../models/relation";
+import { RelationSchema, ChatMessageSchema, LoanSchema, RelationValidated } from "../models/relation.zod";
 import {getUserFromAuth, getUserFromUid} from "./auth";
 import {LendrUser} from "../models/lendrUser";
 import {Dispatch, SetStateAction} from "react";
 import { callCloudFunction } from "../utils/firebase.utils";
+import { LendrUserPreview } from "../models/lendrUser.zod";
 
 // Constants
 const MESSAGE_LOAD_LIMIT = 20;
@@ -93,20 +95,34 @@ export async function createRelation(otherUserId: string, toolId: string): Promi
   return relationId;
 }
 
-export async function getRelationById(relationId: string): Promise<Relation> {
+export async function getRelationById(relationId: string): Promise<RelationValidated> {
   const relationsCollection = collection(db, "relations");
   const relationDocRef = doc(relationsCollection, relationId);
   const relationDoc = await getDoc(relationDocRef);
   if (!relationDoc.exists())
     throw new NotFoundError(`Relation with id ${relationId} does not exist ⭕️`);
 
-  const relationDocumentData = relationDoc.data();
+  const rawData = relationDoc.data();
+  if (!rawData) {
+    // Should be caught by !relationDoc.exists() but good for type safety
+    throw new NotFoundError(`Relation data is undefined for id ${relationId} 🤷‍`);
+  }
 
-  return {id: relationId, ...relationDocumentData} as Relation;
+  const validationResult = RelationSchema.safeParse(rawData);
+
+  if (!validationResult.success) {
+    console.error("Validation failed for relation:", relationId, validationResult.error.flatten());
+    throw new ObjectValidationError(`Relation data validation failed for id ${relationId} 😥`, validationResult.error);
+  }
+
+  // The id is from the document snapshot, not part of the schema-validated data initially
+  return { id: relationId, ...validationResult.data };
 }
 
-export function getOtherUserInRelation(relation: Relation, user: LendrUser | User): LendrUser {
-  return relation.users.filter((chatUser) => chatUser.uid != user.uid)[0];
+export function getOtherUserInRelation(relation: Relation | RelationValidated, user: LendrUser | User): LendrUserPreview {
+  // This assumes relation.users is always an array of two users, which is enforced by the schema.
+  // Might need to be adjusted based on types and schema changes.
+  return relation.users.filter((chatUser) => chatUser.uid != user.uid)[0] as LendrUserPreview;
 }
 
 export async function sendChatMessage(receiverUid: string,
@@ -164,17 +180,44 @@ export function getLiveChatConversationsList(
 
   const unsubscribe = onSnapshot(relationsQuery, async (snapshot) => {
     const docDataList: ChatViewListItem[] = [];
-    const lastMessagePromises: Promise<any>[] = [];
-    snapshot.forEach(async (relationDocument) => {
-      if (!relationDocument || !relationDocument.exists())
-        throw new NotFoundError(`🤝Relation not found ⁉️`);
+    const validRelationsData: { relation: RelationValidated; otherUser: LendrUserPreview; id: string }[] = [];
+    const lastMessagePromises: Promise<QuerySnapshot<DocumentData>>[] = [];
 
-      // Extract the data from the document
-      const relationDocumentData: Relation =
-        relationDocument.data() as Relation;
+    snapshot.forEach(async (relationDocument) => {
+      if (!relationDocument || !relationDocument.exists()) {
+        // This case might be redundant if Firestore snapshot never includes non-existent docs in a live listener
+        console.warn(`Relation document ${relationDocument} does not exist or has no data, skipping.`);
+        return;
+      }
+
+      const rawRelationData = relationDocument.data();
+      if (!rawRelationData) {
+        console.warn(`Relation data is undefined for document ${relationDocument.id}, skipping.`);
+        return;
+      }
+
+      const relationValidationResult = RelationSchema.safeParse(rawRelationData);
+
+      if (!relationValidationResult.success) {
+        console.error("Validation failed for relation:", relationDocument.id, relationValidationResult.error.flatten());
+        // Skip this relation
+        return;
+      }
+      const validatedRelationData = relationValidationResult.data;
 
       // Get the info of the other user to be displayed in the chats list
-      const otherUser = getOtherUserInRelation(relationDocumentData, authUser);
+      // Ensure validatedRelationData is used here
+      const otherUser = getOtherUserInRelation({ id: relationDocument.id, ...validatedRelationData }, authUser);
+      if (!otherUser) {
+        console.error(`Could not determine other user for relation ${relationDocument.id}, skipping.`);
+        return;
+      }
+
+      validRelationsData.push({
+        id: relationDocument.id,
+        relation: validatedRelationData,
+        otherUser: otherUser,
+      });
 
       // Get the most recent message for each relation
       const lastMessageQuery = query(
@@ -183,30 +226,49 @@ export function getLiveChatConversationsList(
         limit(1)
       );
       lastMessagePromises.push(getDocs(lastMessageQuery));
-
-      // Add the (incomplete) relation to the list
-      docDataList.push({
-        id: relationDocument.id,
-        otherUser: otherUser,
-        ...relationDocumentData,
-      } as ChatViewListItem);
     });
 
-    // Tack on the data for the last message of each relation
-    Promise.all(lastMessagePromises).then((lastMessages) => {
-      for (let i = 0; i < docDataList.length; i++) {
-        docDataList[i].lastMessage = lastMessages[i].docs[0]?.data();
-      }
-      // It appears that although we are properly setting the list here with newly hydrated
-      // objects, JS thinks the list is unchanged. So we must also set loading state:
-      setChats(docDataList);
-      setIsLoaded((b) => !b);
-    });
+    // Process valid relations and their last messages
+    Promise.all(lastMessagePromises)
+      .then((lastMessageSnapshots) => {
+        const finalChatListItems: ChatViewListItem[] = validRelationsData.map((validRel, index) => {
+          const lastMessageDoc = lastMessageSnapshots[index]?.docs[0];
+          let lastMessageData: ChatMessage | undefined = undefined;
 
-    // Don't use this yet because it will screw up the loop in the Promise.all() call.
-    // docDataList.sort((a, b) => a.createdAt.seconds - b.createdAt.seconds)
+          if (lastMessageDoc?.exists()) {
+            const rawMessageData = lastMessageDoc.data();
+            const messageValidationResult = ChatMessageSchema.safeParse(rawMessageData);
+            if (messageValidationResult.success) {
+              lastMessageData = { id: lastMessageDoc.id, ...messageValidationResult.data };
+            } else {
+              console.error(
+                "Validation failed for last message in relation:",
+                validRel.id,
+                messageValidationResult.error.flatten()
+              );
+              // lastMessageData remains undefined
+            }
+          }
+          
+          return {
+            id: validRel.id,
+            users: validRel.relation.users, // from validated relation data
+            createdAt: validRel.relation.createdAt, // from validated relation data
+            lastMessage: lastMessageData,
+            otherUser: validRel.otherUser,
+          };
+        });
 
-    setChats(docDataList);
+        // Sort or perform other operations if needed
+        // finalChatListItems.sort((a, b) => (b.lastMessage?.createdAt?.seconds || 0) - (a.lastMessage?.createdAt?.seconds || 0));
+        
+        setChats(finalChatListItems);
+        setIsLoaded((b) => !b); // Consider more robust loading state management
+      })
+      .catch(error => {
+        console.error("Error processing last messages:", error);
+        // Potentially set an error state for the UI
+      });
   });
 
   return unsubscribe;
@@ -239,12 +301,24 @@ export function getLiveMessages(setMessages: ((messages: any) => any),
       limit(MESSAGE_LOAD_LIMIT),
   );
   return onSnapshot(messagesQuery, (snapshot: QuerySnapshot<DocumentData>) => {
-    let messages: ChatMessage[] = [];
+    const messages: ChatMessage[] = [];
     snapshot.forEach(messageSnap => {
+      const rawData = messageSnap.data();
+      if (!rawData) {
+        console.warn(`Message data is undefined for doc id ${messageSnap.id}, skipping.`);
+        return; // Skip this document
+      }
+
+      const validationResult = ChatMessageSchema.safeParse(rawData);
+      if (!validationResult.success) {
+        console.error("Validation failed for chat message:", messageSnap.id, validationResult.error.flatten());
+        return; // Skip this message
+      }
+      
       messages.push({
-        id: messageSnap.id,
-        ...messageSnap.data(),
-      } as ChatMessage);
+        id: messageSnap.id, // ID from the document snapshot
+        ...validationResult.data, // Spread the validated data
+      });
     });
     setMessages(messages.reverse());
   });
@@ -270,18 +344,45 @@ export function getLiveLoans(setLoans: (loans: any) => any,
       orderBy("inquiryDate", "desc"), //TODO fix inquiry date problem: this rejects docs w/o an inquiry date
   );
   return onSnapshot(loansQuery, (snapshot: QuerySnapshot<DocumentData>) => {
-    let loans: Loan[] = [];
+    const loans: Loan[] = [];
     snapshot.forEach(async loanSnap => {
-      let loanDoc = loanSnap.data() as Loan;
-      // if (!loanDoc.tool) // Pretty sure it's actually not necessary 'cause they're hydrated on the backend now
-      //   // Front-end Hydration necessary
-      //   loanDoc.tool = await getToolById(loanDoc.toolId) as IToolPreview;
+      const rawData = loanSnap.data();
+      if (!rawData) {
+        console.warn(`Loan data is undefined for doc id ${loanSnap.id}, skipping.`);
+        return; // Skip this document
+      }
+
+      const validationResult = LoanSchema.safeParse(rawData);
+      if (!validationResult.success) {
+        console.error("Validation failed for loan:", loanSnap.id, validationResult.error.flatten());
+        return; // Skip this loan
+      }
+      
+      let validatedLoanData = validationResult.data;
+
+      // The commented-out tool hydration logic can be revisited later.
+      // For now, validatedLoanData.tool will be whatever z.any() parsed.
+      // if (!validatedLoanData.tool && validatedLoanData.toolId) {
+      //   console.log(`Attempting to hydrate tool for loan ${loanSnap.id}`);
+      //   try {
+      //     // Assuming getToolById is updated to return a ToolPreview compatible type or
+      //     // a new function getToolPreviewById is created.
+      //     // const toolPreview = await getToolById(validatedLoanData.toolId); // This needs to be adjusted for ToolPreview
+      //     // if (toolPreview) {
+      //     //   validatedLoanData.tool = toolPreview; // Or however ToolPreviewSchema is structured
+      //     // }
+      //   } catch (error) {
+      //     console.error(`Error hydrating tool ${validatedLoanData.toolId} for loan ${loanSnap.id}:`, error);
+      //   }
+      // }
 
       loans.push({
-        id: loanSnap.id,
-        ...loanDoc,
-      } as Loan);
+        id: loanSnap.id, // ID from the document snapshot
+        ...validatedLoanData, // Spread the validated data
+      });
     });
-    setLoans(loans.reverse());
+    setLoans(loans.reverse()); // Note: forEach with async inside might not order correctly before reverse.
+                               // If issues arise, consider Promise.all for async operations within loop.
+                               // However, current async operation (tool hydration) is commented out.
   });
 }

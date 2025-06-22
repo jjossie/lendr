@@ -7,7 +7,8 @@
     "start:tunnel": "expo start --dev-client --tunnel",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "jest --watchAll"
   },
   "dependencies": {
     "@expo-google-fonts/epilogue": "^0.2.3",
@@ -54,16 +55,27 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@expo/ngrok": "^4.1.0",
+    "@testing-library/react-native": "^13.2.0",
     "@tsconfig/react-native": "^2.0.3",
     "@types/firebase": "^3.2.3",
-    "@types/jest": "^29.4.0",
+    "@types/jest": "^29.5.14",
     "@types/prop-types": "^15",
     "@types/react": "~18.3.12",
     "@types/react-dom": "~18.3.1",
-    "@types/react-test-renderer": "^18.0.0",
+    "jest": "~29.7.0",
+    "jest-expo": "~52.0.6",
     "prop-types": "^15.8.1",
     "react-dom": "18.3.1"
   },
   "private": true,
-  "packageManager": "yarn@4.8.1"
+  "packageManager": "yarn@4.8.1",
+  "jest": {
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "node_modules/(?!(firebase|@firebase|geofire-common|((jest-)?react-native)|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)"
+    ],
+    "setupFiles": [
+      "./jest.setup.js"
+    ]
+  }
 }

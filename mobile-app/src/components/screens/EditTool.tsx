@@ -341,7 +341,11 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
                 placeholder={`Tell us about the ${name}`}
                 size="lg"
                 value={description}
-                variant="filled"/>
+                variant="filled"
+                tvParallaxProperties={undefined} // This is a hack to make the TextArea work on Android*
+                onTextInput={() => {}} // This is a hack to make the TextArea work on Android
+                // *according to copilot, but idk it's just a type mismatch without
+                />
           </FormControl>
 
           {/* Rate */}

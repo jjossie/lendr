@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Column, Row, ScrollView, Select, Spacer} from 'native-base';
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import BorrowBrowseItem from "../BorrowBrowseItem";
-import {Tool} from "../../models/tool";
+import {Tool, ToolHydrated} from "../../models/tool";
 import {getToolsWithinRadius} from "../../controllers/tool";
 import {useLocation} from "../../utils/hooks/useLocation";
 
@@ -16,7 +16,7 @@ import {useLocation} from "../../utils/hooks/useLocation";
  */
 const BorrowBrowse: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) => {
 
-  const [toolsList, setToolsList]: [Tool[], any] = useState([]);
+  const [toolsList, setToolsList]: [ToolHydrated[], any] = useState([]);
   const [searchRadius, setSearchRadius] = useState(5);
   const [searchRadiusString, setSearchRadiusString] = useState<SearchRadiusString>("5");
 

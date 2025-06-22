@@ -2,6 +2,8 @@ import {LendrLocation} from "./location";
 import {LendrUser} from "./lendrUser";
 import {Geopoint} from "geofire-common";
 import {Timestamp} from "firebase/firestore";
+import { LendrUserPreview } from "./lendrUser.zod";
+import { RequiredExcept } from "../utils/types/typeUtils";
 
 type Rate = {
   price: number;
@@ -17,11 +19,11 @@ export interface Tool {
   imageUrls: string[];
   lenderUid: string;
   holderUid: string;
-  lender?: LendrUser, // Hydrated after retrieving from firestore
-  holder?: LendrUser, // Must be hydrated... after retrieving from firestore?
-  createdAt: Timestamp;
+  lender?: LendrUserPreview, // Hydrated after retrieving from firestore
+  holder?: LendrUserPreview, // Must be hydrated... after retrieving from firestore?
+  createdAt?: Timestamp;
   deletedAt?: any; // Only for firestore use, deprecated
-  modifiedAt: Timestamp;
+  modifiedAt?: Timestamp;
   rate: Rate,
   preferences: {
     delivery: boolean;
@@ -31,6 +33,8 @@ export interface Tool {
   location: LendrLocation;
   visibility: ToolVisibility;
 }
+
+export type ToolHydrated = RequiredExcept<Tool, 'brand' | 'deletedAt'>;
 
 export interface ToolPreview {
   id: string;

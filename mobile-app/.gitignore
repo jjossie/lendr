@@ -76,3 +76,6 @@ yarn-error.*
 # Ignore build tarballs
 *.tar.gz
 *.tgz
+
+# Firebase/Google config (do not commit to repo)
+GoogleService-Info.plist

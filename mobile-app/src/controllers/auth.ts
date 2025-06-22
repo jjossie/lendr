@@ -1,7 +1,9 @@
 import {createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut, User} from "firebase/auth";
 import {arrayRemove, arrayUnion, doc, getDoc, setDoc, Timestamp, updateDoc} from "firebase/firestore";
 import {db} from "../config/firebase";
-import {LendrUser} from "../models/lendrUser";
+import {LendrUser} from "../models/lendrUser"; // This is the TypeScript interface
+import { LendrUserPreview, LendrUserPreviewSchema, LendrUserSchema, LendrUserValidated } from "../models/lendrUser.zod"; // Zod schema for validation
+import { NotFoundError, ObjectValidationError } from "../utils/errors"; // For error handling
 import {registerForPushNotificationsAsync} from "../config/device/notifications";
 
 
@@ -120,17 +122,55 @@ async function createUserInDB(authUser: User, firstName?: string, lastName?: str
 }
 
 export async function getUserFromAuth(authUser: User): Promise<LendrUser | undefined> {
-  const docSnap = await getDoc(doc(db, "users", authUser.uid));
-  return {
-    uid: docSnap.id,
-    ...docSnap.data(),
-  } as LendrUser;
+  const userDocRef = doc(db, "users", authUser.uid);
+  const docSnap = await getDoc(userDocRef);
+
+  if (!docSnap.exists()) {
+    console.warn(`User document not found for uid: ${authUser.uid}`);
+    return undefined; 
+  }
+
+  const rawData = docSnap.data();
+  const validationResult = LendrUserSchema.safeParse(rawData);
+
+  if (!validationResult.success) {
+    console.error("Validation failed for user data (getUserFromAuth):", authUser.uid, validationResult.error.flatten());
+    throw new ObjectValidationError(`User data validation failed for uid ${authUser.uid}`, validationResult.error);
+  }
+  // LendrUserSchema includes uid, so direct return of data is fine.
+  return validationResult.data;
 }
 
-export async function getUserFromUid(uid: string): Promise<LendrUser | undefined> {
-  const docSnap = await getDoc(doc(db, "users", uid));
-  return {
-    uid: docSnap.id,
-    ...docSnap.data(),
-  } as LendrUser;
+export async function getUserFromUid(uid: string): Promise<LendrUserValidated | undefined> { // TODO can we remove undefined from the signature?
+  const userDocRef = doc(db, "users", uid);
+  const docSnap = await getDoc(userDocRef);
+
+  if (!docSnap.exists()) {
+    console.warn(`User document not found for uid: ${uid}`);
+    // Depending on desired behavior, could throw NotFoundError or return undefined.
+    // Returning undefined is consistent with current signature.
+    throw new NotFoundError(`User with uid ${uid} not found in Firestore.`);
+  }
+
+  const rawData = docSnap.data();
+  // Note: The LendrUserSchema expects fields like firstName, lastName, displayName to be non-empty.
+  // If data in Firestore can violate this, this parse step will fail.
+  const validationResult = LendrUserSchema.safeParse(rawData);
+
+  if (!validationResult.success) {
+    console.error("Validation failed for user data (getUserFromUid):", uid, validationResult.error.flatten());
+    throw new ObjectValidationError(`User data validation failed for uid ${uid}`, validationResult.error);
+  }
+  // LendrUserSchema includes uid, so direct return of data is fine.
+  return validationResult.data;
+}
+
+export async function getUserPreviewFromUid(uid: string): Promise<LendrUserPreview | undefined> {
+  const user = await getUserFromUid(uid);
+  const validationResult = LendrUserPreviewSchema.safeParse(user);
+  if (!validationResult.success) {
+    console.error("Validation failed for user data (getUserPreviewFromUid):", uid, validationResult.error.flatten());
+    throw new ObjectValidationError(`User data validation failed for uid ${uid}`, validationResult.error);
+  } 
+  return validationResult.data;
 }
