@@ -2,7 +2,7 @@ import { z } from "zod";
 import { Timestamp } from "firebase/firestore";
 // It's generally better to have LendrUserPreviewSchema in its own file like 'lendrUser.zod.ts'.
 // LendrUserPreviewSchema is now defined in its own file.
-import { LendrUserPreviewSchema } from "./lendrUser.zod"; 
+import { LendrUserPreview, LendrUserPreviewSchema } from "./lendrUser.zod"; 
 
 // Schema for ChatMessage reaction
 export const ChatReactionSchema = z.object({
@@ -65,3 +65,9 @@ export type ChatReaction = z.infer<typeof ChatReactionSchema>;
 export type ChatMessage = z.infer<typeof ChatMessageSchema>;
 export type Loan = z.infer<typeof LoanSchema>;
 export type RelationValidated = z.infer<typeof RelationSchema>;
+export interface RelationHydrated extends RelationValidated {
+  otherUser: LendrUserPreview;
+  // lastMessage?: ChatMessage;
+  // loans: ILoan[];
+}
+

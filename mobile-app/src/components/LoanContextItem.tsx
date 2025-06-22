@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Button, Column, Row, Text, theme} from 'native-base';
-import {Loan, Relation} from "../models/relation";
+import {Loan} from "../models/relation";
 import Card from "./Card";
 import {Image} from "react-native";
 import {acceptHandoff, startHandoff} from "../controllers/relation";
@@ -8,10 +8,11 @@ import {useAuthentication} from "../utils/hooks/useAuthentication";
 import {useNavigation} from "@react-navigation/native";
 import {Timestamp} from "firebase/firestore";
 import AvailabilityChip from "./AvailabilityChip";
+import { RelationHydrated } from '../models/relation.zod';
 
 export interface LoanContextItemProps {
   loan: Loan;
-  relation: Relation;
+  relation: RelationHydrated;
   verbose?: boolean;
 }
 

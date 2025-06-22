@@ -12,12 +12,6 @@ export interface Relation {
   // Need to figure out how to include subcollection data. Or don't do it at all?
 }
 
-export interface RelationHydrated extends Relation {
-  otherUser: LendrUser;
-  lastMessage: ChatMessage;
-  // loans: ILoan[];
-}
-
 export interface ChatViewListItem {
   id: string // Added after retrieving from firestore
   createdAt: Timestamp;
