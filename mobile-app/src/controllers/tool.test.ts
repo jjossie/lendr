@@ -2,7 +2,7 @@ import { getToolById, getToolsWithinRadius } from "./tool";
 import { ObjectValidationError, NotFoundError } from "../utils/errors";
 import { getCityNameFromGeopoint, distanceBetweenMi } from "../models/location"; // Assuming these are used and need mocking
 import * as geofireCommon from "geofire-common"; // For mocking geohashQueryBounds
-import { getDoc, getDocs, getFirestore } from "firebase/firestore"; // Importing Firestore methods directly for mocking
+import { getDoc, getDocs } from "firebase/firestore"; // Importing Firestore methods directly for mocking
 import { mockTimestamp } from "../../__mocks__/utils.mock";
 
 // Mock Firestore
