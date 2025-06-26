@@ -2,13 +2,14 @@ import {ChatMessage, Loan, Relation} from "../../models/relation";
 import {useEffect, useState} from "react";
 import {useAuthentication} from "./useAuthentication";
 import {getLiveLoans, getLiveMessages, getOtherUserInRelation, getRelationById} from "../../controllers/relation";
+import { RelationHydrated } from "../../models/relation.zod";
 
 export function useChatMessages(relationId: string) {
   console.log("🛠️useChatMessages() - Hook Called");
 
   // State
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [relation, setRelation] = useState<Relation>();
+  const [relation, setRelation] = useState<RelationHydrated>();
   const [loans, setLoans] = useState<Loan[]>([]);
   const {authUser, user} = useAuthentication();
 
@@ -22,8 +23,10 @@ export function useChatMessages(relationId: string) {
         .then((relation) => {
           getLiveMessages(setMessages, authUser, user, relation);
           getLiveLoans(setLoans, authUser, relation);
-          relation.otherUser = getOtherUserInRelation(relation, user);
-          setRelation(relation);
+          setRelation({
+            ...relation,
+            otherUser: getOtherUserInRelation(relation, user)
+          });
         });
 
   }, [authUser, user]);

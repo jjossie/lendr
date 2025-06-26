@@ -23,7 +23,7 @@ import {auth, db} from "../config/firebase";
 import {User} from "firebase/auth";
 import {AuthError, LendrBaseError, NotFoundError, NotImplementedError, ObjectValidationError} from "../utils/errors";
 import {ChatMessage, ChatViewListItem, Loan, Relation} from "../models/relation";
-import { RelationSchema, ChatMessageSchema, LoanSchema, RelationValidated } from "../models/relation.zod";
+import { RelationSchema, ChatMessageSchema, LoanSchema, RelationValidated, RelationHydrated } from "../models/relation.zod";
 import {getUserFromAuth, getUserFromUid} from "./auth";
 import {LendrUser} from "../models/lendrUser";
 import {Dispatch, SetStateAction} from "react";
@@ -124,6 +124,20 @@ export function getOtherUserInRelation(relation: Relation | RelationValidated, u
   // Might need to be adjusted based on types and schema changes.
   return relation.users.filter((chatUser) => chatUser.uid != user.uid)[0] as LendrUserPreview;
 }
+
+export async function getRelationFromLoan(loan: Loan): Promise<{relation: RelationHydrated, loan: Loan}> {
+    const relationID = getRelationId(loan.borrowerUid, loan.lenderUid);
+    const relation = await getRelationById(relationID);
+
+    console.log(`❇️relation ${relationID} : `, JSON.stringify(relation, null, 2));
+    return {
+      relation: {
+        ...relation,
+        otherUser: getOtherUserInRelation(relation, auth.currentUser as User), // Assuming auth.currentUser is always defined here
+      }, 
+    loan}
+};
+
 
 export async function sendChatMessage(receiverUid: string,
                                       text: string,
@@ -286,7 +300,7 @@ export function getLiveChatConversationsList(
 export function getLiveMessages(setMessages: ((messages: any) => any),
                                 authUser: User,
                                 user: LendrUser,
-                                relation: Relation): Unsubscribe | undefined {
+                                relation: RelationValidated): Unsubscribe | undefined {
 
   // This might run before user is initialized - just skip if that's the case
   if (!authUser || !user) return;
@@ -335,7 +349,7 @@ export function getLiveMessages(setMessages: ((messages: any) => any),
  */
 export function getLiveLoans(setLoans: (loans: any) => any,
                              authUser: User,
-                             relation: Relation): Unsubscribe | undefined {
+                             relation: RelationValidated): Unsubscribe | undefined {
   console.log("🤝getLiveLoans()");
   if (!authUser || !relation.id) return;
 

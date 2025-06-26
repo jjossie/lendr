@@ -4,9 +4,10 @@ import Spacer from "../utilities/Spacer";
 import {useNavigation} from "@react-navigation/native";
 import {useMyTools} from "../../utils/hooks/useMyTools";
 import LoanContextItem from "../LoanContextItem";
-import {getRelationById, getRelationId} from "../../controllers/relation";
-import {Loan, Relation} from "../../models/relation";
+import {Loan} from "../../models/relation";
 import {RefreshControl} from 'react-native';
+import { RelationHydrated } from '../../models/relation.zod';
+import { getRelationFromLoan } from '../../controllers/relation';
 
 export interface BorrowerInventoryProps {
 
@@ -18,19 +19,15 @@ const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
   const navigation = useNavigation();
   const {borrowingLoansList, setReload} = useMyTools();
   const [refreshing, setRefreshing] = useState<boolean>(false);
-  const [loansAndRelations, setLoansAndRelations] = React.useState<{loan: Loan, relation: Relation }[]>([]);
-
-  // console.log("🌀BorrowingLoansList:", JSON.stringify(borrowingLoansList, null, 2));
+  const [loansAndRelations, setLoansAndRelations] = React.useState<{loan: Loan, relation: RelationHydrated }[]>([]);
 
   // Side Effects
   useEffect(() => {
-    // console.log("🌀< BorrowerInventory > useEffect()");
-    let promises: Promise<{loan: Loan, relation: Relation }>[] = [];
+    let promises: Promise<{loan: Loan, relation: RelationHydrated }>[] = [];
 
     borrowingLoansList.forEach(loan => promises.push(getRelationFromLoan(loan)));
 
     Promise.all(promises).then((results) => {
-      // console.log("🌀< BorrowerInventory > loansAndRelations results:", JSON.stringify(results, null, 2));
       setLoansAndRelations(results);
     });
   }, [borrowingLoansList]);
@@ -44,14 +41,7 @@ const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
     }, 1000)
   };
 
-  const getRelationFromLoan = async (loan: Loan) => {
-    const relationID = getRelationId(loan.borrowerUid, loan.lenderUid);
-    // console.log(`❇️getting relation ${relationID}`);
-    const relation = await getRelationById(relationID);
-    console.log(`❇️relation ${relationID} : `, JSON.stringify(relation, null, 2));
-    return {relation, loan}
-  };
-
+  
   return (
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <Column p={4} flex={1} h={"100%"}>
