@@ -10,7 +10,8 @@
 		"start": "yarn run shell",
 		"deploy": "firebase deploy --only functions",
 		"logs": "firebase functions:log",
-		"seed": "yarn tsc && node lib/scripts/seedFirestore.js"
+		"seed": "yarn tsc && node lib/scripts/seedFirestore.js",
+		"seed:fix-previews": "yarn tsc && node lib/scripts/fixLendrUserPreviews.js"
 	},
 	"engines": {
 		"node": "20"
