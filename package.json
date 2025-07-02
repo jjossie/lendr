@@ -73,7 +73,7 @@
   "jest": {
     "preset": "jest-expo",
     "transformIgnorePatterns": [
-      "node_modules/(?!(firebase|@firebase|geofire-common|expo-modules-core|@react-native|react-native|@react-navigation|expo|@expo|@expo-google-fonts|react-navigation|@sentry/react-native|native-base|react-native-svg|@react-native-js-polyfills)/)"
+      "node_modules/(?!(firebase|@firebase|geofire-common|expo-modules-core|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base|react-native-svg|@react-native|react-native|@react-native-js-polyfills)/)"
     ],
     "setupFiles": [
       "./jest.setup.js"
