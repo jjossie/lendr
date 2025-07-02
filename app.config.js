@@ -50,9 +50,6 @@ export default {
     "plugins": [
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
-      "@react-native-firebase/firestore",
-      "@react-native-firebase/functions",
-      "@react-native-firebase/storage",
       "@react-native-google-signin/google-signin",
       [
         "expo-build-properties",
