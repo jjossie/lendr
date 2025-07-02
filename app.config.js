@@ -31,7 +31,7 @@ export default {
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.joeljossie.lendr",
-      "googleServicesFile": "./GoogleService-Info.plist",
+      "googleServicesFile": "./.firebase/GoogleService-Info.plist",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -41,7 +41,7 @@ export default {
         "foregroundImage": "./assets/lendr-logo-adaptive-v2-2.png",
         "backgroundColor": "#2e5339"
       },
-      "googleServicesFile": "./GoogleService-Info.plist", // TODO fix,
+      "googleServicesFile": "./.firebase/google-services.json",
       "package": "com.joeljossie.lendr"
     },
     "web": {

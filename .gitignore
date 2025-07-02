@@ -81,3 +81,4 @@ yarn-error.*
 # Firebase/Google config (do not commit to repo)
 GoogleService-Info.plist
 lendr-service-account-key.json
+google-services.json
