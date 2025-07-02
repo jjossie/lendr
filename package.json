@@ -38,8 +38,7 @@
     "expo-splash-screen": "~0.29.22",
     "expo-status-bar": "~2.0.1",
     "expo-updates": "~0.27.3",
-    "firebase": "^10.0.0",
-    "firebaseui": "^6.1.0",
+    "firebase": "^11.10.0",
     "geofire-common": "^6.0.0",
     "native-base": "^3.4.28",
     "node-geocoder": "^4.2.0",
@@ -60,7 +59,6 @@
     "@expo/ngrok": "^4.1.0",
     "@testing-library/react-native": "^13.2.0",
     "@tsconfig/react-native": "^2.0.3",
-    "@types/firebase": "^3.2.3",
     "@types/jest": "^29.5.14",
     "@types/prop-types": "^15",
     "@types/react": "~18.3.12",
@@ -75,10 +73,13 @@
   "jest": {
     "preset": "jest-expo",
     "transformIgnorePatterns": [
-      "node_modules/(?!(firebase|@firebase|geofire-common|((jest-)?react-native)|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)"
+      "node_modules/(?!(firebase|@firebase|geofire-common|expo-modules-core|@react-native|react-native|@react-navigation|expo|@expo|@expo-google-fonts|react-navigation|@sentry/react-native|native-base|react-native-svg|@react-native-js-polyfills)/)"
     ],
     "setupFiles": [
       "./jest.setup.js"
-    ]
+    ],
+    "transform": {
+      "^.+\\.[jt]sx?$": "babel-jest"
+    }
   }
 }
