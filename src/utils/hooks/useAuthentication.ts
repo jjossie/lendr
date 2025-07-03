@@ -1,8 +1,9 @@
 import {useEffect, useState} from 'react';
-import {getAuth, onAuthStateChanged, signOut, User} from 'firebase/auth';
+import {getAuth, onAuthStateChanged, signOut} from '@react-native-firebase/auth';
 import {AuthError} from "../errors";
 import {getUserFromAuth} from "../../controllers/auth";
 import {LendrUser} from "../../models/lendrUser";
+import { AuthUser } from '../firebase.utils';
 
 const auth = getAuth();
 
@@ -16,7 +17,7 @@ const auth = getAuth();
  */
 export function useAuthentication() {
   const [user, setUser] = useState<LendrUser | undefined>(undefined);
-  const [authUser, setAuthUser] = useState<User>();
+  const [authUser, setAuthUser] = useState<AuthUser>();
   const [unsub, setUnsub] = useState<(() => void) | undefined >(undefined);
 
   useEffect(() => {

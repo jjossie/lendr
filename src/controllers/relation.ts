@@ -25,7 +25,7 @@ import { RelationSchema, ChatMessageSchema, LoanSchema, RelationValidated, Relat
 import {getUserFromAuth, getUserFromUid} from "./auth";
 import {LendrUser} from "../models/lendrUser";
 import {Dispatch, SetStateAction} from "react";
-import { callCloudFunction, documentId, QuerySnapshot } from "../utils/firebase.utils";
+import { callCloudFunction, documentId, AuthUser, QuerySnapshot } from "../utils/firebase.utils";
 import { LendrUserPreview } from "../models/lendrUser.zod";
 
 // Constants
@@ -79,7 +79,7 @@ export async function createRelation(otherUserId: string, toolId: string): Promi
   } as Loan);
   console.log("");
 
-  // Add the other uid to each FirebaseAuthTypes.User's relations list
+  // Add the other uid to each AuthUser's relations list
   const usersCollection = collection(db, "users");
   const userDocRef = doc(usersCollection, auth.currentUser.uid);
   const otherUserDocRef = doc(usersCollection, otherUserId);
@@ -117,7 +117,7 @@ export async function getRelationById(relationId: string): Promise<RelationValid
   return { id: relationId, ...validationResult.data };
 }
 
-export function getOtherUserInRelation(relation: Relation | RelationValidated, user: LendrUser | FirebaseAuthTypes.User): LendrUserPreview {
+export function getOtherUserInRelation(relation: Relation | RelationValidated, user: LendrUser | AuthUser): LendrUserPreview {
   // This assumes relation.users is always an array of two users, which is enforced by the schema.
   // Might need to be adjusted based on types and schema changes.
   return relation.users.filter((chatUser) => chatUser.uid != user.uid)[0] as LendrUserPreview;
@@ -131,7 +131,7 @@ export async function getRelationFromLoan(loan: Loan): Promise<{relation: Relati
     return {
       relation: {
         ...relation,
-        otherUser: getOtherUserInRelation(relation, auth.currentUser as FirebaseAuthTypes.User), // Assuming auth.currentUser is always defined here
+        otherUser: getOtherUserInRelation(relation, auth.currentUser as AuthUser), // Assuming auth.currentUser is always defined here
       }, 
     loan}
 };
@@ -178,7 +178,7 @@ export async function requestReturn(relationId: string, loanId: string) {
 export function getLiveChatConversationsList(
   setChats: Dispatch<SetStateAction<ChatViewListItem[]>>,
   setIsLoaded: Dispatch<SetStateAction<boolean>>,
-  authUser: FirebaseAuthTypes.User,
+  authUser: AuthUser,
   lendrUser: LendrUser
 ): Unsubscribe {
   const relationIds = lendrUser.relations.map((id) =>
@@ -296,7 +296,7 @@ export function getLiveChatConversationsList(
  * @param {Relation} relation
  */
 export function getLiveMessages(setMessages: ((messages: any) => any),
-                                authUser: FirebaseAuthTypes.User,
+                                authUser: AuthUser,
                                 user: LendrUser,
                                 relation: RelationValidated): Unsubscribe | undefined {
 
@@ -346,7 +346,7 @@ export function getLiveMessages(setMessages: ((messages: any) => any),
  * @returns {Unsubscribe | undefined} The unsubscribe function if it was successful, undefined otherwise.
  */
 export function getLiveLoans(setLoans: (loans: any) => any,
-                             authUser: FirebaseAuthTypes.User,
+                             authUser: AuthUser,
                              relation: RelationValidated): Unsubscribe | undefined {
   console.log("🤝getLiveLoans()");
   if (!authUser || !relation.id) return;

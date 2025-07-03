@@ -5,6 +5,7 @@ import {LendrUser} from "../models/lendrUser"; // This is the TypeScript interfa
 import { LendrUserPreview, LendrUserPreviewSchema, LendrUserSchema, LendrUserValidated } from "../models/lendrUser.zod"; // Zod schema for validation
 import { NotFoundError, ObjectValidationError } from "../utils/errors"; // For error handling
 import {registerForPushNotificationsAsync} from "../config/device/notifications";
+import { AuthUser } from "../utils/firebase.utils";
 
 
 export function registerUser(firstName: string, lastName: string, email: string, password: string) {
@@ -75,7 +76,7 @@ export async function signOutUser() {
  * @param {string} lastName
  * @returns {Promise<DocumentSnapshot<DocumentData> | void>}
  */
-async function createUserInDB(authUser: FirebaseAuthTypes.User, firstName?: string, lastName?: string) {
+async function createUserInDB(authUser: AuthUser, firstName?: string, lastName?: string) {
 
   // Use the Firebase Auth UID as the document ID in Firestore
   const userDocRef = doc(db, "users", authUser.uid);
@@ -121,7 +122,7 @@ async function createUserInDB(authUser: FirebaseAuthTypes.User, firstName?: stri
   }
 }
 
-export async function getUserFromAuth(authUser: FirebaseAuthTypes.User): Promise<LendrUser | undefined> {
+export async function getUserFromAuth(authUser: AuthUser): Promise<LendrUser | undefined> {
   const userDocRef = doc(db, "users", authUser.uid);
   const docSnap = await getDoc(userDocRef);
 

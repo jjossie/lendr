@@ -2,6 +2,7 @@ import { httpsCallable } from "@react-native-firebase/functions";
 import { LendrBaseError } from "./errors";
 import { functions } from "../config/firebase";
 import { FieldPath, FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+import { FirebaseAuthTypes } from "@react-native-firebase/auth";
 
 export async function callCloudFunction(functionName: string, requestData: any) {
     console.log(`🤝Calling Cloud Function ${functionName} with data: ${JSON.stringify(requestData)}`);
@@ -21,3 +22,4 @@ export async function callCloudFunction(functionName: string, requestData: any) 
   
 export type DocumentData = FirebaseFirestoreTypes.DocumentData;
 export type QuerySnapshot = FirebaseFirestoreTypes.QuerySnapshot;
+export type AuthUser = FirebaseAuthTypes.User;
