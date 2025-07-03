@@ -2,8 +2,8 @@ global.self = global;
 
 const { MockFirestore } = require("./__mocks__/utils.mock");
 
-jest.mock("firebase/firestore", () => {
-  const ActualFirestore = jest.requireActual("firebase/firestore");
+jest.mock("@react-native-firebase/firestore", () => {
+  const ActualFirestore = jest.requireActual("@react-native-firebase/firestore");
   return {
     ...ActualFirestore,
     ...MockFirestore

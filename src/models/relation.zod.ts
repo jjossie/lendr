@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "@react-native-firebase/firestore";
 // It's generally better to have LendrUserPreviewSchema in its own file like 'lendrUser.zod.ts'.
 // LendrUserPreviewSchema is now defined in its own file.
 import { LendrUserPreview, LendrUserPreviewSchema } from "./lendrUser.zod"; 

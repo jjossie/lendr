@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "@react-native-firebase/firestore";
 
 // Based on firebase-project/functions/src/models/lendrUser.model.ts lendrUserPreviewSchema
 // and mobile-app/src/models/lendrUser.ts LendrUserPreview interface

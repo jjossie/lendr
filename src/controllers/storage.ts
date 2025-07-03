@@ -1,4 +1,4 @@
-import {deleteObject, getDownloadURL, getStorage, ref, uploadBytes} from "firebase/storage";
+import {deleteObject, getDownloadURL, getStorage, ref, uploadBytes} from "@react-native-firebase/storage";
 import {LendrBaseError} from "../utils/errors";
 
 export const uploadToolImageToFirebase = async (localImageUri: string, toolId: string, index: number = 0) => {

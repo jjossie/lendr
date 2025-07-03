@@ -1,6 +1,7 @@
-import { httpsCallable } from "firebase/functions";
+import { httpsCallable } from "@react-native-firebase/functions";
 import { LendrBaseError } from "./errors";
 import { functions } from "../config/firebase";
+import { FieldPath, FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 
 export async function callCloudFunction(functionName: string, requestData: any) {
     console.log(`🤝Calling Cloud Function ${functionName} with data: ${JSON.stringify(requestData)}`);
@@ -15,3 +16,8 @@ export async function callCloudFunction(functionName: string, requestData: any) 
       throw new LendrBaseError(`Something went wrong calling the cloud function ${functionName}: ${JSON.stringify(e, null, 2)}`);
     }
   }
+
+  export const documentId = () => { return new FieldPath("__name__")};
+  
+export type DocumentData = FirebaseFirestoreTypes.DocumentData;
+export type QuerySnapshot = FirebaseFirestoreTypes.QuerySnapshot;

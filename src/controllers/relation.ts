@@ -3,31 +3,29 @@ import {
   arrayUnion,
   collection,
   doc,
-  DocumentData,
-  documentId,
   getDoc,
   getDocs,
   limit,
   onSnapshot,
   orderBy,
   query,
-  QuerySnapshot,
   serverTimestamp,
   setDoc,
   Timestamp,
   Unsubscribe,
   updateDoc,
   where,
-} from "firebase/firestore";
+  FirebaseFirestoreTypes,
+} from "@react-native-firebase/firestore";
 import {auth, db} from "../config/firebase";
-import {User} from "firebase/auth";
+import {FirebaseAuthTypes} from "@react-native-firebase/auth";
 import {AuthError, LendrBaseError, NotFoundError, NotImplementedError, ObjectValidationError} from "../utils/errors";
 import {ChatMessage, ChatViewListItem, Loan, Relation} from "../models/relation";
 import { RelationSchema, ChatMessageSchema, LoanSchema, RelationValidated, RelationHydrated } from "../models/relation.zod";
 import {getUserFromAuth, getUserFromUid} from "./auth";
 import {LendrUser} from "../models/lendrUser";
 import {Dispatch, SetStateAction} from "react";
-import { callCloudFunction } from "../utils/firebase.utils";
+import { callCloudFunction, documentId, QuerySnapshot } from "../utils/firebase.utils";
 import { LendrUserPreview } from "../models/lendrUser.zod";
 
 // Constants
@@ -81,7 +79,7 @@ export async function createRelation(otherUserId: string, toolId: string): Promi
   } as Loan);
   console.log("");
 
-  // Add the other uid to each User's relations list
+  // Add the other uid to each FirebaseAuthTypes.User's relations list
   const usersCollection = collection(db, "users");
   const userDocRef = doc(usersCollection, auth.currentUser.uid);
   const otherUserDocRef = doc(usersCollection, otherUserId);
@@ -119,7 +117,7 @@ export async function getRelationById(relationId: string): Promise<RelationValid
   return { id: relationId, ...validationResult.data };
 }
 
-export function getOtherUserInRelation(relation: Relation | RelationValidated, user: LendrUser | User): LendrUserPreview {
+export function getOtherUserInRelation(relation: Relation | RelationValidated, user: LendrUser | FirebaseAuthTypes.User): LendrUserPreview {
   // This assumes relation.users is always an array of two users, which is enforced by the schema.
   // Might need to be adjusted based on types and schema changes.
   return relation.users.filter((chatUser) => chatUser.uid != user.uid)[0] as LendrUserPreview;
@@ -133,7 +131,7 @@ export async function getRelationFromLoan(loan: Loan): Promise<{relation: Relati
     return {
       relation: {
         ...relation,
-        otherUser: getOtherUserInRelation(relation, auth.currentUser as User), // Assuming auth.currentUser is always defined here
+        otherUser: getOtherUserInRelation(relation, auth.currentUser as FirebaseAuthTypes.User), // Assuming auth.currentUser is always defined here
       }, 
     loan}
 };
@@ -180,7 +178,7 @@ export async function requestReturn(relationId: string, loanId: string) {
 export function getLiveChatConversationsList(
   setChats: Dispatch<SetStateAction<ChatViewListItem[]>>,
   setIsLoaded: Dispatch<SetStateAction<boolean>>,
-  authUser: User,
+  authUser: FirebaseAuthTypes.User,
   lendrUser: LendrUser
 ): Unsubscribe {
   const relationIds = lendrUser.relations.map((id) =>
@@ -195,7 +193,7 @@ export function getLiveChatConversationsList(
   const unsubscribe = onSnapshot(relationsQuery, async (snapshot) => {
     const docDataList: ChatViewListItem[] = [];
     const validRelationsData: { relation: RelationValidated; otherUser: LendrUserPreview; id: string }[] = [];
-    const lastMessagePromises: Promise<QuerySnapshot<DocumentData>>[] = [];
+    const lastMessagePromises: Promise<QuerySnapshot>[] = [];
 
     snapshot.forEach(async (relationDocument) => {
       if (!relationDocument || !relationDocument.exists()) {
@@ -298,7 +296,7 @@ export function getLiveChatConversationsList(
  * @param {Relation} relation
  */
 export function getLiveMessages(setMessages: ((messages: any) => any),
-                                authUser: User,
+                                authUser: FirebaseAuthTypes.User,
                                 user: LendrUser,
                                 relation: RelationValidated): Unsubscribe | undefined {
 
@@ -314,7 +312,7 @@ export function getLiveMessages(setMessages: ((messages: any) => any),
       orderBy("createdAt", "desc"),
       limit(MESSAGE_LOAD_LIMIT),
   );
-  return onSnapshot(messagesQuery, (snapshot: QuerySnapshot<DocumentData>) => {
+  return onSnapshot(messagesQuery, (snapshot: QuerySnapshot) => {
     const messages: ChatMessage[] = [];
     snapshot.forEach(messageSnap => {
       const rawData = messageSnap.data();
@@ -348,7 +346,7 @@ export function getLiveMessages(setMessages: ((messages: any) => any),
  * @returns {Unsubscribe | undefined} The unsubscribe function if it was successful, undefined otherwise.
  */
 export function getLiveLoans(setLoans: (loans: any) => any,
-                             authUser: User,
+                             authUser: FirebaseAuthTypes.User,
                              relation: RelationValidated): Unsubscribe | undefined {
   console.log("🤝getLiveLoans()");
   if (!authUser || !relation.id) return;
@@ -357,7 +355,7 @@ export function getLiveLoans(setLoans: (loans: any) => any,
       collection(db, "relations", relation.id, "loans"),
       orderBy("inquiryDate", "desc"), //TODO fix inquiry date problem: this rejects docs w/o an inquiry date
   );
-  return onSnapshot(loansQuery, (snapshot: QuerySnapshot<DocumentData>) => {
+  return onSnapshot(loansQuery, (snapshot: QuerySnapshot) => {
     const loans: Loan[] = [];
     snapshot.forEach(async loanSnap => {
       const rawData = loanSnap.data();

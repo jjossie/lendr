@@ -1,5 +1,5 @@
 import React, {Dispatch, SetStateAction} from 'react';
-import {collection, collectionGroup, onSnapshot, query, where} from "firebase/firestore";
+import {collection, collectionGroup, onSnapshot, query, where} from "@react-native-firebase/firestore";
 import {db} from "../../config/firebase";
 import {Tool} from "../../models/tool";
 import {useAuthentication} from "./useAuthentication";

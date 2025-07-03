@@ -2,28 +2,27 @@ import {
   collection,
   deleteDoc,
   doc,
-  DocumentData,
   endAt,
   getDoc,
   getDocs,
   orderBy,
   query,
-  QuerySnapshot,
   serverTimestamp,
   setDoc,
   startAt,
   Timestamp,
   where,
-} from "firebase/firestore";
+} from "@react-native-firebase/firestore";
 import {db} from "../config/firebase";
 import {Tool, ToolForm, ToolHydrated} from "../models/tool";
 import {ToolModelSchema, ToolValidated} from "../models/tool.zod";
-import {getAuth} from "firebase/auth";
+import {getAuth} from "@react-native-firebase/auth";
 import {AuthError, NotFoundError, ObjectValidationError} from "../utils/errors";
 
 import {Geopoint} from "geofire-common";
 import {distanceBetweenMi, getCityNameFromGeopoint, getGeohashedLocation, metersFromMiles} from "../models/location";
 import { getUserFromUid, getUserPreviewFromUid } from "./auth";
+import { QuerySnapshot } from "../utils/firebase.utils";
 
 const geofire = require("geofire-common");
 
@@ -255,7 +254,7 @@ export async function getToolsWithinRadius(radiusMi: number, center: Geopoint): 
   const radiusM = metersFromMiles(radiusMi);
 
   const bounds = geofire.geohashQueryBounds(center, radiusM);
-  const promises: Promise<QuerySnapshot<DocumentData>>[] = [];
+  const promises: Promise<QuerySnapshot>[] = [];
 
   bounds.forEach((bound: any) => {
     const q = query(

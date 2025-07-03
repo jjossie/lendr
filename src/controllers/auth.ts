@@ -1,5 +1,5 @@
-import {createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut, User} from "firebase/auth";
-import {arrayRemove, arrayUnion, doc, getDoc, setDoc, Timestamp, updateDoc} from "firebase/firestore";
+import {createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut, FirebaseAuthTypes} from "@react-native-firebase/auth";
+import {arrayRemove, arrayUnion, doc, getDoc, setDoc, Timestamp, updateDoc} from "@react-native-firebase/firestore";
 import {db} from "../config/firebase";
 import {LendrUser} from "../models/lendrUser"; // This is the TypeScript interface
 import { LendrUserPreview, LendrUserPreviewSchema, LendrUserSchema, LendrUserValidated } from "../models/lendrUser.zod"; // Zod schema for validation
@@ -75,7 +75,7 @@ export async function signOutUser() {
  * @param {string} lastName
  * @returns {Promise<DocumentSnapshot<DocumentData> | void>}
  */
-async function createUserInDB(authUser: User, firstName?: string, lastName?: string) {
+async function createUserInDB(authUser: FirebaseAuthTypes.User, firstName?: string, lastName?: string) {
 
   // Use the Firebase Auth UID as the document ID in Firestore
   const userDocRef = doc(db, "users", authUser.uid);
@@ -121,7 +121,7 @@ async function createUserInDB(authUser: User, firstName?: string, lastName?: str
   }
 }
 
-export async function getUserFromAuth(authUser: User): Promise<LendrUser | undefined> {
+export async function getUserFromAuth(authUser: FirebaseAuthTypes.User): Promise<LendrUser | undefined> {
   const userDocRef = doc(db, "users", authUser.uid);
   const docSnap = await getDoc(userDocRef);
 

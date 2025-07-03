@@ -6,7 +6,7 @@ import {Image} from "react-native";
 import {acceptHandoff, startHandoff} from "../controllers/relation";
 import {useAuthentication} from "../utils/hooks/useAuthentication";
 import {useNavigation} from "@react-navigation/native";
-import {Timestamp} from "firebase/firestore";
+import {Timestamp} from '@react-native-firebase/firestore';
 import AvailabilityChip from "./AvailabilityChip";
 import { RelationHydrated } from '../models/relation.zod';
 

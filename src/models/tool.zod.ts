@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from "@react-native-firebase/firestore";
 import { LendrUserPreviewSchema } from "./lendrUser.zod"; // Import LendrUserPreviewSchema
 
 // Schema for the 'rate' object

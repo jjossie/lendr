@@ -1,7 +1,6 @@
 import {LendrLocation} from "./location";
-import {LendrUser} from "./lendrUser";
 import {Geopoint} from "geofire-common";
-import {Timestamp} from "firebase/firestore";
+import {Timestamp} from "@react-native-firebase/firestore";
 import { LendrUserPreview } from "./lendrUser.zod";
 import { RequiredExcept } from "../utils/types/typeUtils";
 
