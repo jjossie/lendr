@@ -55,6 +55,7 @@ export default {
         "expo-build-properties",
         {
           "ios": {
+            "deploymentTarget": "17.0",
             "useFrameworks": "static"
           }
         }
