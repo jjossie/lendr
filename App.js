@@ -1,20 +1,13 @@
 // import "expo-dev-client";
-
-import {app} from "./src/config/firebase";
-
 import {CustomNativeBaseProvider} from "./src/components/CustomNativeBaseProvider";
 import {LogBox} from "react-native";
-
-import {useEffect, useState} from "react";
 import AuthStack from "./src/components/navigation/AuthStack";
 import {useAuthentication} from "./src/utils/hooks/useAuthentication";
 import {NavigationContainer} from "@react-navigation/native";
 import MainTabNavigator from "./src/components/navigation/MainTabNavigator";
 import "./src/config/algolia";
 import "./src/config/googlesignin";
-import {onAuthStateChanged, getAuth} from "@react-native-firebase/auth";
 // import * as Linking from 'expo-linking';
-// import {Center, Text} from "native-base";
 
 
 // const prefix = Linking.createURL('/');
@@ -29,37 +22,20 @@ LogBox.ignoreLogs([
 
 export default function App() {
   // "Initializing" state var might be necessary later, but doesn't seem essential rn
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
   // const linking = {
   //   prefixes: [prefix],
   // };
 
-  function handleAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
-
-  useEffect(() => {
-    console.log("App initializing (useEffect) ", initializing);
-    // if (!app) {
-    //   setInitializing(true);
-    // }
-    const subscriber = onAuthStateChanged(getAuth(), handleAuthStateChanged);
-    return subscriber;
-  }, [])
-
-  // const {authUser} = useAuthentication();
+  const {authUser, initializing} = useAuthentication();
 
   if (initializing) return null;
-  // if (authUser) console.log(authUser.email);
   else console.log("Done Initializing");
 
   return (
     <CustomNativeBaseProvider>
       <NavigationContainer>
       {/*<NavigationContainer linking={linking} fallback={<Center><Text>Loading...</Text></Center>}>*/}
-        {user
+        {authUser
           ? <MainTabNavigator/>
           : <AuthStack/>
         }

@@ -8,53 +8,49 @@ import { AuthUser } from '../firebase.utils';
 const auth = getAuth();
 
 /**
- * Custom hook that will return a React State variable that represents the currently logged-in user.
- * It's important to note that this will typically return undefined at first, then will run again
- * and return the properly initialized User object. Components (and, therefore, hooks) should be
- * able to handle this user object potentially being undefined. You can't just guard and early exit
- * a hook that depends on the user because it may break React's rules of hooks to do a different order.
- * @returns {{user: User | undefined}}
+ * Custom hook that returns the current authenticated user and their corresponding LendrUser profile.
+ * Initially, both values may be undefined while authentication state is being determined.
+ * Components using this hook should handle the possibility of undefined values without early exits.
+ * 
+ * @returns {{
+ *   authUser: AuthUser | undefined,
+ *   user: LendrUser | undefined,
+ *   initializing: boolean
+ * }}
  */
 export function useAuthentication() {
-  console.log("Initializing useAuthentication hook. Auth: ", auth);
   
   const [user, setUser] = useState<LendrUser | undefined>(undefined);
   const [authUser, setAuthUser] = useState<AuthUser>();
-  const [unsub, setUnsub] = useState<(() => void) | undefined >(undefined);
+  const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
-    console.log("Setting up auth state listener");
     const unsubscribeFromAuthStatusChanged = onAuthStateChanged(auth, (foundUser) => {
-      console.log("Auth state changed, foundUser: ", foundUser);
       if (foundUser) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/firebase.User
+        // User is signed in
         setAuthUser(foundUser);
-        console.log("User is signed in, foundUser: ", foundUser); 
 
         // Get the Lendr foundUser from Firestore
         getUserFromAuth(foundUser)
             .then(u => setUser(u as LendrUser))
-            .catch(e => console.log(e.message));
+            .catch(e => console.warn(e.message));
+
+        if (initializing) setInitializing(false);
 
       } else {
-        console.log("User is signed out, foundUser: ", foundUser);
         // User is signed out
         signOut(auth)
             .then(() => setAuthUser(undefined))
             .catch(() => {throw new AuthError("Somehow we failed to sign out 🤨")});
       }
     });
-    // setUnsub(unsubscribeFromAuthStatusChanged); // Apparently this prevents being able to log in at all 🫢
     return () => {unsubscribeFromAuthStatusChanged();};
   }, []);
 
-  console.log("Auth user: ", authUser);
-  console.log("User: ", user);
 
   return {
     authUser,
     user,
-    // unsub
+    initializing
   };
 }
