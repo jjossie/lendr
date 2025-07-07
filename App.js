@@ -12,6 +12,7 @@ import {NavigationContainer} from "@react-navigation/native";
 import MainTabNavigator from "./src/components/navigation/MainTabNavigator";
 import "./src/config/algolia";
 import "./src/config/googlesignin";
+import {onAuthStateChanged, getAuth} from "@react-native-firebase/auth";
 // import * as Linking from 'expo-linking';
 // import {Center, Text} from "native-base";
 
@@ -28,27 +29,37 @@ LogBox.ignoreLogs([
 
 export default function App() {
   // "Initializing" state var might be necessary later, but doesn't seem essential rn
-  const [initializing, setInitializing] = useState(false);
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState();
   // const linking = {
   //   prefixes: [prefix],
   // };
 
+  function handleAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
+
   useEffect(() => {
-    if (!app) {
-      setInitializing(true);
-    }
+    console.log("App initializing (useEffect) ", initializing);
+    // if (!app) {
+    //   setInitializing(true);
+    // }
+    const subscriber = onAuthStateChanged(getAuth(), handleAuthStateChanged);
+    return subscriber;
   }, [])
 
-  const {authUser} = useAuthentication();
+  // const {authUser} = useAuthentication();
 
   if (initializing) return null;
-  if (authUser) console.log(authUser.email);
+  // if (authUser) console.log(authUser.email);
+  else console.log("Done Initializing");
 
   return (
     <CustomNativeBaseProvider>
       <NavigationContainer>
       {/*<NavigationContainer linking={linking} fallback={<Center><Text>Loading...</Text></Center>}>*/}
-        {authUser
+        {user
           ? <MainTabNavigator/>
           : <AuthStack/>
         }

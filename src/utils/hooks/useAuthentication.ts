@@ -16,16 +16,21 @@ const auth = getAuth();
  * @returns {{user: User | undefined}}
  */
 export function useAuthentication() {
+  console.log("Initializing useAuthentication hook. Auth: ", auth);
+  
   const [user, setUser] = useState<LendrUser | undefined>(undefined);
   const [authUser, setAuthUser] = useState<AuthUser>();
   const [unsub, setUnsub] = useState<(() => void) | undefined >(undefined);
 
   useEffect(() => {
+    console.log("Setting up auth state listener");
     const unsubscribeFromAuthStatusChanged = onAuthStateChanged(auth, (foundUser) => {
+      console.log("Auth state changed, foundUser: ", foundUser);
       if (foundUser) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/firebase.User
         setAuthUser(foundUser);
+        console.log("User is signed in, foundUser: ", foundUser); 
 
         // Get the Lendr foundUser from Firestore
         getUserFromAuth(foundUser)
@@ -33,6 +38,7 @@ export function useAuthentication() {
             .catch(e => console.log(e.message));
 
       } else {
+        console.log("User is signed out, foundUser: ", foundUser);
         // User is signed out
         signOut(auth)
             .then(() => setAuthUser(undefined))
@@ -42,6 +48,9 @@ export function useAuthentication() {
     // setUnsub(unsubscribeFromAuthStatusChanged); // Apparently this prevents being able to log in at all 🫢
     return () => {unsubscribeFromAuthStatusChanged();};
   }, []);
+
+  console.log("Auth user: ", authUser);
+  console.log("User: ", user);
 
   return {
     authUser,
