@@ -42,3 +42,12 @@ export const MockFirestore = {
     where: jest.fn(),
     query: jest.fn(),
   }
+
+
+export const MockAuth = {
+  signInWithEmailAndPassword: jest.fn(),
+  createUserWithEmailAndPassword: jest.fn(),
+  signOut: jest.fn(),
+  onAuthStateChanged: jest.fn(),
+  currentUser: null,
+};

@@ -1,4 +1,3 @@
-// import "expo-dev-client";
 import {CustomNativeBaseProvider} from "./src/components/CustomNativeBaseProvider";
 import {LogBox} from "react-native";
 import AuthStack from "./src/components/navigation/AuthStack";

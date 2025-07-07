@@ -71,17 +71,5 @@
     "react-dom": "18.3.1"
   },
   "private": true,
-  "packageManager": "yarn@4.8.1",
-  "jest": {
-    "preset": "jest-expo",
-    "transformIgnorePatterns": [
-      "node_modules/(?!(firebase|@firebase|geofire-common|expo-modules-core|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base|react-native-svg|@react-native|react-native|@react-native-js-polyfills)/)"
-    ],
-    "setupFiles": [
-      "./jest.setup.js"
-    ],
-    "transform": {
-      "^.+\\.[jt]sx?$": "babel-jest"
-    }
-  }
+  "packageManager": "yarn@4.8.1"
 }
