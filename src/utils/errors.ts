@@ -1,6 +1,6 @@
 export class LendrBaseError extends Error {
   constructor(message?: string) {
-    super("⚠️🛠Lendr Error 🛠⚠️ " + message ?? "");
+    super("⚠️🛠Lendr Error 🛠⚠️ " + message);
   }
 }
 
