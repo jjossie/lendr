@@ -10,7 +10,6 @@
     "web": "expo start --web",
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "typecheck": "tsc --noEmit",
     "build:clean": "yarn typecheck && yarn expo prebuild --clean",
     "build:superclean": "rm -rf node_modules && rm yarn.lock && yarn install && yarn build:clean"
