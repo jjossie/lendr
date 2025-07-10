@@ -1,4 +1,4 @@
-import {deleteObject, getDownloadURL, getStorage, ref, uploadBytes} from "@react-native-firebase/storage";
+import {deleteObject, getDownloadURL, getStorage, putFile, ref, uploadBytes} from "@react-native-firebase/storage";
 import {LendrBaseError} from "../utils/errors";
 
 export const uploadToolImageToFirebase = async (localImageUri: string, toolId: string, index: number = 0) => {
@@ -10,19 +10,20 @@ export const uploadToolImageToFirebase = async (localImageUri: string, toolId: s
     const storage = getStorage();
     // Get file blob from device
     const response = await fetch(localImageUri);
-    console.log("🗃️Device file: ", JSON.stringify(response.url));
-    const blob = await response.blob();
+    if (!response.ok) {
+      throw new LendrBaseError(`Failed to fetch image from device: ${response.statusText}`);
+    }
 
     // Get Image Reference
     const imageRef = ref(storage, getStorageUrlForToolImage(toolId, index));
     console.log("🗃imageRef: ", JSON.stringify(imageRef.fullPath));
-
+    
     // Upload file to Firebase Storage
-    const uploadResult = await uploadBytes(imageRef, blob);
-    console.log("🗃uploadResult: ", JSON.stringify(uploadResult.metadata.fullPath));
+    const uploadTask = await putFile(imageRef, localImageUri);
+    console.log("🗃uploadTask: ", uploadTask);
 
     // Get the public download URL of the uploaded image
-    const downloadUrl = await getDownloadURL(uploadResult.ref);
+    const downloadUrl = await getDownloadURL(imageRef);
     console.log("🗃downloadUrl: ", downloadUrl);
 
     return downloadUrl;
