@@ -12,7 +12,9 @@
     "test:watch": "jest --watchAll",
     "typecheck": "tsc --noEmit",
     "build:clean": "yarn typecheck && yarn expo prebuild --clean",
-    "build:superclean": "rm -rf node_modules && rm yarn.lock && yarn install && yarn build:clean"
+    "build:superclean": "rm -rf node_modules && rm yarn.lock && yarn install && yarn build:clean",
+    "lint": "eslint . --config eslint.config.mjs",
+    "lint:fix": "eslint . --config eslint.config.mjs --fix"
   },
   "dependencies": {
     "@expo-google-fonts/epilogue": "^0.2.3",
