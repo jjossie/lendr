@@ -30,6 +30,6 @@ export function useChatMessages(relationId: string) {
         });
 
   }, [authUser, user]);
-  console.log("🛠️useChatMessage() - Returning Loans: ", JSON.stringify(loans[0], null, 2));
+  console.log("🛠️useChatMessage() - Returning Loans: ", loans[0]);
   return {messages, relation, loans};
 }

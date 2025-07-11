@@ -41,8 +41,10 @@ const ToolDetail: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) 
 
       navigation.navigate("Inbox", {
         screen: "ChatConversation",
-        relationId,
-        draftMessage: `Hey, I'm interested in this ${toolData?.name ?? "tool"}!`,
+        params: {
+          relationId,
+          draftMessage: `Hey, I'm interested in this ${toolData?.name ?? "tool"}!`,
+        },
       });
     } catch (e) {
       console.log("🌀Failed to create relation", e);

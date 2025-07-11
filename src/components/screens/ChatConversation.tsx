@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Box, ChevronRightIcon, Column, IconButton, Input, KeyboardAvoidingView, Row, theme} from 'native-base';
+import {Box, Center, ChevronRightIcon, Column, IconButton, Input, KeyboardAvoidingView, Row, Spinner, theme} from 'native-base';
 import {NativeStackScreenProps} from "@react-navigation/native-stack";
 import {useChatMessages} from "../../utils/hooks/useChatMessages";
 import {useAuthentication} from "../../utils/hooks/useAuthentication";
@@ -18,10 +18,14 @@ import LoanContext from "../LoanContext";
 
 const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
 
+  if (!route.params?.relationId) {
+    throw new LendrBaseError("❇️ChatConversation screen requires a relationId parameter");
+  }
+
   // Content State
   const [messageText, setMessageText] = useState<string>(route.params?.draftMessage ?? "");
   const [screenTitle, setScreenTitle] = useState<string>(route.params?.title ?? "");
-  const {messages, relation, loans} = useChatMessages(route.params?.relationId);
+  const {messages, relation, loans} = useChatMessages(route.params.relationId);
   const {user} = useAuthentication();
   
   console.log("🌀 ChatConversation screen title: ", screenTitle);
@@ -67,7 +71,13 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
   }, [relation])
 
   // State Guards
-  if (!user || !relation) return null;
+   if (!user || !relation) {
+    return (
+        <Center flex={1}>
+          <Spinner size="lg" accessibilityLabel="Loading messages"/>
+        </Center>
+    );
+  }
 
 
   return (

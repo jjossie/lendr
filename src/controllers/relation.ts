@@ -15,10 +15,8 @@ import {
   Unsubscribe,
   updateDoc,
   where,
-  FirebaseFirestoreTypes,
 } from "@react-native-firebase/firestore";
 import {auth, db} from "../config/firebase";
-import {FirebaseAuthTypes} from "@react-native-firebase/auth";
 import {AuthError, LendrBaseError, NotFoundError, NotImplementedError, ObjectValidationError} from "../utils/errors";
 import {ChatMessage, ChatViewListItem, Loan, Relation} from "../models/relation";
 import { RelationSchema, ChatMessageSchema, LoanSchema, RelationValidated, RelationHydrated } from "../models/relation.zod";
@@ -348,7 +346,7 @@ export function getLiveMessages(setMessages: ((messages: any) => any),
 export function getLiveLoans(setLoans: (loans: any) => any,
                              authUser: AuthUser,
                              relation: RelationValidated): Unsubscribe | undefined {
-  console.log("🤝getLiveLoans()");
+  console.log("🤝 getLiveLoans()");
   if (!authUser || !relation.id) return;
 
   const loansQuery = query(
@@ -366,7 +364,7 @@ export function getLiveLoans(setLoans: (loans: any) => any,
 
       const validationResult = LoanSchema.safeParse(rawData);
       if (!validationResult.success) {
-        console.error("Validation failed for loan:", loanSnap.id, validationResult.error.flatten());
+        console.error("🤝 Validation failed for loan:", loanSnap.id, validationResult.error.issues);
         return; // Skip this loan
       }
       
