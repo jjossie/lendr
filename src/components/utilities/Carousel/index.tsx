@@ -39,7 +39,7 @@ export const Carousel: React.FC<CarouselProps> = ({items, variant = "slides", it
     }
   };
 
-  let bullets = [];
+  const bullets = [];
   for (let i = 1; i <= intervals; i++) {
     bullets.push(
         <Text

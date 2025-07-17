@@ -71,7 +71,7 @@ const ToolImagePicker: React.FC<ImagePickerProps> = ({
       // setSelectedImage(result.assets[0].uri);
       setSelectedImages(result.assets.map((asset) => asset.uri));
 
-      let promises: Promise<any>[] = [];
+      const promises: Promise<any>[] = [];
       result.assets.forEach((asset, index) => {
         console.log(`✳️I promise I'll add ${asset.uri}`);
         promises.push(onSelectImage(asset.uri, index));

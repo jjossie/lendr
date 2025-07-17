@@ -368,7 +368,7 @@ export function getLiveLoans(setLoans: (loans: any) => any,
         return; // Skip this loan
       }
       
-      let validatedLoanData = validationResult.data;
+      const validatedLoanData = validationResult.data;
 
       // The commented-out tool hydration logic can be revisited later.
       // For now, validatedLoanData.tool will be whatever z.any() parsed.

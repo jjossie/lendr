@@ -81,7 +81,7 @@ async function createUserInDB(authUser: AuthUser, firstName?: string, lastName?:
   // Use the Firebase Auth UID as the document ID in Firestore
   const userDocRef = doc(db, "users", authUser.uid);
   const token = await registerForPushNotificationsAsync();
-  let userDocSnap = await getDoc(userDocRef);
+  const userDocSnap = await getDoc(userDocRef);
 
   const displayName = authUser.displayName ?? `${firstName} ${lastName}`;
 
@@ -93,7 +93,7 @@ async function createUserInDB(authUser: AuthUser, firstName?: string, lastName?:
   // Create the user if it doesn't exist; otherwise, just update the Expo push tokens // TODO simplify that logic
   if (!userDocSnap.exists()) {
     console.log(`Creating user ${authUser.email} with uid ${authUser.uid} in firestore`);
-    let lendrUser: LendrUser = {
+    const lendrUser: LendrUser = {
       relations: [],
       uid: authUser.uid,
       providerData: {

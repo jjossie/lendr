@@ -178,7 +178,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     setIsLoading(true);
     setIsError(false);
 
-    let toolForm: ToolForm = {
+    const toolForm: ToolForm = {
       name,
       imageUrls,
       description,
@@ -213,7 +213,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
     // setIsLoading(true);
     setIsError(false);
 
-    let toolForm: ToolForm = {
+    const toolForm: ToolForm = {
       name,
       imageUrls,
       description,

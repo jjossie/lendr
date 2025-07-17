@@ -136,7 +136,7 @@ const theme = extendTheme({
 const colorModeManager: StorageManager = {
   get: async () => {
     try {
-      let val = await AsyncStorage.getItem("@my-app-color-mode");
+      const val = await AsyncStorage.getItem("@my-app-color-mode");
       return val === "dark" ? "dark" : "light";
     } catch (e) {
       console.log(e);

@@ -162,7 +162,7 @@ export async function deleteTool(toolId: string) {
  */
 export async function getAllTools(): Promise<Tool[]> {
   const querySnapshot = await getDocs(collection(db, "tools"));
-  let tools: Tool[] = [];
+  const tools: Tool[] = [];
   querySnapshot.forEach(doc => {
     const docData = doc.data();
     if (!docData) {
@@ -214,7 +214,7 @@ export async function getToolById(toolId: string, userGeopoint?: Geopoint): Prom
 
 async function hydrateTool(validatedToolData: ToolValidated, toolId: string, userGeopoint: Geopoint | undefined): Promise<ToolHydrated> {
   const geopoint: Geopoint = [validatedToolData.location.latitude, validatedToolData.location.longitude];
-  let resultTool: Tool = {
+  const resultTool: Tool = {
     id: toolId, // id comes from the document snapshot, not from validatedToolData initially
     ...validatedToolData, // Spread validated data
   };

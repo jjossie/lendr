@@ -4,6 +4,7 @@ import prettier from "eslint-config-prettier";
 
 export default [
   // js.configs.recommended,
+  tseslint.configs.eslintRecommended,
   prettier,
   {
     files: ["**/*.{js,jsx,ts,tsx}"],

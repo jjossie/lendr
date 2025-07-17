@@ -75,7 +75,7 @@ let requestCount = 0;
 export async function getDeviceLocation() {
   const requestId = requestCount++;
   // Courtesy of ChatGPT
-  let { status } = await requestForegroundPermissionsAsync();
+  const { status } = await requestForegroundPermissionsAsync();
   if (status !== 'granted')
     throw new LendrBaseError('Permission to access location was denied');
   try {

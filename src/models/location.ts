@@ -147,7 +147,7 @@ export async function getGeopointFromCityName(city: string, state?: string): Pro
   const geocodeService = GeocodeService.getInstance();
   
   // Given a city name, find the geopoint
-  let options: any = {city: city};
+  const options: any = {city: city};
   if (state)
     options.state = state;
   const response = await geocodeService.geocode(options);
@@ -176,7 +176,7 @@ export async function getCityNameFromGeopoint(geopoint: Geopoint): Promise<strin
       .filter(element => element);
 
   let cityString = "";
-  for (let localityElement of locality) {
+  for (const localityElement of locality) {
     if (localityElement) {
       cityString += localityElement;
       cityString += ", ";

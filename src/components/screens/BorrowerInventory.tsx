@@ -23,7 +23,7 @@ const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
 
   // Side Effects
   useEffect(() => {
-    let promises: Promise<{loan: Loan, relation: RelationHydrated }>[] = [];
+    const promises: Promise<{loan: Loan, relation: RelationHydrated }>[] = [];
 
     borrowingLoansList.forEach(loan => promises.push(getRelationFromLoan(loan)));
 
