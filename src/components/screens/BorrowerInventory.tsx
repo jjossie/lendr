@@ -49,7 +49,7 @@ const BorrowerInventory: React.FC<BorrowerInventoryProps> = ({}) => {
           {(loansAndRelations && loansAndRelations.length > 0)
               ?
               loansAndRelations
-                  .filter(({loan, relation}) => loan.status !== "returned") // Remove completed loans
+                  .filter(({loan}) => loan.status !== "returned") // Remove completed loans
                   .map( ({loan, relation}) => {
                 return (<LoanContextItem verbose key={loan.id} relation={relation} loan={loan}/>);
               })

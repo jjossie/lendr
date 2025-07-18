@@ -16,9 +16,9 @@ const ChatSingleMessage: React.FC<ChatMessageProps> = ({message, relation}) => {
   if (!user || !relation.otherUser) return null;
 
   const receivedMessage = message.receiverUid === user.uid;
-  const messageColor = receivedMessage ? 'blue.500' : 'green.500';
-  const messageBgColor = receivedMessage ? 'blue.50' : 'green.50';
-  const messageBorderColor = receivedMessage ? 'blue.200' : 'green.200';
+  // const messageColor = receivedMessage ? 'blue.500' : 'green.500';
+  // const messageBgColor = receivedMessage ? 'blue.50' : 'green.50';
+  // const messageBorderColor = receivedMessage ? 'blue.200' : 'green.200';
 
   return (
       <Box mx={2} my={1}>

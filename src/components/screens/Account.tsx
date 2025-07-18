@@ -9,7 +9,7 @@ import * as Notifications from "expo-notifications";
 import AvatarImage from "../AvatarImage";
 
 
-const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
+const Account: React.FC<BottomTabScreenProps<any>> = () => {
 
   const {authUser, user} = useAuthentication();
 
@@ -58,7 +58,7 @@ const Account: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
               </Column>
             }
             <Button onPress={() => {
-              signOutUser().then(r => console.log("🌀Signed out"));
+              signOutUser().then(_r => console.log("🌀Signed out"));
             }}>Sign Out</Button>
 
 

@@ -290,7 +290,7 @@ const EditTool: React.FC<NativeStackScreenProps<any>> = ({navigation, route}) =>
       await deleteToolImageFromFirebase(toolId);
       console.log("🌀Tool deleted successfully");
     } catch (e) {
-      throw new LendrBaseError("Failed to delete tool image");
+      throw new LendrBaseError("Failed to delete tool image", e);
     }
   };
 

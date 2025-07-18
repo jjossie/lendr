@@ -13,7 +13,7 @@ import {NativeStackScreenProps} from "@react-navigation/native-stack";
 
 type SearchRadiusString = "5" | "10" | "20" | "30" | "50" | "100" | "300" | "500";
 
-export const BorrowSearch: React.FC<NativeStackScreenProps<any>> = ({navigation}) => {
+export const BorrowSearch: React.FC<NativeStackScreenProps<any>> = () => {
   // React Stuff
   const [isModalOpen, setModalOpen] = useState(false);
   const listRef = useRef<FlatList>(null);

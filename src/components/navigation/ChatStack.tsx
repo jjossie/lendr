@@ -16,7 +16,7 @@ const Stack = createNativeStackNavigator();
 // }
 
 
-const ChatStack: React.FC<BottomTabScreenProps<any>> = ({navigation}) => {
+const ChatStack: React.FC<BottomTabScreenProps<any>> = () => {
   const {colors} = useTheme();
   return (
         <Stack.Navigator initialRouteName="Chats" screenOptions={{

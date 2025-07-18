@@ -6,7 +6,7 @@ import BorrowSearch from "../screens/BorrowSearch";
 
 const Stack = createNativeStackNavigator();
 
-const SearchStack: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
+const SearchStack: React.FC<BottomTabScreenProps<any>> = () => {
   return (
       <Stack.Navigator screenOptions={{
         // TODO put some title styles here but make em consistent across the app

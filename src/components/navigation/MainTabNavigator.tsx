@@ -30,33 +30,33 @@ const MainTabNavigator: React.FC<Props> = () => {
       }}>
         <Tab.Screen name="Search" component={SearchStack} options={{
           headerShown: false,
-          tabBarIcon: ({focused, color, size}) => {
+          tabBarIcon: ({color}) => {
 
             return <FontAwesome name="search" size={24} color={color}/>;
           },
         }}/>
         <Tab.Screen name="Borrow" component={BorrowStack} options={{
           headerShown: false,
-          tabBarIcon: ({focused, color, size}) => {
+          tabBarIcon: ({color}) => {
             return <FontAwesome6 name="hand-holding-hand" size={24} color={color} />;
           },
         }}/>
         <Tab.Screen name="Lend" component={LendStack} options={{
           headerShown: false,
-          tabBarIcon: ({focused, color, size}) => {
+          tabBarIcon: ({color}) => {
             return <FontAwesome6 name="toolbox" size={24} color={color} />;
           },
         }}/>
         <Tab.Screen name="Inbox" component={ChatStack} options={{
           headerShown: false,
-          tabBarIcon: ({focused, color, size}) => {
+          tabBarIcon: ({color}) => {
             return <Ionicons name="chatbox" size={24} color={color} />;
           },
         }}/>
         <Tab.Screen name="Account" component={Account}  options={{
           // headerShown: false,
           headerTitle: "",
-          tabBarIcon: ({focused, color, size}) => {
+          tabBarIcon: ({color}) => {
             return <MaterialCommunityIcons name="account-circle" size={24} color={color} />;
           },
         }}/>

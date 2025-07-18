@@ -11,6 +11,7 @@ export const ChatListItem = ({
 
   // console.log("🌀< ChatListItem >" );
   // console.log("🌀< ChatListItem > Item: ", JSON.stringify(item, null, 2));
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const initials = item.displayName.split(" ").map((name: string) => name[0]).join("");
   return (
       <Pressable key={index} onPress={item.onPressCallback} _dark={{

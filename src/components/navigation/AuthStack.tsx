@@ -10,7 +10,7 @@ export interface AuthStackProps {
 const Stack = createNativeStackNavigator();
 
 
-const AuthStack: React.FC<AuthStackProps> = (props: AuthStackProps) => {
+const AuthStack: React.FC<AuthStackProps> = (_props: AuthStackProps) => {
   return (
         <Stack.Navigator initialRouteName="LenderInventory">
           <Stack.Screen name="Login" component={Login}/>

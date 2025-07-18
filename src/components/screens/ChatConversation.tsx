@@ -32,7 +32,6 @@ const ChatConversation: React.FC<NativeStackScreenProps<any>> = ({route, navigat
 
   // UI State
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
 
   // Refs
   const scrollViewRef = useRef<ScrollView | null>(null);

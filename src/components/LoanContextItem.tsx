@@ -126,7 +126,7 @@ const LoanContextItem: React.FC<LoanContextItemProps> = ({loan, relation, verbos
                 {action && <Button
                   isLoading={isLoading}
                   variant={action?.variant ?? "ghost"}
-                  onPress={async (e) => {
+                  onPress={async (_e) => {
                     setIsLoading(true);
                     try {
                       await action?.callback(relation.id!, loan.id!);

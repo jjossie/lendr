@@ -15,17 +15,13 @@ export interface ImagePickerProps {
 const ToolImagePicker: React.FC<ImagePickerProps> = ({
                                                        onSelectImage,
                                                        onRemoveImage,
-                                                       existingImageUrl,
                                                        existingImageUrls,
                                                      }) => {
 
   // State
-  const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasUserChangedImage, setHasUserChangedImage] = useState<boolean>(false);
-
-  const {colors} = useTheme();
 
   // Permissions
   const [cameraPermissionStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();

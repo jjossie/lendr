@@ -7,7 +7,7 @@ import {useTheme} from "native-base";
 
 const Stack = createNativeStackNavigator();
 
-const BorrowStack: React.FC<BottomTabScreenProps<any>> = ({navigation, route}) => {
+const BorrowStack: React.FC<BottomTabScreenProps<any>> = () => {
   const {colors} = useTheme();
   return (
       <Stack.Navigator screenOptions={{

@@ -84,12 +84,14 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
       setRefreshing(false);
     }, 1000)
   };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const closeRow = (rowMap: any[], rowKey: any) => {
     // if (rowMap[rowKey]) {
     //   rowMap[rowKey].closeRow();
     // }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const deleteRow = (rowMap: any[], rowKey: any) => {
     // closeRow(rowMap, rowKey);
     // const newData = [...listData];
@@ -103,6 +105,7 @@ const Chats: React.FC<NativeStackScreenProps<any>> = ({route, navigation}) => {
   };
 
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const renderHiddenItem = (data: any, rowMap: any) => {
     return (
         // <HStack flex="1" pl="2" key={data.item.key}>
